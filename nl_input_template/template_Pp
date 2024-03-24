@@ -33,21 +33,6 @@ NLDamping= 0.00000        eV      # [NL] Damping (or dephasing)
   1.00     | 5.00    | 0.005     |  fs    # [RT] Time between to consecutive I/O (OBSERVABLEs - GF - OUTPUT)
 %
 
-% FieldNone_Freq
- 00.00     | 0.00     | eV        # [RT Field1] Frequency
-%
-FieldNone_Int= 1000.000000   kWLm2     # [RT Field1] Intensity
-FieldNone_Width= 0.000000 fs        # [RT Field1] Width
-FieldNone_kind= "DELTA"             # [RT Field1] Kind(SIN|RES|ANTIRES|GAUSS|DELTA|QSSIN)
-FieldNone_pol= "linear"             # [RT Field1] Pol(linear|circular)
-% FieldNone_Dir
- 1.000000 | 0.000000 | 0.000000 |        # [RT Field1] Versor
-%
-% FieldNone_Dir_circ
- 0.000000 | 0.000000 | 0.000000 |        # [RT Field1] Versor_circ
-%
-FieldNone_Tstart= 0.00000  fs      # [RT Field1] Initial Time
-
 
 % Field1_Freq
  35.00     | 0.00     | eV        # [RT Field1] Frequency
@@ -61,7 +46,7 @@ Field1_pol= "linear"             # [RT Field1] Pol(linear|circular)
 % Field1_Dir_circ
  0.000000 | 0.000000 | 0.000000 |        # [RT Field1] Versor_circ
 %
-Field1_Tstart= 27.000000 fs      # [RT Field1] Initial Time
+Field1_Tstart= 0.000000 fs      # [RT Field1] Initial Time
 
 
 % Field2_Freq

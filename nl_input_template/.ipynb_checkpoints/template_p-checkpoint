@@ -48,39 +48,6 @@ Field1_pol= "linear"             # [RT Field1] Pol(linear|circular)
 %
 Field1_Tstart= 0.00000  fs      # [RT Field1] Initial Time
 
-
-% FieldNone_Freq
- 35.00     | 0.00     | eV        # [RT Field1] Frequency
-%
-FieldNone_Int= 1.E3   kWLm2     # [RT Field1] Intensity
-FieldNone_Width= 0.20000 fs        # [RT Field1] Width
-FieldNone_kind= "QSSIN"             # [RT Field1] Kind(SIN|RES|ANTIRES|GAUSS|DELTA|QSSIN)
-FieldNone_pol= "linear"             # [RT Field1] Pol(linear|circular)
-% FieldNone_Dir
- 1.000000 | 0.000000 | 0.000000 |        # [RT Field1] Versor
-%
-% FieldNone_Dir_circ
- 0.000000 | 0.000000 | 0.000000 |        # [RT Field1] Versor_circ
-%
-FieldNone_Tstart= 27.000000 fs      # [RT Field1] Initial Time
-
-
-% FieldNone_Freq
-  1.5   | 0.00     | eV        # [RT Field1] Frequency
-%
-FieldNone_Int= 1.E8   kWLm2     # [RT Field1] Intensity
-FieldNone_Width= 10.000000 fs        # [RT Field1] Width
-FieldNone_kind= "QSSIN"             # [RT Field1] Kind(SIN|RES|ANTIRES|GAUSS|DELTA|QSSIN)
-FieldNone_pol= "linear"             # [RT Field1] Pol(linear|circular)
-% FieldNone_Dir
- 1.000000 | 0.000000 | 0.000000 |        # [RT Field1] Versor
-%
-% FieldNone_Dir_circ
- 0.000000 | 0.000000 | 0.000000 |        # [RT Field1] Versor_circ
-%
-FieldNone_Tstart= 0.000000fs      # [RT Field1] Initial Time
-
-
 HARRLvcs= 339         RL      # [XX] Exchange    RL components
 EXXRLvcs=  59         RL      # [XX] Exchange    RL components
 CORRLvcs=  59         RL      # [GW] Correlation RL components
