@@ -10,5 +10,9 @@ Per i primi test un buon punto di partenza è la griglia k8 in cui la SAVE è qu
 in questa folder c'è la sh6.0+str0.05_probes nella quale trovo la simulazione con un solo field da cui prendere i
 parametri (riduco le bande da 3 a 6)
 
-Ora bisogna capire come fare i conti con yambo_nl in modo da costruire (attraverso postprocessing yambopy) tutte le chi3 che servono per applicare la formula
-della note.
+Lettura della chi
+
+Il criterio è che il file YamboPy-SF_probe_order_n_m contiene la chi a n volte il valore del field 1 (il nostro probe) e
+a m volte il valore del field 2 (il pulse). L'ordine della chi è quindi nProbe+mPulse. Dentro il file associato ci sono i valori
+per tutte le frequenze calcolate per il probe. Per ogni frequenza ci sono 6 valori che rappresentano le componenti immaginarie 
+e reale della chi per x,y e z.
