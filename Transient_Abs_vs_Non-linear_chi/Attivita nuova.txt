@@ -1,5 +1,4 @@
-Devo capire come calcolare le chi con yambo_nl in modo da poter usare la formula derivata nelle note per riottenere la risposta ottica di non equilibrio
-calcolata da Davide con l'approccio rt (un conto per ogni delay fra P e p).
+Devo capire come calcolare le chi con yambo_nl in modo da poter usare la formula derivata nelle note per riottenere la risposta ottica di non equilibrio calcolata da Davide con l'approccio rt (un conto per ogni delay fra P e p).
 
 DOVE LAVORARE
 
