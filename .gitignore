@@ -9,3 +9,4 @@ NL_Chi/*/
 NL_Chi/o.*
 RT_Transient_Absorption/*/
 !References/*.pdf
+.claude/settings.local.json
