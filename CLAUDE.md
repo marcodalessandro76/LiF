@@ -40,7 +40,7 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
 
 ## Repository and data
 - Laptop: `D:\RICERCA\DFT AND MANY BODY\SIMULATIONS\LiF` (path with spaces: quote it). Cluster: `~/work/LiF` on ismhpc.
-  Same git repo (GitHub `marcodalessandro76/LiF`, branch `master`), synced only through git (commit/push on one
+  Same git repo (GitHub `marcodalessandro76/LiF`, branch `main`), synced only through git (commit/push on one
   machine, pull on the other). In git there are only README, this file, `Attivita nuova.txt`, the notebooks and `References/`:
   the data (~13 GB on the cluster) are NOT in git and live only on the cluster (the yambo runs) or on the laptop
   (Davide's reports and tarballs in `NL_Chi/Davide_Google_drive`, ~320 MB, and
