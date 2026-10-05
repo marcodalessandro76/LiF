@@ -1,0 +1,10 @@
+# Data are not tracked: yambo runs live on the cluster, reports and PDFs on the laptop
+.ipynb_checkpoints/
+known_hosts
+*.pdf
+*.tar
+*.tar.gz
+*.tgz
+NL_Chi/*/
+NL_Chi/o.*
+Transient_Absorption/*/
