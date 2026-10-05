@@ -1,0 +1,18 @@
+La folder di riferimento è  : /work/sangalli/simulations/LiF
+
+qui posso vedere lo script tdhsex_nl.sh usato per il run e in particolare l'eseguibile yambo da usare passandolo nell'header del mio slurm:
+
+yambo="/home/sangalli/Codes/Yambo/yambo-mine/compiled/phys/non-linear/gcc10_ompi4_DP/bin/yambo_nl"
+
+Tutti i risultati di Davide sono in /work/sangalli/simulations/LiF/yambo/e80_kx6_pbe_sr/kx8_nb100/. In particolare NoTr_E100 contiene i conti con le simmetrie rimosse per il pulse 100. Posso usare la SAVE e le collisions coll-par-cv_1-15B_X59RL-50B_noSM_H339RL_kpar per fare direttamente i conti RT (con yambo_nl).
+
+Devo fare 3 tipi di conti : solo probe (per avere l'assorbimento di equilibrio), pump and probe e solo pump. In questo modo mi costruisco lo spettro di assorbimento transiente facendo la FT della polarizzazione (pp-p)/E e poi calcolo lo spettro transiente come (R-R0)/R0.
+
+Per il probe uso essenzialmente i parametri di Davide con la sostituzione che la durata deve essere di 300 As (come indicato nelle info sperimentali) e quindi devo mettere 425 fs nella variabile FWHM.
+
+Per il pulse posso vedere l'analisi fatta nella folder NoTr_E100/Field_test e in particolare i risultati qsfield (che sono quelli in cui yambo
+attribuisce la forma di tipo qsin al potenziale vettore e non al campo elettrico). Qui posso vedere i parametri riportati in ypp_fields_qsfield1.55eV-ph90_fwhm6.00fs. Il field1_FWHM deve essere 8 fs. Per quanto riguarda l'amplitude probabilmente il valore usato da Davide di 1e8 deve essere moltiplicato per circa 26 per ottenere il valore sperimentale (da controllare).
+
+Infine per le simulazioni pp devo settare il valore di inizio del probe rispetto al pump. Il criterio è quello di lavorare in regime di overlap e quindi scelgo il delay del probe in modo che il suo massimo coincida con quello del pump.
+
+

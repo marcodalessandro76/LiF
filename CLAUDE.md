@@ -23,6 +23,9 @@ Theory (the reference PDFs of the work go in `References/`, tracked in git):
   amplitudes (E_w = E_-w), not the convention of MPPI.
 - `NL_Chi/Attivita nuova.txt`: the original plan (starting SAVE of Sangalli, how the YamboPy
   `o-*.YamboPy-SF_probe_order_n_m` files store chi at n times the probe and m times the pump frequency).
+- `References/Report_LiF_Davide.pdf`: Davide's report on the RT transient absorption of LiF.
+- `References/RT_Analisi_LiF.txt` (old, Jan 2026): plan of the RT transient absorption runs (Sangalli's folders and
+  yambo_nl executable, probe-only / pump-probe / pump-only runs, pulse parameters, delay at pump-probe overlap).
 
 ### Translation of Eq. (11) into MPPI quantities (MPPI >= 1.3)
 `Xn_frequency_mixing(data, X_order=(1,2)).compute_Xn()[0][(n,m)]` at probe frequency w is the ratio between the
@@ -43,8 +46,7 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
   Same git repo (GitHub `marcodalessandro76/LiF`, branch `main`), synced only through git (commit/push on one
   machine, pull on the other). In git there are only README, this file, `Attivita nuova.txt`, the notebooks and `References/`:
   the data (~13 GB on the cluster) are NOT in git and live only on the cluster (the yambo runs) or on the laptop
-  (Davide's reports and tarballs in `NL_Chi/Davide_Google_drive`, ~320 MB, and
-  `RT_Transient_Absorption/Report_LiF_Davide.pdf`).
+  (Davide's reports and tarballs in `NL_Chi/Davide_Google_drive`, ~320 MB).
   Never `git add` data folders, `.ipynb_checkpoints` or tarballs (see `.gitignore`).
 - `NL_Chi/` (current work):
   - `Transient_Abs_NL-Chi.ipynb`: yambo_nl datasets (built with MPPI YamboInput/YamboCalculator/Dataset, slurm),
