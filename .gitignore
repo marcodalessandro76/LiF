@@ -7,4 +7,5 @@ known_hosts
 *.tgz
 NL_Chi/*/
 NL_Chi/o.*
-Transient_Absorption/*/
+RT_Transient_Absorption/*/
+!References/*.pdf

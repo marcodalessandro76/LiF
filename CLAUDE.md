@@ -11,8 +11,8 @@ susceptibilities computed with `yambo_nl`, and compare it with the direct real-t
 (one RT run for each pump-probe delay). Pump: IR, 1.55 eV (~800 nm). Probe: XUV/broad (around the F 2p / Li 1s
 transitions, the analysis window is ~10-20 eV in the yambo_nl runs).
 
-Theory (files in the root of the repo, not in git):
-- `Pp_and_non_linear_functions.pdf` (Attaccalite, Sangalli; draft): chi_eff = P(w)/E_p(w);
+Theory (the reference PDFs of the work go in `References/`, tracked in git):
+- `References/Pp_and_non_linear_functions.pdf` (Attaccalite, Sangalli; draft): chi_eff = P(w)/E_p(w);
   chi^neq,(1)[E_P](w) = (P_Pp(w) - P_P(w))/E_p(w) (pump-probe minus pump-only polarization, divided by the probe), and
   its expansion in equilibrium susceptibilities, Eq. (11):
   chi^neq - chi^eq,(1) = [chi2(w+wP,-wP) E_p(w+wP)/E_p(w) + chi2(w-wP,wP) E_p(w-wP)/E_p(w)] E_P(wP)
@@ -21,7 +21,6 @@ Theory (files in the root of the repo, not in git):
   survives (Eq. 13); for a broad pulsed probe the shape of the probe enters. The note itself says that the frequency
   arguments and the treatment of the +-wP combinations still have to be fixed (red N.B.), and it uses real cos
   amplitudes (E_w = E_-w), not the convention of MPPI.
-- `Pump-probe and non-linear response.pdf`: the user's handwritten derivation of the same expansion.
 - `NL_Chi/Attivita nuova.txt`: the original plan (starting SAVE of Sangalli, how the YamboPy
   `o-*.YamboPy-SF_probe_order_n_m` files store chi at n times the probe and m times the pump frequency).
 
@@ -42,9 +41,10 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
 ## Repository and data
 - Laptop: `D:\RICERCA\DFT AND MANY BODY\SIMULATIONS\LiF` (path with spaces: quote it). Cluster: `~/work/LiF` on ismhpc.
   Same git repo (GitHub `marcodalessandro76/LiF`, branch `master`), synced only through git (commit/push on one
-  machine, pull on the other). In git there are only README, this file, `Attivita nuova.txt` and the notebooks:
+  machine, pull on the other). In git there are only README, this file, `Attivita nuova.txt`, the notebooks and `References/`:
   the data (~13 GB on the cluster) are NOT in git and live only on the cluster (the yambo runs) or on the laptop
-  (Davide's reports and tarballs in `NL_Chi/Davide_Google_drive`, ~320 MB, and the PDFs).
+  (Davide's reports and tarballs in `NL_Chi/Davide_Google_drive`, ~320 MB, and
+  `RT_Transient_Absorption/Report_LiF_Davide.pdf`).
   Never `git add` data folders, `.ipynb_checkpoints` or tarballs (see `.gitignore`).
 - `NL_Chi/` (current work):
   - `Transient_Abs_NL-Chi.ipynb`: yambo_nl datasets (built with MPPI YamboInput/YamboCalculator/Dataset, slurm),
@@ -57,8 +57,8 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
     (pump 1.55 eV at 1e6 + probe at 1e3, same two probe grids), `pump_1.55-*` (older tests), slurm `job_*.sh/.out`.
   - cluster only, `Davide_data/`: Davide's RT results at kx16 (`o-abs_0-50eV_sm0.6eV.YPP-eps_along_E` for each delay,
     in folders named `...delta<value>fs...`, read by `build_delta_dict`), plus tarballs.
-- `Transient_Absorption/` (earlier work): `Transient_Absorption.ipynb` (fit of the experimental IR pump,
-  MPPI Gaussian pulses vs ypp_rt fields, yambo_nl RT pump-probe dynamics with a 1.56 eV pump of fwhm 7.58 fs and a
+- `RT_Transient_Absorption/` (earlier work, transient absorption from RT simulations): `Transient_Absorption.ipynb`
+  (fit of the experimental IR pump, MPPI Gaussian pulses vs ypp_rt fields, yambo_nl RT pump-probe dynamics with a 1.56 eV pump of fwhm 7.58 fs and a
   35 eV probe of fwhm 0.42 fs, transient spectra and reflectivity, delays 7.0 and 9.12 fs) and `Sum_frequency.ipynb`.
   Cluster only: `NoTr_E100` (SAVE + collisions `coll-par-cv_1-15B_X59RL-50B_noSM_H339RL_kpar`, fixsym for the 100
   field), `Field_test`, `nl_input_template`, three `td-hsex-*` runs.
