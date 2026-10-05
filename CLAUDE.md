@@ -98,6 +98,10 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
   - Yambo: `ntasks_per_node=32, cpus_per_task=1, omp_num_threads=1,
     pre_processing='/home/dalessandro/module_script/yambo_module'`,
     `YamboCalculator(rr, executable='yambo_nl', activate_BeeOND=True)` (or `yambo_rt`, `ypp`, `yambo`)
+- Claude does not submit sbatch/slurm jobs nor execute the analysis notebooks (`NL-Chi_Analysis.ipynb` takes several
+  hours): the user runs them from Jupyter on the cluster; Claude prepares the cells and reads the outputs afterwards.
+  Light ssh commands (git pull, ls, reading outputs) use the prefix
+  `ssh -o BatchMode=yes -o ClearAllForwardings=yes -o ConnectTimeout=30 ismhpc` (allowed in `.claude/settings.local.json`).
 - Ask the user before launching p2y/yambo/yambo_nl runs (cost, quota). The user prefers clean runs from scratch to
   reusing old outputs, unless stated otherwise.
 
