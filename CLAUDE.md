@@ -49,14 +49,19 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
   (Davide's reports and tarballs in `NL_Chi/Davide_Google_drive`, ~320 MB).
   Never `git add` data folders, `.ipynb_checkpoints` or tarballs (see `.gitignore`).
 - `NL_Chi/` (current work):
-  - `Transient_Abs_NL-Chi.ipynb`: yambo_nl datasets (built with MPPI YamboInput/YamboCalculator/Dataset, slurm),
-    extraction of the chi with `Xn_single_frequency` / `Xn_frequency_mixing`, `eval_dchi_neq` and `build_delta_dict`,
-    comparison with Davide's spectra for each delay. 89 cells, ~14 empty; written with MPPI < 1.3.
+  - `YamboNL_Analysis.ipynb`: the yambo_nl datasets (MPPI YamboInput/YamboCalculator/Dataset, slurm, all appended
+    with `skip=True`): delta (linear response), SIN probe only, frequency mixing probe + pump. No analysis here.
+  - `NL-Chi_Analysis.ipynb`: extraction of the chi (`Xn_single_frequency`, `Xn_frequency_mixing`), third order term
+    at the probe frequency, `eval_dchi_neq` and `build_delta_dict`, comparison with Davide's spectra for each delay.
+    Both notebooks come from the split (2026-10-05) of the old `Transient_Abs_NL-Chi.ipynb` (in the git history).
   - cluster only, `kx8_nb100_NoTr_E100/`: a copy of Sangalli's SAVE (`/work/sangalli/simulations/LiF/yambo/
-    e80_kx6_pbe_sr/kx8_nb100/NoTr_E100`, kx8 grid, 100 bands, no time reversal, field along 100) and the yambo_nl runs
-    (bands 3-6, damping 0.1-0.2 eV, SIN fields, Tstart 0.1 fs): `lresponse-bands_3-6-delta` (linear response, delta),
-    `pulse-*` (probe only, 5-25 eV/100 steps and 10-20 eV/201 steps, intensity 1e3 kW/m^2), `Pp-Ep_1e3-EP_1e6-PE_1.55-*`
-    (pump 1.55 eV at 1e6 + probe at 1e3, same two probe grids), `pump_1.55-*` (older tests), slurm `job_*.sh/.out`.
+    e80_kx6_pbe_sr/kx8_nb100/NoTr_E100`, kx8 grid, 100 bands, no time reversal, field along 100), `r_setup` and the
+    three runs of `YamboNL_Analysis.ipynb` (bands 3-6, SIN fields, Tstart 0.1 fs) with their `.in` and slurm
+    `job_*.sh/.out`: `lresponse-bands_3-6-delta` (delta, damping 0, 100 fs), `pulse-E1_1e3-nlenrange_10.0-20.0-
+    nlensteps_201-bands_3-6-damp_0.1-sin` (probe only, 1e3 kW/m^2, 200 fs, step 0.01 fs) and
+    `Pp-Ep_1e3-EP_1e6-PE_1.55-nlenrange_10.0-20.0-nlensteps_201-bands_3-6-damp_0.1-sin` (+ pump 1.55 eV at 1e6).
+    The older runs (5-25 eV grids, pump_1.55 tests) were deleted on 2026-10-05; the existing runs predate the Lumen
+    rebuild of 2026-10-01.
   - cluster only, `Davide_data/`: Davide's RT results at kx16 (`o-abs_0-50eV_sm0.6eV.YPP-eps_along_E` for each delay,
     in folders named `...delta<value>fs...`, read by `build_delta_dict`), plus tarballs.
 - `RT_Transient_Absorption/` (earlier work, transient absorption from RT simulations): `Transient_Absorption.ipynb`
@@ -135,17 +140,19 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
   formula (e.g. dchi^neq) against exact results before applying it to LiF.
 
 ## Open points (2026-10-05)
-1. In `Transient_Abs_NL-Chi.ipynb` the third order term is computed as `x11m1 = (chi_freqmix[(1,0)] - chi_lr[1])/Ew[(0,2)]`:
-   wrong, Ew[(0,2)] = E_P(wP)^2; it must be divided by |E_P(wP)|^2 = EP**2/4 (EP = pump amplitude in au).
+1. Done in `NL-Chi_Analysis.ipynb` (not yet executed): the third order term is now
+   `x11m1 = (chi_freqmix[(1,0)] - chi_lr[1])/(EP**2/4)` (it was divided by Ew[(0,2)] = E_P(wP)^2). Check that
+   `data_Pp.Efield2[0]['amplitude']` is the amplitude E0 in au.
 2. `eval_dchi_neq(omega, omega_P, tau, EP, x11, x1m1, x11m1, x12, x1m2)`: check it against the formula above (shifted
    grids, complex pump amplitude i*EP/2 instead of the real EP, phases exp(+-i wP t0P) and the delay convention,
-   E_p(w')/E_p(w) ratios of the probe used in the RT runs; the docstring mentions x10 but the argument is x11m1;
-   `round(omega_P/domega)` assumes wP is a multiple of the grid step). Test it on the anharmonic oscillator.
+   E_p(w')/E_p(w) ratios of the probe used in the RT runs; `round(omega_P/domega)` assumes wP is a multiple of the
+   grid step). Test it on the anharmonic oscillator.
 3. LiF (rock salt, Fm-3m) is centrosymmetric: all even order chi vanish, so chi(1,+-1) and the F2 term (linear in E_P)
    of `eval_dchi_neq` must be zero within the numerical accuracy; check |chi(1,+-1) E_P| << |chi(1,+-2) E_P^2| on the
    yambo_nl data (on the oscillator the even keys are ~1e-9 of the linear one). The leading pump induced terms are
    then chi(1,0)-chi1 and chi(1,+-2).
 4. Recompute all the chi with MPPI >= 1.3 and check the old warnings ("time sampling starts before the dephasing time":
    some probe frequencies need a long time window because of near-degenerate harmonics).
-5. Clean up `Transient_Abs_NL-Chi.ipynb` (empty cells; the old "Field 3 not found" prints disappear with MPPI 1.3) and
-   decide whether to move the old MPPI Analysis_Optics (LiF version) here.
+5. Notebook split done (2026-10-05). Still to do: compare chi1 from the delta run (`Linear_Response`) with
+   `Xn_single_frequency` in `NL-Chi_Analysis.ipynb`; decide whether to move the old MPPI Analysis_Optics (LiF
+   version) here.
