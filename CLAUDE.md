@@ -50,18 +50,24 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
   Never `git add` data folders, `.ipynb_checkpoints` or tarballs (see `.gitignore`).
 - `NL_Chi/` (current work):
   - `YamboNL_Analysis.ipynb`: the yambo_nl datasets (MPPI YamboInput/YamboCalculator/Dataset, slurm, all appended
-    with `skip=True`): delta (linear response), SIN probe only, frequency mixing probe + pump. No analysis here.
-  - `NL-Chi_Analysis.ipynb`: extraction of the chi (`Xn_single_frequency`, `Xn_frequency_mixing`), third order term
-    at the probe frequency, `eval_dchi_neq` and `build_delta_dict`, comparison with Davide's spectra for each delay.
+    with `skip=True`), no analysis: inversion check of the k sampling (`YamboDftParser.expand_IBZ_kpoints`), kx8
+    production runs (delta, sine, P&p, damping 0.1 eV), diagnostic runs for the chi(1,+-1) terms (5 probe frequencies
+    17.41-17.61 eV: reference, pump/4, probe*4, NLstep/2, CRANKNIC, kx12 reference), delta runs on kx12/kx16, and the
+    damping 0.3 eV sine + P&p runs on kx8 and kx12 (single dataset `study_eta`, 4 runs in series, 2 nodes each).
+  - `NL-Chi_Analysis.ipynb`: chi extraction (linear in three ways, second order), diagnostics of chi(1,+-1),
+    k grid convergence of chi1 from the delta runs, a posteriori Lorentzian broadening on the probe grid
+    (`lorentzian_broadening`, validated on the anharmonic oscillator), then the not yet revised part (third order,
+    `eval_dchi_neq`, `build_delta_dict`, comparison with Davide). To be revised on the damping 0.3 eV runs.
     Both notebooks come from the split (2026-10-05) of the old `Transient_Abs_NL-Chi.ipynb` (in the git history).
-  - cluster only, `kx8_nb100_NoTr_E100/`: a copy of Sangalli's SAVE (`/work/sangalli/simulations/LiF/yambo/
-    e80_kx6_pbe_sr/kx8_nb100/NoTr_E100`, kx8 grid, 100 bands, no time reversal, field along 100), `r_setup` and the
-    three runs of `YamboNL_Analysis.ipynb` (bands 3-6, SIN fields, Tstart 0.1 fs) with their `.in` and slurm
-    `job_*.sh/.out`: `lresponse-bands_3-6-delta` (delta, damping 0, 100 fs), `pulse-E1_1e3-nlenrange_10.0-20.0-
-    nlensteps_201-bands_3-6-damp_0.1-sin` (probe only, 1e3 kW/m^2, 200 fs, step 0.01 fs) and
-    `Pp-Ep_1e3-EP_1e6-PE_1.55-nlenrange_10.0-20.0-nlensteps_201-bands_3-6-damp_0.1-sin` (+ pump 1.55 eV at 1e6).
-    The older runs (5-25 eV grids, pump_1.55 tests) were deleted on 2026-10-05; the existing runs predate the Lumen
-    rebuild of 2026-10-01.
+  - cluster only, `kx8_nb100_NoTr_E100/`, `kx12_nb100_NoTr_E100/`, `kx16_nb100_NoTr_E100/`: copies of Sangalli's
+    NoTr_E100 SAVEs (`/work/sangalli/simulations/LiF/yambo/e80_kx6_pbe_sr/kx{8,12,16}_nb100/NoTr_E100/SAVE`: same
+    lattice, 100 bands, the same 8 symmetries without inversion and time reversal, 100/294/648 IBZ points), copied
+    without the yambo 5.2 setup databases and with the setup redone (`yambo` without arguments) with Lumen 2.1.0.
+    kx8: production runs (`lresponse-bands_3-6-delta` with NLstep 0.01 fs, `pulse-E1_1e3-nlenrange_10.0-20.0-
+    nlensteps_201-bands_3-6-damp_0.1-sin`, `Pp-Ep_1e3-EP_1e6-PE_1.55-nlenrange_10.0-20.0-nlensteps_201-bands_3-6-
+    damp_0.1-sin`, the last two with Lumen 2.0.0) and the diagnostic runs `...nlensteps_5...`; kx12: delta,
+    diagnostic reference; kx16: delta. The damping 0.3 eV runs (`...nlenrange_10.0-25.016-nlensteps_155-...-damp_0.3-
+    sin-nltime_100`) go in the kx8 and kx12 folders.
   - cluster only, `Davide_data/`: Davide's RT results at kx16 (`o-abs_0-50eV_sm0.6eV.YPP-eps_along_E` for each delay,
     in folders named `...delta<value>fs...`, read by `build_delta_dict`), plus tarballs.
 - `RT_Transient_Absorption/` (earlier work, transient absorption from RT simulations): `Transient_Absorption.ipynb`
@@ -77,8 +83,9 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
 - Reached from the laptop with `ssh -o BatchMode=yes -o ClearAllForwardings=yes ismhpc '...'` (host in
   `~/.ssh/config`, jump through `narro`; ClearAllForwardings avoids the LocalForward 4444 clash). CentOS 7 /
   glibc 2.17: VS Code Remote-SSH does not work. The connection sometimes times out: just retry later.
-- Never run heavy computations on the login node `frontend`: use slurm. Partition `debug` (2h) for short tests,
-  `all12h` for production (32 cores per node). Home quota 19.5 GB (11 GB used on 2026-10-05: watch the size of new runs,
+- Never run heavy computations on the login node `frontend`: use slurm. Always use the partition `all12h` (32 cores
+  per node), also for the short test/diagnostic runs: it runs on all the nodes and gives no problems (user's choice,
+  2026-10-06; the `debug` partition is not used). Home quota 19.5 GB (11 GB used on 2026-10-05: watch the size of new runs,
   BeeOND scratch is used for the runs).
 - Python: `~/miniconda3` base, python 3.13; numpy, scipy, matplotlib, netCDF4 and the Jupyter stack are pip-installed
   (update with pip). Notebooks are executed in place with
@@ -118,6 +125,15 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
 - yambo_nl: the DELTA field is written as a single time step of value E0/dt (so int E dt = E0); SIN/SOFTSIN fields start
   at `FieldX_Tstart`; the transient after the switch on decays with the dephasing (NL_damping).
 - yambo vector alat of a fcc cell is alat/2 (YamboDftParser `rescale=True` lattice differs by 2 from PwParser).
+- SAVEs made with older yambo versions: the setup databases (`ndb.gops`, `ndb.kindx`, `ndb.kpts`) written by yambo 5.2
+  give NaN overlaps (`ndb.Overlap` DIP_S, `ndb.dipoles` DIP_iR) and a NaN Berry polarization at t=0 with Lumen 2.1.0
+  ("Found NaN in carr. Dynamics stopped"): remove them and redo the setup (`yambo` without arguments in the run folder).
+- yambo_nl INVINT integrator (default): Cayley step with the Hamiltonian at the beginning of the step. For the static
+  part a transition energy E evolves as E_eff = (2hbar/dt) arctan(E dt/2hbar): dt = 0.05 fs red shifts the 10-20 eV
+  spectrum by ~2 eV (17.4 -> 15.4 eV), dt = 0.01 fs by ~0.1 eV; the field acts with a delay dt/2 (phase w dt/2, also
+  the delta kick). CRANKNIC (midpoint Hamiltonian, 2x cost) has the same static phase error. Use NLstep = 0.01 fs.
+- yambo truncates the job string (-J) at 100 characters: keep the run ids of MPPI datasets within 100 characters.
+- `UseDipoles` (fixed dipoles instead of the Berry coupling) gives only the linear response correctly.
 
 ## MPPI for the analysis (user side)
 - Parsers: `YamboNLDBParser(<run>/ndb.Nonlinear)` reads the yambo_nl database and its fragments (attributes
@@ -144,20 +160,30 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
   1e-6-1e-3), `Tutorial_YamboNLDBParser.ipynb`. `mppi.Models.AnharmonicOscillator` can be used to test any new analysis
   formula (e.g. dchi^neq) against exact results before applying it to LiF.
 
-## Open points (2026-10-05)
-1. Done in `NL-Chi_Analysis.ipynb` (not yet executed): the third order term is now
-   `x11m1 = (chi_freqmix[(1,0)] - chi_lr[1])/(EP**2/4)` (it was divided by Ew[(0,2)] = E_P(wP)^2). Check that
-   `data_Pp.Efield2[0]['amplitude']` is the amplitude E0 in au.
+## Status and open points (2026-10-06)
+Results so far (details and comments in `NL-Chi_Analysis.ipynb`):
+- chi1 from delta, sine and P&p (1,0) agree (kx8: 2.7% delta vs sine after fixing NLstep and the setup). The third
+  order term is `(chi(1,0) - chi1)/(EP**2/4)` (EP = `Efield2[0]['amplitude']`, E0 in au), checked also against the
+  pump intensity scaling.
+- chi(1,+-1) is NOT zero although LiF is centrosymmetric: |chi(1,+-1)||E_P|/|chi1| ~ 1e-3-1e-2, 10 times the third
+  order term, resonant with the probe. Excluded: harmonic fit (X_order (1,3), raw spectrum of P(t)), k sampling of the
+  ground state (k/-k closure, E and dipoles), nonlinearity/noise (exact E_p*E_P scaling), time integrator (CRANKNIC).
+  Remaining candidate: discretization of the Berry coupling in k. The kx12 test (5 frequencies) was inconclusive
+  because chi1 itself is not k converged there.
+- k convergence of chi1 (delta runs): with damping/broadening 0.1 eV no grid is converged above the gap (kx8 vs kx16
+  19% mean, kx12 vs kx16 11%); with 0.3 eV kx12 is converged within 2% (kx8 6%, artifact peak at 17.5 eV); with
+  0.6 eV also kx8 (2.6%).
+- A posteriori broadening of chi1 and of the keys (1,m) (linear in the probe): Lorentzian convolution on the probe
+  grid = chi(w + i Delta); validated on the oscillator (~3%, limited by the window tails) and on LiF (sine broadened by
+  0.2 eV vs delta with eta 0.3 eV: 3%); reliable up to Delta ~ 0.3 eV in a 10-20 eV window. Not the same as a larger
+  dynamical damping (the pump-only denominators are not broadened), but analogous to Davide's smoothing (he uses
+  dephasing 0 in the dynamics and sm 0.6 eV in post-processing).
+Next:
+1. Run the damping 0.3 eV sine and P&p runs (kx8 and kx12, 10-25 eV, 155 frequencies with step wP/16, NLtime 100 fs)
+   and revise the whole `NL-Chi_Analysis.ipynb` on them (chi extraction, chi(1,+-1) relative size, third order).
 2. `eval_dchi_neq(omega, omega_P, tau, EP, x11, x1m1, x11m1, x12, x1m2)`: check it against the formula above (shifted
-   grids, complex pump amplitude i*EP/2 instead of the real EP, phases exp(+-i wP t0P) and the delay convention,
-   E_p(w')/E_p(w) ratios of the probe used in the RT runs; `round(omega_P/domega)` assumes wP is a multiple of the
-   grid step). Test it on the anharmonic oscillator.
-3. LiF (rock salt, Fm-3m) is centrosymmetric: all even order chi vanish, so chi(1,+-1) and the F2 term (linear in E_P)
-   of `eval_dchi_neq` must be zero within the numerical accuracy; check |chi(1,+-1) E_P| << |chi(1,+-2) E_P^2| on the
-   yambo_nl data (on the oscillator the even keys are ~1e-9 of the linear one). The leading pump induced terms are
-   then chi(1,0)-chi1 and chi(1,+-2).
-4. Recompute all the chi with MPPI >= 1.3 and check the old warnings ("time sampling starts before the dephasing time":
-   some probe frequencies need a long time window because of near-degenerate harmonics).
-5. Notebook split done (2026-10-05). Still to do: compare chi1 from the delta run (`Linear_Response`) with
-   `Xn_single_frequency` in `NL-Chi_Analysis.ipynb`; decide whether to move the old MPPI Analysis_Optics (LiF
-   version) here.
+   grids, now exact with the step wP/16; complex pump amplitude i*EP/2 instead of the real EP; phases exp(+-i wP t0P)
+   and the delay convention; E_p(w')/E_p(w) ratios of the probe used in the RT runs). Test it on the oscillator.
+3. Possibly move `lorentzian_broadening` into MPPI (Optics/Utils.py and a `broadening` option of `compute_Xn` for the
+   keys linear in the probe), with a test on the oscillator.
+4. Decide whether to move the old MPPI Analysis_Optics (LiF version) here.
