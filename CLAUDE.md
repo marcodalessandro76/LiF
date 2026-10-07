@@ -190,6 +190,33 @@ Results so far (details and comments in `NL-Chi_Analysis.ipynb`):
   0.2 eV vs delta with eta 0.3 eV: 3%); reliable up to Delta ~ 0.3 eV in a 10-20 eV window. Not the same as a larger
   dynamical damping (the pump-only denominators are not broadened), but analogous to Davide's smoothing (he uses
   dephasing 0 in the dynamics and sm 0.6 eV in post-processing).
+### GOAL OF THE CURRENT PHASE (2026-10-07)
+Understand why the chi2 terms chi(1,+-1), which must vanish in centrosymmetric LiF, are dominant w.r.t. the chi3 terms
+((1,0)-chi1 and (1,+-2)). Every analysis of this phase must be oriented to this question; the comparison with Davide
+(transient absorption, eval_dchi_neq) is postponed. First results with damping 0.3 eV (2-node runs, 10-20 eV, good
+frequencies): quadratic/cubic ratio (median) 22 on kx8 and 8 on kx12 (vs (1,+-2): 40 and 15); max |chi(1,+-1)||E_P|/
+|chi1| 2.8e-3 (kx8), 1.2e-3 (kx12); max |chi(1,0)-chi1|/|chi1| ~1e-4 on both grids; single field SHG < 1e-6.
+
+Analyses to implement in `NL-Chi_Analysis.ipynb` (new part) when the single-node runs are available:
+a. Revision of the new part on the 1-node runs (same names as before); replace the broadening prototype of the old
+   part with `compute_Xn(broadening=...)` of MPPI.
+b. 1-node vs 2-node runs (`..._2nodes`, `..._corrupted` folders): are the "good" 2-node runs identical to the 1-node
+   ones? (relative differences of all the keys, in particular chi(1,+-1)).
+c. Signal to noise map: for each frequency and key, residual of the harmonic fit (rms of P(t) - fitted signal in the
+   fit window, from the stored fits of `Xn_frequency_mixing`/`eval_Pw`, see `perform_harmonic_analysis`, results dict
+   + B0 + residual) vs the amplitude of the components (1,0), (1,+-1), (1,+-2) and of the difference (1,0)-chi1
+   (difference of two runs: estimate its noise from the residuals of both). Flag the frequencies where a key is not
+   above the noise.
+d. Intensity scan (runs `study_scan` of `YamboNL_Analysis.ipynb`, kx8, damping 0.3 eV, 39 frequencies = every 4th of
+   the 155 grid, step wP/4: pump 2.5e5 and 4e6 kW/m^2, probe 4e3 kW/m^2; reference = the 1-node kx8 P&p run at the
+   same frequencies, indices 0,4,...,152): exponents a (probe) and b (pump) of |P(key)| for each key and frequency
+   (expected a=1 and b=0,1,2 for (1,0),(1,+-1),(1,+-2)); stability of the normalized chi between the intensities
+   (criterion: <~1% and exponents within ~0.01); third order (1,0)-chi1 from different intensity pairs. Purpose: check
+   that the extracted chi are not affected by noise (low field) or higher orders (high field) and whether a larger
+   pump can be used to improve the S/N of the cubic terms.
+e. Trend of the chi2/chi3 ratio with the k grid (kx8 vs kx12, possibly kx16): the main hypothesis for the chi2 terms is
+   the k discretization of the Berry coupling in the dynamics with two fields.
+
 Next:
 1. Run the damping 0.3 eV sine and P&p runs (kx8 and kx12, 10-25 eV, 155 frequencies with step wP/16, NLtime 100 fs)
    and revise the whole `NL-Chi_Analysis.ipynb` on them (chi extraction, chi(1,+-1) relative size, third order).
