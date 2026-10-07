@@ -155,6 +155,18 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
     otherwise they spoil the weak terms; if the estimated time window is longer than the simulation the fit starts at
     the dephasing time with a warning.
   - Every result of the LiF notebooks computed before these changes must be recomputed.
+- MPPI >= a7aac3f (2026-10-07, review of the Optics classes driven by LiF, see the MPPI CLAUDE.md):
+  - `compute_Xn(..., broadening=None, renormalize=True)` of both Xn classes and `O.Utils.lorentzian_broadening(freqs,
+    chi, delta)`: a posteriori Lorentzian broadening (eV) of the keys linear in the probe (key 1 of the sine, keys (1,m)
+    of the mixing; the others are returned unchanged). Use it instead of the prototype in the notebook.
+  - the harmonic fits are stored per frequency (eval_Pw/eval_Ew/compute_Xn no longer repeat them: LiF 201 frequencies
+    13 s -> 2 s, identical results); the fit window of the mixing never starts before the dephasing time (no LiF
+    frequency was affected); the time sampling warnings are now one summary line (the old ones on LiF were spurious).
+  - `generate_frequencies` drops a key whose frequency coincides with another one (e.g. (1,-3) when w = 6 wP).
+  - INVINT phase: the fields act with a delay dt/2 (phase w dt/2 = 0.13 rad at 17 eV with NLstep 0.01 fs), the same for
+    the delta and the sine/P&p runs, so it cancels in the internal comparisons. It can be removed by adding dt/2 to the
+    `initial_time` of the fields (`efield['initial_time']` for `Linear_Response`, and consistently for the Xn classes);
+    to be done for the comparison with the RT runs of Davide (dt = 3 as, negligible delay).
 - MPPI tutorials useful as reference: `Analysis_Optics.ipynb` and `Model_AnharmonicOscillator.ipynb` (classical
   anharmonic oscillator with analytical chi: the Optics module reproduces chi1, chi2, chi3 and the mixing keys to
   1e-6-1e-3), `Tutorial_YamboNLDBParser.ipynb`. `mppi.Models.AnharmonicOscillator` can be used to test any new analysis
@@ -184,6 +196,10 @@ Next:
 2. `eval_dchi_neq(omega, omega_P, tau, EP, x11, x1m1, x11m1, x12, x1m2)`: check it against the formula above (shifted
    grids, now exact with the step wP/16; complex pump amplitude i*EP/2 instead of the real EP; phases exp(+-i wP t0P)
    and the delay convention; E_p(w')/E_p(w) ratios of the probe used in the RT runs). Test it on the oscillator.
-3. Possibly move `lorentzian_broadening` into MPPI (Optics/Utils.py and a `broadening` option of `compute_Xn` for the
-   keys linear in the probe), with a test on the oscillator.
+3. Done in MPPI (a7aac3f): use `compute_Xn(broadening=...)` in the notebook instead of the prototype. Before the
+   comparison with Davide, remove the INVINT phase w dt/2 consistently from all the chi (see the MPPI section).
+5. The damping 0.3 eV runs are being repeated on a single node (2026-10-07): the 2-node runs showed MXM segmentation
+   faults (hundreds of 400 MB core dumps, deleted) and the kx12 sine run had 36 wrong frequencies. The 2-node runs
+   are kept with the suffixes `_2nodes` / `_corrupted` for comparison. Use 1 node for yambo_nl until the inter-node
+   communication is understood.
 4. Decide whether to move the old MPPI Analysis_Optics (LiF version) here.
