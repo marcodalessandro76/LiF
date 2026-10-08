@@ -261,4 +261,10 @@ Next:
    yambo_nl jobs (`exclude_nodes = 'wnode07'` in the RunRules cell of `YamboNL_Analysis.ipynb`, passed as
    `RunRules(..., exclude=exclude_nodes)` to rr, rr_debug and rr_2nodes; option of MPPI >= 1e65f4c) and a new run is
    always checked against an independent one (sine vs (1,0), delta).
+   UPDATE (2026-10-08): the kx12 pump test run with 1.6e7 kW/m^2 (39 frequencies, wnode02, NL_CPU 4.8) has the same
+   corruption: indices 10,14,...,38 (|P| ~80%), i.e. the same frequency group (indices 2 mod 4) from its third
+   frequency, as the corrupted kx12 1-node P&p (indices 10,14,...,154); the 2-node kx12 sine had two groups (1,2 mod 8)
+   from their third frequency. So it is NOT a faulty node but an intermittent yambo_nl problem, so far only on kx12,
+   always starting at the third frequency of a group. The wnode07 exclusion is harmless but not the fix: check every run
+   (|chi(1,0)-chi1|/|chi1| > 1e-2 flags the corrupted frequencies, or the pattern of max|P| vs the neighbours).
 4. Decide whether to move the old MPPI Analysis_Optics (LiF version) here.
