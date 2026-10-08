@@ -238,7 +238,8 @@ Next:
    value, no error message), while the 2-node kx12 P&p (wnode02,05) is good at all the frequencies (identical to the
    1-node one elsewhere, (1,0) consistent with the sine and the delta). So the kx12 P&p used is the 2-node run, renamed
    to the original name; the 1-node one is kept as `..._corrupted`. Both corrupted runs ran on wnode07 (the kx8 2-node
-   P&p on wnode02,07 is fine): suspected faulty node, intermittent and silent. Exclude wnode07 from the yambo_nl jobs
-   (`#SBATCH --exclude=wnode07`: MPPI RunRules has no such option, prepare the job with `dry_run=True` and submit it
-   by hand) and always check a new run against an independent one (sine vs (1,0), delta).
+   P&p on wnode02,07 is fine): suspected faulty node, intermittent and silent. wnode07 is excluded from all the
+   yambo_nl jobs (`exclude_nodes = 'wnode07'` in the RunRules cell of `YamboNL_Analysis.ipynb`, passed as
+   `RunRules(..., exclude=exclude_nodes)` to rr, rr_debug and rr_2nodes; option of MPPI >= 1e65f4c) and a new run is
+   always checked against an independent one (sine vs (1,0), delta).
 4. Decide whether to move the old MPPI Analysis_Optics (LiF version) here.
