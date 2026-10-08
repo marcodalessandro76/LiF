@@ -229,6 +229,12 @@ order: (1,+-2) stable (b = 2.00); (1,0)-chi1 limited by a floor ~1e-6 chi1 on (1
 1e6 and 4e6). Next runs: pump >~4e6 kW/m^2 (still perturbative) and kx12/kx16; chi(1,+-1) to be dropped in dchi^neq
 (zero by symmetry) but it measures the k discretization error (the cubic keys differ 35-50% between kx8 and kx12).
 Still open: c (S/N map from the fit residuals, partly superseded by the scan) and e on kx16.
+Broadening 0.5 eV (2026-10-08: 0.3 eV damping + `compute_Xn(broadening=0.2)`, shown side by side with 0.3 eV in the
+notebook): chi1 and the cubic keys get closer between kx8 and kx12 (chi1 4.8% -> 2.3% mean; chi(1,1,-1) 48% -> 35%,
+ratio of the maxima 1.67 -> 1.24; delta kx12 vs kx16 0.8%), while chi(1,+-1) does not (ratio of the maxima kx8/kx12
+3.5-4.2 -> 3.3-3.6, mean difference 60-90%) and R does not decrease (median 22 -> 29 kx8, 8.5 -> 8.9 kx12; I_eq
+8.6e8 / 7.8e7 kW/m^2). So chi(1,+-1) is not a slowly converging spectral sum but a k discretization error of the
+coupling (Berry finite differences), R ~ Dk^(2-3) / E_P: only a finer k grid and a stronger pump reduce it.
 
 Next:
 1. Run the damping 0.3 eV sine and P&p runs (kx8 and kx12, 10-25 eV, 155 frequencies with step wP/16, NLtime 100 fs)
