@@ -193,9 +193,13 @@ Results so far (details and comments in `NL-Chi_Analysis.ipynb`):
 ### GOAL OF THE CURRENT PHASE (2026-10-07)
 Understand why the chi2 terms chi(1,+-1), which must vanish in centrosymmetric LiF, are dominant w.r.t. the chi3 terms
 ((1,0)-chi1 and (1,+-2)). Every analysis of this phase must be oriented to this question; the comparison with Davide
-(transient absorption, eval_dchi_neq) is postponed. First results with damping 0.3 eV (2-node runs, 10-20 eV, good
-frequencies): quadratic/cubic ratio (median) 22 on kx8 and 8 on kx12 (vs (1,+-2): 40 and 15); max |chi(1,+-1)||E_P|/
-|chi1| 2.8e-3 (kx8), 1.2e-3 (kx12); max |chi(1,0)-chi1|/|chi1| ~1e-4 on both grids; single field SHG < 1e-6.
+(transient absorption, eval_dchi_neq) is postponed. Results with damping 0.3 eV (final runs, 2026-10-08, 10-20 eV, all
+frequencies): quadratic/cubic ratio (median) 22 on kx8 and 9 on kx12 (vs (1,+-2): 40 and 15); |chi(1,+-1)||E_P|/|chi1|
+max 2.8e-3 -> 1.3e-3 and median 3e-4/2e-4 -> 1.5e-4/1.2e-4 from kx8 to kx12 (factor ~2, close to (12/8)^2 = 2.25),
+while the cubic terms change little (max |chi(1,0)-chi1|/|chi1| 1.1e-4 -> 8.6e-5, median (1,+-2) unchanged): chi2
+decreases with the k grid, the cubic terms do not. The chi(1,+-1) of the two grids have different shapes (mean rel.
+diff 40-60%). Single field SHG |chi_2||E_p|/chi1 < 3e-6: per unit field and without the degeneracy factor (chi(1,+-1) = 2 chi2) the
+probe SHG chi2 is ~5-7 times smaller than the mixing chi2 (medians, different frequency arguments).
 
 Analyses to implement in `NL-Chi_Analysis.ipynb` (new part) when the single-node runs are available:
 a. Revision of the new part on the 1-node runs (same names as before); replace the broadening prototype of the old
@@ -229,4 +233,12 @@ Next:
    faults (hundreds of 400 MB core dumps, deleted) and the kx12 sine run had 36 wrong frequencies. The 2-node runs
    are kept with the suffixes `_2nodes` / `_corrupted` for comparison. Use 1 node for yambo_nl until the inter-node
    communication is understood.
+   Outcome (2026-10-08): the kx8 1-node runs are bitwise identical to the 2-node ones; the kx12 1-node sine is good,
+   but the kx12 1-node P&p (wnode07) is corrupted at 37 frequencies (indices 10,14,...,154, |P| 76-89% of the right
+   value, no error message), while the 2-node kx12 P&p (wnode02,05) is good at all the frequencies (identical to the
+   1-node one elsewhere, (1,0) consistent with the sine and the delta). So the kx12 P&p used is the 2-node run, renamed
+   to the original name; the 1-node one is kept as `..._corrupted`. Both corrupted runs ran on wnode07 (the kx8 2-node
+   P&p on wnode02,07 is fine): suspected faulty node, intermittent and silent. Exclude wnode07 from the yambo_nl jobs
+   (`#SBATCH --exclude=wnode07`: MPPI RunRules has no such option, prepare the job with `dry_run=True` and submit it
+   by hand) and always check a new run against an independent one (sine vs (1,0), delta).
 4. Decide whether to move the old MPPI Analysis_Optics (LiF version) here.
