@@ -85,7 +85,9 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
   glibc 2.17: VS Code Remote-SSH does not work. The connection sometimes times out: just retry later.
 - Never run heavy computations on the login node `frontend`: use slurm. Always use the partition `all12h` (32 cores
   per node), also for the short test/diagnostic runs: it runs on all the nodes and gives no problems (user's choice,
-  2026-10-06; the `debug` partition is not used). Home quota 19.5 GB (11 GB used on 2026-10-05: watch the size of new runs,
+  2026-10-06; the `debug` partition is not used). Runs longer than 12 h (e.g. the kx16 yambo_nl runs on one node,
+  ~14 h) use `slownodes` (time limit 2 days, wnode01-02, 04-05, 07-08): `yambo_nl_code(nodes, partition)` in the first
+  cell of `YamboNL_Analysis.ipynb`. Home quota 19.5 GB (11 GB used on 2026-10-05: watch the size of new runs,
   BeeOND scratch is used for the runs).
 - Python: `~/miniconda3` base, python 3.13; numpy, scipy, matplotlib, netCDF4 and the Jupyter stack are pip-installed
   (update with pip). Notebooks are executed in place with
