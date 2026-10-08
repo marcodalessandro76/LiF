@@ -220,6 +220,15 @@ d. Intensity scan (runs `study_scan` of `YamboNL_Analysis.ipynb`, kx8, damping 0
    pump can be used to improve the S/N of the cubic terms.
 e. Trend of the chi2/chi3 ratio with the k grid (kx8 vs kx12, possibly kx16): the main hypothesis for the chi2 terms is
    the k discretization of the Berry coupling in the dynamics with two fields.
+Done (2026-10-08): b (kx8 1 node = 2 nodes bit by bit) and d (section "Intensity scan (kx8)" of the notebook, with
+conclusions). Outcome: chi(1,+-1) is exactly bilinear (a = b = 1.000, normalized chi stable to ~1e-3 over x16 pump and
+x4 probe intensity): a genuine second order response of the discretized dynamics, ~Dk^2 (kx8 -> kx12). It "dominates"
+only because the pump is weak: quadratic/cubic ratio R ~ 1/E_P (median 41.5, 21.2, 10.6 at 2.5e5, 1e6, 4e6 kW/m^2);
+cubic terms dominate above I_eq = I_P R^2 = 4.7e8 (kx8), 7.3e7 (kx12) kW/m^2 (median 10-20 eV; RT pump 1e8). Third
+order: (1,+-2) stable (b = 2.00); (1,0)-chi1 limited by a floor ~1e-6 chi1 on (1,0) (20% error at pump/4, 1% between
+1e6 and 4e6). Next runs: pump >~4e6 kW/m^2 (still perturbative) and kx12/kx16; chi(1,+-1) to be dropped in dchi^neq
+(zero by symmetry) but it measures the k discretization error (the cubic keys differ 35-50% between kx8 and kx12).
+Still open: c (S/N map from the fit residuals, partly superseded by the scan) and e on kx16.
 
 Next:
 1. Run the damping 0.3 eV sine and P&p runs (kx8 and kx12, 10-25 eV, 155 frequencies with step wP/16, NLtime 100 fs)
