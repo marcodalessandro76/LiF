@@ -107,11 +107,15 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
   - Yambo: `ntasks_per_node=32, cpus_per_task=1, omp_num_threads=1,
     pre_processing='/home/dalessandro/module_script/yambo_module'`,
     `YamboCalculator(rr, executable='yambo_nl', activate_BeeOND=True)` (or `yambo_rt`, `ypp`, `yambo`)
-- Claude does not submit sbatch/slurm jobs (the notebooks that launch them are run by the user from Jupyter). The
-  analysis notebooks (e.g. `NL-Chi_Analysis.ipynb`) Claude may execute directly on the login node, as the user does
-  through the Jupyter tunnel: `nohup jupyter nbconvert ... --execute --inplace ... > ~/tmp_claude/<nb>.log 2>&1 &`.
-  Light ssh commands (git pull, ls, reading outputs) use the prefix
-  `ssh -o BatchMode=yes -o ClearAllForwardings=yes -o ConnectTimeout=30 ismhpc` (allowed in `.claude/settings.local.json`).
+- Claude submits slurm jobs only when the user asks explicitly, or for repairs/tests agreed with the user (user's rule,
+  2026-10-09); otherwise the user runs the notebooks that launch them from Jupyter. Jobs of the production notebook are
+  launched without Jupyter with `~/tmp_claude/launch_dataset.py` (see the Handoff section). The analysis notebooks
+  (e.g. `NL-Chi_Analysis.ipynb`) Claude may execute directly on the login node:
+  `nohup jupyter nbconvert ... --execute --inplace ... > ~/tmp_claude/<nb>.log 2>&1 &`.
+- Claude can run either on the laptop (desktop app; cluster commands through
+  `ssh -o BatchMode=yes -o ClearAllForwardings=yes -o ConnectTimeout=30 ismhpc`, allowed in `.claude/settings.local.json`)
+  or directly on the cluster (Claude Code CLI in the conda env `tools`, inside `tmux new -s lif`, started in `~/work/LiF`,
+  Remote Control on): there the commands are local (no ssh prefix) and long monitoring survives the laptop.
 - Ask the user before launching p2y/yambo/yambo_nl runs (cost, quota). The user prefers clean runs from scratch to
   reusing old outputs, unless stated otherwise.
 
@@ -281,3 +285,50 @@ Next:
    kx16 repair launched 2026-10-09 (jobs 59071/59072, slownodes, NL_CPU 4.8). A report for the yambo developers is to
    be written in a dedicated notebook.
 4. Decide whether to move the old MPPI Analysis_Optics (LiF version) here.
+
+## Handoff (2026-10-09, from the laptop session to the Claude CLI session on the cluster)
+The laptop session ("NL-CHI") hands the work over to a Claude CLI session on the cluster (`tmux` session `lif`,
+started in `~/work/LiF`). State at 18:20 of 2026-10-09:
+
+Running (independent of any Claude session; check with `squeue -u $USER` and the logs):
+- **kx16 P&p repair**, job 59072 (slownodes, wnode01, NL_CPU 4.8, no BeeOND): recomputes 64 corrupted frequencies
+  (group 1 indices 9..153 and group 2 indices 50..154) of
+  `kx16_nb100_NoTr_E100/Pp-Ep_1e3-EP_1e6-PE_1.55-nlenrange_10.0-25.016-nlensteps_155-bands_3-6-damp_0.3-sin-nltime_100`.
+  22/64 done at 18:20, all correct; ~5 h left. Its launcher process was killed (only the slurm job runs): nothing
+  to do at the end but the checks below. Health: `python ~/tmp_claude/check_repair_progress.py Pp` (new/ref of max|P|
+  w.r.t. the good groups 0 and 3, `*` if off by more than 2%).
+- **kx16 sine chunk repair**: driver on the login node (`launch_dataset.py none --exec "# chunk repair: kx16 sine"`,
+  log `~/tmp_claude/chunk_repair_kx16_sine.log`, one line per chunk with the health ratio of each frequency) that
+  recomputes the 70 remaining corrupted frequencies of
+  `kx16_nb100_NoTr_E100/pulse-E1_1e3-nlenrange_10.0-25.016-nlensteps_155-bands_3-6-damp_0.3-sin-nltime_100` in 18
+  chunks of 2 frequencies per group (jobs on all12h, ~30 min each + queue). Chunks 0 and 1 (17,18,21,22,25,26,29,30)
+  correct. Frequencies 9, 10, 13, 14 were already repaired by job 59071 (cancelled when its groups got corrupted again
+  from their 3rd frequency). Fragments: `_corrupted` (original run), `_corrupted_repair1` (job 59071),
+  `_corrupted_chunk<k>_pass<p>` (chunks off tolerance, redone in a later pass). The driver ends with "all the 70
+  frequencies done" or "stop after 3 passes". If it has to be stopped: `scancel` its job, kill the two python
+  processes (MPPI runs the task in a child process, SIGINT does not work), then `python ~/tmp_claude/clean_placeholders.py`
+  (removes the placeholder fragments, identical to their `_corrupted` copy) before starting it again.
+
+Helper scripts (in `~/tmp_claude`, run with `~/miniconda3/bin/python`): `launch_dataset.py <dataset|none> [--prepare
+"<first line of a '# restart preparation' cell>"] [--exec "<first line of a '# chunk repair' cell>"] [--dry]` (executes
+the first cells and the damping 0.3 eV section of `YamboNL_Analysis.ipynb`, then runs one dataset; use `nohup ... &`);
+`check_repair_progress.py [sine|Pp]`; `clean_placeholders.py`; `check_kx16_sine.py` (sine vs P&p vs delta kx16 per
+frequency group); `check_restart.py`; `plot_corrupted.py` (figure good vs corrupted chi1 of the kx12 P&p run, used for
+the report). Backups of job outputs/reports/LOG of the restarts: `<run>_backup_<tag>` folders next to the runs.
+
+Next steps, in this order:
+1. When both repairs end: full check of the kx16 runs (sine first harmonic vs P&p (1,0) at every frequency, < 1e-3
+   on good frequencies; both vs the kx16 delta, exact below the gap; `check_kx16_sine.py`); redo any frequency still
+   wrong with the same restart mechanism. Then remove the placeholder logic from the plan and note the outcome here.
+2. `NL-Chi_Analysis.ipynb`: add kx16 to the damping 0.3/0.5 eV section (chi1, the keys (1,+-1), (1,+-2), chi(1,1,-1)
+   on kx8/kx12/kx16): convergence kx12 -> kx16 of the cubic terms (the key question: are the chi3 converged at kx12/kx16?),
+   power law in Dk of chi(1,+-1) with three grids, quadratic/cubic ratio and I_eq; add the pump test (4e6 and 1.6e7 on
+   kx12, results above: 4e6 perturbative, 1.6e7 not) and the kx12 P&p run with pump 4e6 (155 frequencies, good:
+   third order = 1e6 result within 0.2%). Keep the analysis concise, oriented to the goal of the phase.
+3. Dedicated notebook for the yambo developers on the corrupted frequencies: list of the cases (grid, nodes, NL_CPU,
+   group, first corrupted frequency = 3rd computed by the group in all cases but one (13th), size of the error),
+   the figure of `plot_corrupted.py` (P(t) wrong from the first time step, the whole response reduced by 30-50%, as
+   if part of the k points were missing in the group), the restart tests 1a/1b (correct runs reproducible bit by bit,
+   error intermittent), the chunk repair (2 frequencies per group never corrupted), the MXM segfaults of the 2-node
+   runs, the input and the yambo version (Lumen 2.1.0).
+4. Commit the notebooks (`YamboNL_Analysis.ipynb`, `NL-Chi_Analysis.ipynb`) at the end of the phase (never data).
