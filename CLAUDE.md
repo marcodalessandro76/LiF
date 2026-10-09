@@ -267,4 +267,17 @@ Next:
    from their third frequency. So it is NOT a faulty node but an intermittent yambo_nl problem, so far only on kx12,
    always starting at the third frequency of a group. The wnode07 exclusion is harmless but not the fix: check every run
    (|chi(1,0)-chi1|/|chi1| > 1e-2 flags the corrupted frequencies, or the pattern of max|P| vs the neighbours).
+   2026-10-09: the kx16 sine (groups 1 and 2 from indices 9 and 10) and P&p (group 1 from 9, group 2 from 50) runs are
+   also corrupted; the delta run of the same grid is the arbiter (exact below the gap). Restart tests on the kx12 1.6e7
+   run (section "Restart of the corrupted frequencies" of `YamboNL_Analysis.ipynb`): recomputing the 8 corrupted
+   frequencies with the same NL_CPU 4.8 (same group) gives correct values, and NL_CPU 1.32 gives fragments identical bit
+   by bit: the error is random/intermittent, correct runs are exactly reproducible. NL_CPU 1.32 (32 tasks on k) is ~2.5x
+   slower than 4.8. Repair: yambo_nl recomputes only the frequencies whose `ndb.Nonlinear_fragment_<index+1>` is missing
+   (`NL_start_and_restart`, "RESTART, remaining frequencies"): rename the corrupted fragments, back up job out/report/LOG,
+   rerun the same input with `skip=False, clean_restart=False, activate_BeeOND=False` (with BeeOND MPPI copies the job
+   folder content in the scratch root while yambo looks in <scratch>/<jobname>, so the fragments would not be found).
+   Helpers `backup_run_files`, `remove_fragments`, `missing_fragments` in the notebook; launcher script
+   `~/tmp_claude/launch_dataset.py <dataset> [--prepare "<first line of a '# restart preparation' cell>"] [--dry]`.
+   kx16 repair launched 2026-10-09 (jobs 59071/59072, slownodes, NL_CPU 4.8). A report for the yambo developers is to
+   be written in a dedicated notebook.
 4. Decide whether to move the old MPPI Analysis_Optics (LiF version) here.
