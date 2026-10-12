@@ -61,9 +61,14 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
     test (1e6, 4e6, 1.6e7), conclusions. The old diagnostics of chi(1,+-1) (kx8, damping 0.1 eV: X_order (1,3), raw
     spectrum of P(t), intensity scaling, integrator, first k tests), the old k convergence and the broadening
     validation on the oscillator were removed (summarized in one markdown cell; full version in git commit 3fd6f06).
-  - `Dchi-neq_Analysis.ipynb` (2026-10-12): the transient absorption part moved out of `NL-Chi_Analysis.ipynb`
-    (Eq. (11), translation in MPPI quantities, `eval_dchi_neq`, `build_delta_dict`, comparison with Davide's RT
-    spectra), now loading the kx16 damping 0.3 eV sine and P&p runs; NOT yet revised (see the open points).
+  - `Dchi-neq_Analysis.ipynb` (2026-10-12): RT IP runs of Davide (reading, spectra, maps), kx16 damping 0.3 eV chi with
+    `compute_Xn(broadening=0.3)` (total 0.6 eV = RT smoothing), formula and function `dchi_neq` (third order terms only,
+    replaces `eval_dchi_neq`, which read the (1,+-2) keys on the wrong shifted grid):
+    dchi(w,tau) = |E_P(tau)|^2 [x3(w) - chi_(1,2)(w-2wP) e^{-2i wP tau} - chi_(1,-2)(w+2wP) e^{2i wP tau}],
+    |E_P|^2 = E0P^2/4 exp(-tau^2/sigma^2) (delta probe, QSFIELD PHPI90 pump = -E0 f(t) sin(wP(t-t_P)): minus sign from
+    (+-i)^2; quasi-monochromatic pump, envelope at the probe time), w in 13.10-21.82 eV (exact index shift 32 = 2wP/step)
+    (INVINT phase not corrected: ~0.13 rad, small w.r.t. the other differences, user's choice for simplicity). First
+    comparison: good below 17.5 eV (bleach 17 eV ~1.5x larger than RT), shapes differ above.
     Both notebooks come from the split (2026-10-05) of the old `Transient_Abs_NL-Chi.ipynb` (in the git history).
   - cluster only, `kx8_nb100_NoTr_E100/`, `kx12_nb100_NoTr_E100/`, `kx16_nb100_NoTr_E100/`: copies of Sangalli's
     NoTr_E100 SAVEs (`/work/sangalli/simulations/LiF/yambo/e80_kx6_pbe_sr/kx{8,12,16}_nb100/NoTr_E100/SAVE`: same
@@ -78,8 +83,18 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
     of the deleted 2-node runs (`job_..._2nodes.out`, kx12 `job_pulse..._corrupted.out`: MXM segfaults). Deleted: the
     damping 0.1 eV production and 5-frequency diagnostic runs (kx8, kx12), the kx8 intensity scan, the kx12 4e6 run at
     39 frequencies, the 2-node kx8 runs and the kx12 2-node sine `_corrupted` (case A, results kept as text).
-  - cluster only, `Davide_data/`: Davide's RT results at kx16 (`o-abs_0-50eV_sm0.6eV.YPP-eps_along_E` for each delay,
-    in folders named `...delta<value>fs...`, read by `build_delta_dict`), plus tarballs.
+  - cluster only, `Davide_data/`: Davide's RT results at kx16 in `20250312_Report_simulations_data_kx16_ball/` (plus
+    tarballs): one folder per probe time `delta<t_p>fs` with `o-abs_0-50eV_sm0.6eV.YPP-eps_along_E` (E, Im eps x/y/z,
+    Re eps x/y/z; ypp, Lorentzian smoothing 0.6 eV). Two sets: `td-hsex-cv-ber_..._3-12b` (HARTREE+SEX, 61 delays,
+    10-60 eV) and `td-ip-ber_..._1-15b` (IP, 62 delays, 0-50 eV); yambo 5.3, CRANKNIC 3 as, 40 fs, no dephasing; probe
+    DELTA along x; pump QSFIELD PHPI90 5SIGMA 1.56 eV, 6e9 kW/cm^2, sigma 3.219 fs, switched on at 0.003 fs. Pump
+    maximum at t_P = 0.003 + (pi/wP) nint(5 sigma wP/pi) = 15.909 fs (yambo `RT_small_a`), delay tau = t_p - t_P
+    (-7.41..+7.34 fs, step 0.25 fs; probe times read from the headers). No probe-only run: the reference is the earliest
+    delay (t_p = 5.25 fs, tau = -10.66 fs), as in Davide's plotting script (`20250312_Report_simulations_data_kx16.py`:
+    t0 = 15.9 fs, reference = first delay, Fresnel R at 72 deg; his "Neq." curve and right panel are averages over
+    |tau - 0.1| <= 2 fs, his left panel shows -X). `Dchi-neq_Analysis.ipynb` uses only the IP set (`load_rt_runs`,
+    `rt_quantity`, `plot_rt_spectra`, `plot_rt_map`; the dR/R map at 72 deg s-pol reproduces his figure). N.B. the RT
+    pump is at 1.56 eV, the yambo_nl pump at 1.55 eV.
 - `RT_Transient_Absorption/` (earlier work, transient absorption from RT simulations): `Transient_Absorption.ipynb`
   (fit of the experimental IR pump, MPPI Gaussian pulses vs ypp_rt fields, yambo_nl RT pump-probe dynamics with a 1.56 eV pump of fwhm 7.58 fs and a
   35 eV probe of fwhm 0.42 fs, transient spectra and reflectivity, delays 7.0 and 9.12 fs) and `Sum_frequency.ipynb`.
@@ -140,6 +155,9 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
 - ypp bands: use `BANDS_kpts` (not `BANDS_path` labels) and `INTERP_mode='BOLTZ'` (NN gives step-like bands).
 - yambo_nl: the DELTA field is written as a single time step of value E0/dt (so int E dt = E0); SIN/SOFTSIN fields start
   at `FieldX_Tstart`; the transient after the switch on decays with the dephasing (NL_damping).
+- yambo field intensities (`FieldX_Int`, input unit `kWLm2`, reports `[kWCMm2]`) are in kW/cm^2: E0 = sqrt(4 pi I/c) au
+  with I in au (AU2KWCMm2 = 6.4364086e12), 1e6 -> 1.194e-4 au. The "kW/m^2" written in these notes and in the notebooks
+  for the yambo_nl runs are kW/cm^2. Davide's RT pump is 6e9 kW/cm^2 (E0 = 9.25e-3 au, 6000 times our 1e6 pump).
 - yambo vector alat of a fcc cell is alat/2 (YamboDftParser `rescale=True` lattice differs by 2 from PwParser).
 - SAVEs made with older yambo versions: the setup databases (`ndb.gops`, `ndb.kindx`, `ndb.kpts`) written by yambo 5.2
   give NaN overlaps (`ndb.Overlap` DIP_S, `ndb.dipoles` DIP_iR) and a NaN Berry polarization at t=0 with Lumen 2.1.0
