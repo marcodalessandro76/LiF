@@ -45,29 +45,39 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
 - Laptop: `D:\RICERCA\DFT AND MANY BODY\SIMULATIONS\LiF` (path with spaces: quote it). Cluster: `~/work/LiF` on ismhpc.
   Same git repo (GitHub `marcodalessandro76/LiF`, branch `main`), synced only through git (commit/push on one
   machine, pull on the other). In git there are only README, this file, `Attivita nuova.txt`, the notebooks and `References/`:
-  the data (~13 GB on the cluster) are NOT in git and live only on the cluster (the yambo runs) or on the laptop
+  the data (~11 GB on the cluster) are NOT in git and live only on the cluster (the yambo runs) or on the laptop
   (Davide's reports and tarballs in `NL_Chi/Davide_Google_drive`, ~320 MB).
   Never `git add` data folders, `.ipynb_checkpoints` or tarballs (see `.gitignore`).
 - `NL_Chi/` (current work):
   - `YamboNL_Analysis.ipynb`: the yambo_nl datasets (MPPI YamboInput/YamboCalculator/Dataset, slurm, all appended
-    with `skip=True`), no analysis: inversion check of the k sampling (`YamboDftParser.expand_IBZ_kpoints`), kx8
-    production runs (delta, sine, P&p, damping 0.1 eV), diagnostic runs for the chi(1,+-1) terms (5 probe frequencies
-    17.41-17.61 eV: reference, pump/4, probe*4, NLstep/2, CRANKNIC, kx12 reference), delta runs on kx12/kx16, and the
-    damping 0.3 eV sine + P&p runs on kx8 and kx12 (single dataset `study_eta`, 4 runs in series, 2 nodes each).
-  - `NL-Chi_Analysis.ipynb`: chi extraction (linear in three ways, second order), diagnostics of chi(1,+-1),
-    k grid convergence of chi1 from the delta runs, a posteriori Lorentzian broadening on the probe grid
-    (`lorentzian_broadening`, validated on the anharmonic oscillator), then the not yet revised part (third order,
-    `eval_dchi_neq`, `build_delta_dict`, comparison with Davide). To be revised on the damping 0.3 eV runs.
+    with `skip=True`), no analysis: inversion check of the k sampling (`YamboDftParser.expand_IBZ_kpoints`), kx8 delta,
+    delta runs on kx12/kx16, damping 0.3 eV sine + P&p runs on kx8/kx12 (`study_eta`) and kx16, the 39-frequency test
+    grid, kx12 pump tests (1.6e7 at 39 frequencies, 4e6 at 155), restart and chunk repair of the corrupted frequencies.
+    The sections of the runs deleted on 2026-10-12 (damping 0.1 eV production, chi(1,+-1) diagnostics, kx8 intensity
+    scan, kx12 4e6 at 39 frequencies) were removed (git history, e.g. 3fd6f06).
+  - `NL-Chi_Analysis.ipynb` (simplified 2026-10-12): linear response from the delta runs (kx8/kx12/kx16, eta 0.3 and
+    0.5 eV: kx8 not adequate), chi from the damping 0.3 eV sine and P&p runs on kx12/kx16 (linear check, non-linear
+    keys and their k dependence with 0.5 eV, relative sizes, quadratic/cubic ratio R and I_eq), kx12 pump intensity
+    test (1e6, 4e6, 1.6e7), conclusions. The old diagnostics of chi(1,+-1) (kx8, damping 0.1 eV: X_order (1,3), raw
+    spectrum of P(t), intensity scaling, integrator, first k tests), the old k convergence and the broadening
+    validation on the oscillator were removed (summarized in one markdown cell; full version in git commit 3fd6f06).
+  - `Dchi-neq_Analysis.ipynb` (2026-10-12): the transient absorption part moved out of `NL-Chi_Analysis.ipynb`
+    (Eq. (11), translation in MPPI quantities, `eval_dchi_neq`, `build_delta_dict`, comparison with Davide's RT
+    spectra), now loading the kx16 damping 0.3 eV sine and P&p runs; NOT yet revised (see the open points).
     Both notebooks come from the split (2026-10-05) of the old `Transient_Abs_NL-Chi.ipynb` (in the git history).
   - cluster only, `kx8_nb100_NoTr_E100/`, `kx12_nb100_NoTr_E100/`, `kx16_nb100_NoTr_E100/`: copies of Sangalli's
     NoTr_E100 SAVEs (`/work/sangalli/simulations/LiF/yambo/e80_kx6_pbe_sr/kx{8,12,16}_nb100/NoTr_E100/SAVE`: same
     lattice, 100 bands, the same 8 symmetries without inversion and time reversal, 100/294/648 IBZ points), copied
     without the yambo 5.2 setup databases and with the setup redone (`yambo` without arguments) with Lumen 2.1.0.
-    kx8: production runs (`lresponse-bands_3-6-delta` with NLstep 0.01 fs, `pulse-E1_1e3-nlenrange_10.0-20.0-
-    nlensteps_201-bands_3-6-damp_0.1-sin`, `Pp-Ep_1e3-EP_1e6-PE_1.55-nlenrange_10.0-20.0-nlensteps_201-bands_3-6-
-    damp_0.1-sin`, the last two with Lumen 2.0.0) and the diagnostic runs `...nlensteps_5...`; kx12: delta,
-    diagnostic reference; kx16: delta. The damping 0.3 eV runs (`...nlenrange_10.0-25.016-nlensteps_155-...-damp_0.3-
-    sin-nltime_100`) go in the kx8 and kx12 folders.
+    Runs kept after the cleanup of 2026-10-12 (~8.5 GB deleted on /work, not in the home quota): delta
+    (`lresponse-bands_3-6-delta`, NLstep 0.01 fs) on the three grids; damping 0.3 eV sine and P&p 1e6
+    (`...nlenrange_10.0-25.016-nlensteps_155-...-damp_0.3-sin-nltime_100`) on kx8 (1 node), kx12 (P&p = the 2-node
+    run) and kx16 (repaired); kx12 P&p 4e6 (155 frequencies) and 1.6e7 (39 frequencies, with its `_corrupted` and
+    `_restart_NL_CPU_4.8` fragments); one corrupted run, the kx12 1-node P&p `..._corrupted` (case B of
+    `YamboNL_Corrupted_Frequencies.ipynb`); the `_corrupted*` fragments inside the kx16 runs (cases D-F); the job outputs
+    of the deleted 2-node runs (`job_..._2nodes.out`, kx12 `job_pulse..._corrupted.out`: MXM segfaults). Deleted: the
+    damping 0.1 eV production and 5-frequency diagnostic runs (kx8, kx12), the kx8 intensity scan, the kx12 4e6 run at
+    39 frequencies, the 2-node kx8 runs and the kx12 2-node sine `_corrupted` (case A, results kept as text).
   - cluster only, `Davide_data/`: Davide's RT results at kx16 (`o-abs_0-50eV_sm0.6eV.YPP-eps_along_E` for each delay,
     in folders named `...delta<value>fs...`, read by `build_delta_dict`), plus tarballs.
 - `RT_Transient_Absorption/` (earlier work, transient absorption from RT simulations): `Transient_Absorption.ipynb`
@@ -286,6 +296,28 @@ Next:
    be written in a dedicated notebook.
 4. Decide whether to move the old MPPI Analysis_Optics (LiF version) here.
 
+## Outcome of the handoff (2026-10-10, CLI session on the cluster)
+- kx16 repairs done: P&p 64/64 (job 59072), sine 70/70 in chunks (index 154 flagged at 0.976 only because the health
+  reference at the grid edge is the constant value of index 152: recomputed twice bit-identical, restored by hand,
+  copies `_good_chunk*`). Full check: kx16 sine vs delta mean 1.4% (as kx12), P&p (1,0) vs sine max 4e-5, no
+  corrupted frequency. Steps 1-3 of the handoff below are done; step 4 (commit) is pending (user's go).
+- `NL-Chi_Analysis.ipynb` executed with kx16 and the pump tests (conclusions cell rewritten). Results (10-20 eV,
+  medians): chi(1,+-1) decrease kx12 -> kx16 by 2.6-3.6 (|chi| ~ dk^p, p = 3.4-4.5; kx8 -> kx12 p = 1.0-2.9), single
+  field SHG too: k discretization error, drop them. R = 21.7/8.5/5.2 (0.3 eV) on kx8/kx12/kx16, I_eq kx16 2-2.7e7
+  kW/m^2 (cubic ~2x quadratic at the RT pump 1e8). Cubic keys: size stable (p ~ 0) but NOT converged in shape in
+  16-21 eV (kx12 vs kx16 29-46% of the max, maxima ratio 1.4-2.1; chi1 converged at 1-2%). Pump 4e6 perturbative,
+  1.6e7 not (fifth order, changes x5). Open: k convergence of the cubic terms (kx20/kx24 or 0.6 eV total broadening).
+- `NL-Chi_Analysis.ipynb` simplified (2026-10-12, user's request, script `~/tmp_claude/simplify_nlchi.py`): no damping
+  0.1 eV in the new part, kx8 only in the delta section (eta 0.3/0.5, shows kx8 is not adequate), non-linear terms
+  plotted with 0.5 eV on kx12/kx16 (table with p from the kx12/kx16 medians), the kx8 intensity scan and the "dependence
+  on the k grid" section removed, one kx12 pump test section (exponent b 1e6->4e6 on 155 frequencies, changes at 1.6e7).
+  Then the "Previous analysis" part was removed and the transient absorption part moved to `Dchi-neq_Analysis.ipynb`.
+- Cleanup of the runs (2026-10-12, user's request, `~/tmp_claude/cleanup_runs.sh`): see the list in the NL_Chi data
+  section; `YamboNL_Analysis.ipynb` (sections of the deleted runs removed, script `~/tmp_claude/clean_yambonl_nb.py`)
+  and `YamboNL_Corrupted_Frequencies.ipynb` (case A dropped from the computation, kept as text) updated and checked.
+- `YamboNL_Corrupted_Frequencies.ipynb` executed on the final data (cases A-F; 9 of 10 corrupted groups start at the
+  3rd frequency of the group; a corrupted group never recovers).
+
 ## Handoff (2026-10-09, from the laptop session to the Claude CLI session on the cluster)
 The laptop session ("NL-CHI") hands the work over to a Claude CLI session on the cluster (`tmux` session `lif`,
 started in `~/work/LiF`). State at 18:20 of 2026-10-09:
@@ -325,10 +357,20 @@ Next steps, in this order:
    power law in Dk of chi(1,+-1) with three grids, quadratic/cubic ratio and I_eq; add the pump test (4e6 and 1.6e7 on
    kx12, results above: 4e6 perturbative, 1.6e7 not) and the kx12 P&p run with pump 4e6 (155 frequencies, good:
    third order = 1e6 result within 0.2%). Keep the analysis concise, oriented to the goal of the phase.
+   Prepared (2026-10-09, tested on a copy with kx8/kx12): `~/tmp_claude/add_kx16_analysis.py` (backs up the notebook,
+   adds kx16 to the damping 0.3/0.5 eV section, a "Dependence of the second and third order terms on the k grid" cell
+   with the exponent p of |chi| ~ dk^p, the sections "Pump intensity test (kx12)" and "kx12 P&p run with pump 4e6").
+   To apply when the kx16 repairs end, then execute the notebook and rewrite the conclusions cell on the numbers.
 3. Dedicated notebook for the yambo developers on the corrupted frequencies: list of the cases (grid, nodes, NL_CPU,
    group, first corrupted frequency = 3rd computed by the group in all cases but one (13th), size of the error),
    the figure of `plot_corrupted.py` (P(t) wrong from the first time step, the whole response reduced by 30-50%, as
    if part of the k points were missing in the group), the restart tests 1a/1b (correct runs reproducible bit by bit,
    error intermittent), the chunk repair (2 frequencies per group never corrupted), the MXM segfaults of the 2-node
    runs, the input and the yambo version (Lumen 2.1.0).
+   Draft done (2026-10-09): `NL_Chi/YamboNL_Corrupted_Frequencies.ipynb`, generated by
+   `~/tmp_claude/devnb/make_dev_notebook.py` (cases A-F, fragment-by-fragment comparison wrong vs correct). Findings:
+   P(t) identical bit by bit up to the switch-on of the field, wrong from the first step with the field (step 12);
+   projection on the correct P(t) constant within a group (e.g. 0.564 on 37 frequencies of the kx12 P&p); first wrong
+   frequency = 3rd of its group in 9 of 10 corrupted groups. To be re-executed (and the summary revised on the final
+   numbers) when the kx16 repairs end: before that the kx16 cases D/E compare with placeholders.
 4. Commit the notebooks (`YamboNL_Analysis.ipynb`, `NL-Chi_Analysis.ipynb`) at the end of the phase (never data).
