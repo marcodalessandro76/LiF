@@ -67,8 +67,21 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
     dchi(w,tau) = |E_P(tau)|^2 [x3(w) - chi_(1,2)(w-2wP) e^{-2i wP tau} - chi_(1,-2)(w+2wP) e^{2i wP tau}],
     |E_P|^2 = E0P^2/4 exp(-tau^2/sigma^2) (delta probe, QSFIELD PHPI90 pump = -E0 f(t) sin(wP(t-t_P)): minus sign from
     (+-i)^2; quasi-monochromatic pump, envelope at the probe time), w in 13.10-21.82 eV (exact index shift 32 = 2wP/step)
-    (INVINT phase not corrected: ~0.13 rad, small w.r.t. the other differences, user's choice for simplicity). First
+    (INVINT phase and energy shift corrected since 2026-10-13, see below). First
     comparison: good below 17.5 eV (bleach 17 eV ~1.5x larger than RT), shapes differ above.
+    2026-10-13: a rigid shift of ~0.3 eV to the right of the chi spectra improves the agreement (rms 0.93 -> 0.44 in
+    13.6-17.5 eV); it is static (same at all delays) and already in the equilibrium spectrum (edge of Im eps 0.26 eV
+    below the RT earliest delay). QSFIELD PHPI90 checked in the Lumen source (`RT_small_a.F`): E = -E0 f [sin(wP tau) +
+    tau cos(wP tau)/(wP sigma^2)], so the formula (sine, minus sign) is right. Same scissor (Davide's folder
+    `sh6.0+str0.05`). IP optics runs with `yambo -o c` (section "IP linear response with yambo optics" at the end of
+    `YamboNL_Analysis.ipynb`, `study_ip_bands`, kx16, bands 3-6/3-15/1-15, damping 0.6 eV, run in
+    `kx16_nb100_NoTr_E100/ip-optics-bands_*-damp_0.6`): optics 1-15 = RT earliest delay (edge 0.03 eV: yambo 5.3 and
+    Lumen agree); bands 7-15 move the edge by 0.07 eV only (bands 1-2 nothing) but add absorption above 19 eV and +0.5 to
+    Re eps. `invint_correction` = chi(w_eff) exp(-i w_eff dt/2) (energy map + phase of the field delay dt/2, the phase is
+    the larger effect): yambo_nl chi1 = optics 3-6 (edge 0.01 eV, eps 2%; delta run 0.8%). The equilibrium shift is
+    solved. dEps: rms 0.93 -> 0.68, residual best shift 0.34 -> 0.22 eV, now dependent on the pump envelope (0.15-0.27
+    near the maximum, 0.04-0.14 in the tail) with RT/chi3 amplitude 0.6-0.85 at the maximum: likely beyond third order
+    (pump induced edge shift comparable to the 0.6 eV broadening; RT pump 1500x our highest perturbative test).
     Both notebooks come from the split (2026-10-05) of the old `Transient_Abs_NL-Chi.ipynb` (in the git history).
   - cluster only, `kx8_nb100_NoTr_E100/`, `kx12_nb100_NoTr_E100/`, `kx16_nb100_NoTr_E100/`: copies of Sangalli's
     NoTr_E100 SAVEs (`/work/sangalli/simulations/LiF/yambo/e80_kx6_pbe_sr/kx{8,12,16}_nb100/NoTr_E100/SAVE`: same
