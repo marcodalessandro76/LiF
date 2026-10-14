@@ -99,6 +99,15 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
     the even one at 6e7). It equals the fit b for tau >= 0 (rms 0.01-0.06), and chi3 reproduces it with no shift
     (<= 0.06 eV near the maximum) over 13-22 eV: rms 0.17/0.23, amplitude 0.95/1.20 at tau -1.41/0.09 fs; chi3/RT 0.69
     at -2.9 fs and 1.44/1.70 at +1.6/+3.1 fs (envelope approximation of the formula).
+    Envelope correction (2026-10-14, section "Time dependence of the pump envelope", `dchi_neq_t`): the formula above
+    takes chi3 at Omega = 0 (envelope at the probe time); the pump acts during the life of the probe coherence (~1.1 fs).
+    Model: transform of the constant-envelope dchi to s = t - t_p, times W(tau,s) = (1/s) int_0^s f^2(tau+s') ds'
+    (accumulated envelope: adiabatic Stark/Franz-Keldysh shift accumulated on the coherence), back to w; same W applied
+    to the (1,+-2) terms (an extension, not derived). chi3 vs RT third order (even 6e7) at all 5 delays: amplitude
+    1.04-1.07 (was 0.69-1.70), rms 0.17-0.26; the local weight f^2(tau+s) overcorrects. Reversed pump at 6e9 (6 more
+    runs `-EP_6e9-neg`): odd part 6-13% of the even one (spurious term small); the even part at 6e9 departs from the
+    third order up to +1.6 fs (rms 0.61-0.25, amplitude 0.74-0.82, spectrum up to 0.13 eV higher), coincides at +3.1 fs:
+    the RT of Davide is beyond the perturbative regime near/before the pump maximum.
     Both notebooks come from the split (2026-10-05) of the old `Transient_Abs_NL-Chi.ipynb` (in the git history).
   - cluster only, `kx8_nb100_NoTr_E100/`, `kx12_nb100_NoTr_E100/`, `kx16_nb100_NoTr_E100/`: copies of Sangalli's
     NoTr_E100 SAVEs (`/work/sangalli/simulations/LiF/yambo/e80_kx6_pbe_sr/kx{8,12,16}_nb100/NoTr_E100/SAVE`: same
