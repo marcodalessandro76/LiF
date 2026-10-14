@@ -10,3 +10,13 @@ NL_Chi/o.*
 RT_Transient_Absorption/*/
 !References/*.pdf
 .claude/settings.local.json
+# LaTeX auxiliary files of the technical notes (the PDF is compiled locally)
+Notes/*.aux
+Notes/*.log
+Notes/*.out
+Notes/*.toc
+Notes/*.bbl
+Notes/*.blg
+Notes/*.fls
+Notes/*.fdb_latexmk
+Notes/*.synctex.gz

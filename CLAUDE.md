@@ -44,7 +44,8 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
 ## Repository and data
 - Laptop: `D:\RICERCA\DFT AND MANY BODY\SIMULATIONS\LiF` (path with spaces: quote it). Cluster: `~/work/LiF` on ismhpc.
   Same git repo (GitHub `marcodalessandro76/LiF`, branch `main`), synced only through git (commit/push on one
-  machine, pull on the other). In git there are only README, this file, `Attivita nuova.txt`, the notebooks and `References/`:
+  machine, pull on the other). In git there are only README, this file, `Attivita nuova.txt`, the notebooks, `References/` and the
+  technical notes `Notes/` (LaTeX sources and figures):
   the data (~11 GB on the cluster) are NOT in git and live only on the cluster (the yambo runs) or on the laptop
   (Davide's reports and tarballs in `NL_Chi/Davide_Google_drive`, ~320 MB).
   Never `git add` data folders, `.ipynb_checkpoints` or tarballs (see `.gitignore`).
@@ -142,6 +143,57 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
 - The old version of MPPI's `Analysis_Optics.ipynb`, based on the LiF runs (now replaced in MPPI by an analytical model),
   is in the MPPI git history: `git -C <MPPI> show b785feb:sphinx_source/tutorials/Analysis_Optics.ipynb`. It can be
   moved here.
+
+## Technical notes (`Notes/`, LaTeX, started 2026-10-14)
+Technical notes on this activity: NOT the paper, but a complete and as concise as possible explanation of what is
+done (theory, implementation, computations) and of the notation and conventions. Written in English, in LaTeX.
+- Files: `Notes/main.tex` (main file: `\documentclass[11pt,a4paper]{paper}`, then `\input{header.tex}`),
+  `Notes/header.tex` (packages and new commands: put there the macros of the recurring symbols, e.g. the MPPI keys
+  chi_(n,m), Delta eps, E_P, the pump envelope f, so that the notation stays uniform), figures in `Notes/Figures/`
+  as jpeg (`\includegraphics{Figures/<name>.jpeg}`). Style of the user's example notes: header with inputenc utf8,
+  babel (english here), amsmath/amsfonts/amssymb, bm (`\bm{}` for vectors), geometry (margin 1in), booktabs,
+  graphicx, subcaption, tikz, `\parindent` 4pt; `\section`/`\subsection`, numbered equations with `\label{eq:...}` and
+  `\eqref`, figures `[h!]` with `\label{fig:...}` and `Fig.~\ref{...}`, subfigures side by side for panels.
+- Workflow: the notes are written on the laptop (LaTeX is there, not on the cluster) with the Claude of VS Code and
+  compiled locally (the PDF is not tracked, `*.pdf` is in `.gitignore`; the LaTeX auxiliary files too). The data and
+  the notebook executions are only on the cluster: the figures are made there (Claude CLI session in tmux `lif`, from
+  the notebooks/data with a script kept in `Notes/`), saved as jpeg in `Notes/Figures` and pushed; the laptop session
+  asks for them through the user (or checks small things with ssh, see "Cluster ismhpc"). Sync only through git, with
+  a file edited on one side at a time.
+- Sources: this file (conventions, results, numbers) and the markdown cells of the notebooks (tracked in git, they can
+  be read on the laptop): `Dchi-neq_Analysis.ipynb` ("Formula used for dchi^neq", "Frequency grids", "Correction of
+  the INVINT integrator", "Our RT runs with the bands 3-6", "Pump intensity: third order RT response", "High pump
+  intensity: orders above the third", "Time dependence of the pump envelope"), `NL-Chi_Analysis.ipynb` (chi
+  extraction, chi(1,+-1), k convergence, pump intensity test), `YamboNL_Analysis.ipynb` (inputs of all the runs),
+  `YamboNL_Corrupted_Frequencies.ipynb`; `References/Pp_and_non_linear_functions.pdf` (Attaccalite-Sangalli, Eq. 11),
+  `References/Report_LiF_Davide.pdf`; Boyd, Nonlinear Optics, ch. 1 (conventions of the fields and of chi).
+- Outline agreed as a starting point (to be refined with the user):
+  1. Introduction: transient absorption of LiF from the equilibrium non-linear chi (yambo_nl) vs direct RT pump-probe
+     runs (D. Sangalli's and ours).
+  2. Conventions: E(t) = sum_n E(w_n) e^{-i w_n t}, E(-w) = E(w)^*, sine field E0 sin(w(t-t0)) -> E(w) = (i E0/2)
+     e^{i w t0}; MPPI keys chi_(n,m) with Boyd's degeneracy factors (chi_(1,+-1) = 2 chi2, chi_(1,+-2) = 3 chi3,
+     third order part of chi_(1,0) = 6 chi3(w;w,wP,-wP)|E_P|^2); units (yambo kWLm2 = kW/cm^2, E0 = sqrt(4 pi I/c)
+     au, 1e6 kW/cm^2 -> 1.194e-4 au); Delta eps = 4 pi dchi.
+  3. Theory: chi^neq expansion (Eq. 11 of the reference), exact third order expression for a delta probe
+     (dchi(w,t_p) = 3 int dOmega e^{-i Omega t_p} int dw1 chi3(w; w-Omega, w1, Omega-w1) E_P(w1) E_P(Omega-w1), three
+     groups Omega ~ 0, +-2wP), monochromatic limit = the formula with the envelope at the probe time
+     (dchi = |E_P(tau)|^2 [x3(w) - chi_(1,2)(w-2wP) e^{-2i wP tau} - chi_(1,-2)(w+2wP) e^{2i wP tau}], minus sign
+     from the sine pump), accumulated envelope model (W(tau,s) = (1/s) int_0^s f^2(tau+s') ds', Stark shift
+     accumulated on the probe coherence; extension to the (1,+-2) terms not derived).
+  4. Computation of chi with yambo_nl: SAVE and setup (kx16, bands 3-6, no inversion/time reversal symmetries,
+     Lumen 2.1.0), sine and pump&probe runs (155 frequencies 10-25 eV, step wP/16, damping 0.3 eV, NLtime 100 fs,
+     NLstep 0.01 fs, pump 1e6), harmonic analysis (`Xn_frequency_mixing`, X_order (1,2)), a posteriori broadening
+     0.3 eV, INVINT correction, shifted frequency grids (2wP = 32 steps).
+  5. Numerical issues: spurious chi_(1,+-1) (k discretization of the Berry coupling, decreases with the k grid,
+     dropped), k convergence of the cubic terms, pump intensity test (4e6 perturbative, 1.6e7 not), silently corrupted
+     frequencies of yambo_nl (short: detection and repair).
+  6. RT runs: setup (CRANKNIC 3 as, 40 fs, no damping; DELTA probe; QSFIELD PHPI90 5SIGMA pump 1.56 eV, sigma 3.219 fs,
+     t_P = 15.909 fs; delays), Delta eps = eps[P_Pp - P_P] - eps_eq with the 0.6 eV Lorentzian smoothing of the FT
+     (a window of the analysis, not a dephasing), check vs D. Sangalli and vs yambo optics, bands 3-6 vs 1-15, pump
+     intensities 6e9/6e7, reversed pump and even/odd parts.
+  7. Results: chi3 vs RT third order (accumulated envelope: amplitude 1.04-1.07, rms 0.17-0.26), 6e9 beyond the
+     perturbative regime (orders above the third, odd part small).
+  8. Open points (k convergence of the cubic terms, bands above 6 for 18-22 eV, residual 5% / 0.07 eV).
 
 ## Cluster ismhpc
 - Reached from the laptop with `ssh -o BatchMode=yes -o ClearAllForwardings=yes ismhpc '...'` (host in
