@@ -82,6 +82,23 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
     solved. dEps: rms 0.93 -> 0.68, residual best shift 0.34 -> 0.22 eV, now dependent on the pump envelope (0.15-0.27
     near the maximum, 0.04-0.14 in the tail) with RT/chi3 amplitude 0.6-0.85 at the maximum: likely beyond third order
     (pump induced edge shift comparable to the 0.6 eV broadening; RT pump 1500x our highest perturbative test).
+    2026-10-14, our RT runs (`yambo_nl`, Davide's IP setup, section "RT pump-probe runs" of `YamboNL_Analysis.ipynb`,
+    `kx16_nb100_NoTr_E100/rt-ip-*`, 26 runs: bands 3-6 with pump 6e9/6e8/6e7 at t_p 13-19 fs, bands 1-15 6e9 at 16 fs
+    and 6e7 at 14.5-17.5 fs, pump-only and probe-only references; analysis in the last section of
+    `Dchi-neq_Analysis.ipynb`): our 1-15 6e9 run = Davide's (3e-7); probe-only CRANKNIC = optics (0.8%). Bands 1-15 vs
+    3-6: same dEps in 13.6-17.5 eV (rms 0.03-0.08), very different above 18 eV. Intensity: 6e9 is beyond third order
+    (fifth order 25-45% of the third near the maximum), 6e7 has the spurious linear-in-E_P term (k discretization)
+    comparable with the third order: the orders are separated at each frequency with the three intensities
+    (a e + b e^2 + c e^4). The third order part b agrees with chi3 near the pump maximum (tau -1.41/0.09 fs: rms
+    0.28/0.19, amplitude 1.04/1.16, shift <= 0.1 eV, also above 17.5 eV): the residual 0.2 eV shift is from the orders
+    above the third. Away from the maximum chi3/b = 0.6 (tau -2.9) and 1.4-1.7 (+1.6, +3.1): limit of the formula with
+    the envelope at the probe time (probe polarization lives ~1.1 fs, sigma 3.2 fs); next: a formula with the time
+    dependence of the envelope, chi with more bands for 18-22 eV.
+    Reversed pump (`study_rt_neg`, bands 3-6, 6e7 along -x, `pump_sign=-1` in `build_rt_input`/`rt_id`, ids `-EP_6e7-neg`):
+    the even part [dEps(+E_P)+dEps(-E_P)]/2 is the clean third order RT (odd part = spurious second order, as large as
+    the even one at 6e7). It equals the fit b for tau >= 0 (rms 0.01-0.06), and chi3 reproduces it with no shift
+    (<= 0.06 eV near the maximum) over 13-22 eV: rms 0.17/0.23, amplitude 0.95/1.20 at tau -1.41/0.09 fs; chi3/RT 0.69
+    at -2.9 fs and 1.44/1.70 at +1.6/+3.1 fs (envelope approximation of the formula).
     Both notebooks come from the split (2026-10-05) of the old `Transient_Abs_NL-Chi.ipynb` (in the git history).
   - cluster only, `kx8_nb100_NoTr_E100/`, `kx12_nb100_NoTr_E100/`, `kx16_nb100_NoTr_E100/`: copies of Sangalli's
     NoTr_E100 SAVEs (`/work/sangalli/simulations/LiF/yambo/e80_kx6_pbe_sr/kx{8,12,16}_nb100/NoTr_E100/SAVE`: same
@@ -121,7 +138,8 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
 - Reached from the laptop with `ssh -o BatchMode=yes -o ClearAllForwardings=yes ismhpc '...'` (host in
   `~/.ssh/config`, jump through `narro`; ClearAllForwardings avoids the LocalForward 4444 clash). CentOS 7 /
   glibc 2.17: VS Code Remote-SSH does not work. The connection sometimes times out: just retry later.
-- Never run heavy computations on the login node `frontend`: use slurm. Always use the partition `all12h` (32 cores
+- Never run heavy computations on the login node `frontend`: use slurm. At most three nodes in use at the same time (cluster rule,
+  2026-10-13): MPPI datasets of 1-node runs with `num_tasks` <= 3, counting the other running jobs. Always use the partition `all12h` (32 cores
   per node), also for the short test/diagnostic runs: it runs on all the nodes and gives no problems (user's choice,
   2026-10-06; the `debug` partition is not used). Runs longer than 12 h (e.g. the kx16 yambo_nl runs on one node,
   ~14 h) use `slownodes` (time limit 2 days, wnode01-02, 04-05, 07-08): `yambo_nl_code(nodes, partition)` in the first
