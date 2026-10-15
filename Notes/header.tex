@@ -16,6 +16,22 @@
 \setlength{\parindent}{4pt}
 %\setlength{\parskip}{1\baselineskip}
 
+% Title block: the paper class sets it flush left and does not print the date
+\makeatletter
+\def\@maketitle{%
+  \null
+  \vskip \beforetitlespace
+  \begin{center}
+    {\t@font \@title \par}%
+    \vskip 1.5em
+    {\a@font \lineskip .5em \begin{tabular}[t]{c}\@author\end{tabular}\par}%
+    \vskip 1em
+    {\large \@date \par}%
+  \end{center}
+  \par \vskip 1.5em
+}
+\makeatother
+
 % Notation
 \newcommand{\chin}[2]{\chi_{(#1,#2)}}          % MPPI key chi_(n,m)
 \newcommand{\dchi}{\delta\chi}                  % pump induced change of chi
@@ -26,3 +42,11 @@
 \newcommand{\tP}{t_{\mathrm{P}}}                % pump maximum
 \newcommand{\tp}{t_{\mathrm{p}}}                % probe time
 \newcommand{\fenv}{f}                           % pump envelope
+\newcommand{\chineq}{\chi^{\mathrm{neq}}}       % non-equilibrium response
+\newcommand{\PPp}{P_{\mathrm{Pp}}}              % polarization with pump and probe
+\newcommand{\PPo}{P_{\mathrm{P}}}               % polarization with the pump only
+\newcommand{\EOP}{E_{0\mathrm{P}}}              % peak amplitude of the pump
+\newcommand{\Kt}{\mathcal{K}}                   % response function in time
+\newcommand{\chiz}{\chi^{(3)}_{0}}              % 6 chi3(w;w,wP,-wP)
+\newcommand{\chip}{\chi^{(3)}_{+}}              % 3 chi3(w;w-2wP,wP,wP)
+\newcommand{\chim}{\chi^{(3)}_{-}}              % 3 chi3(w;w+2wP,-wP,-wP)

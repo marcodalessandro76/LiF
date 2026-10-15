@@ -160,6 +160,14 @@ done (theory, implementation, computations) and of the notation and conventions.
   the notebooks/data with a script kept in `Notes/`), saved as jpeg in `Notes/Figures` and pushed; the laptop session
   asks for them through the user (or checks small things with ssh, see "Cluster ismhpc"). Sync only through git, with
   a file edited on one side at a time.
+- User's guidelines (2026-10-15): notes for the user and the colleagues (technical, explicit derivations). Section 1
+  is the theory (P vs chi, delta probe, chi^neq, dchi for monochromatic and pulsed pump, accumulated envelope), written
+  without MPPI notation (chi_0 = 6 chi3(w;w,wP,-wP), chi_+- = 3 chi3(w;w-+2wP,+-wP,+-wP)): the MPPI keys and the
+  implementation come in the later sections. Vectors in bold (`\bm`) with Cartesian indices until the fields are
+  taken along x. Only a delta probe (no monochromatic probe). Display equations must fit the line (split with align,
+  check the log for Overfull \hbox). Bibliography in `Notes/biblio.bib` (bibtex, unsrt); do NOT cite the
+  Attaccalite-Sangalli draft (these notes replace it). Compile checks: `main.pdf` is often locked by the PDF viewer,
+  so compile a copy in the scratchpad (latexmk) and leave the build in `Notes/` to the user.
 - Sources: this file (conventions, results, numbers) and the markdown cells of the notebooks (tracked in git, they can
   be read on the laptop): `Dchi-neq_Analysis.ipynb` ("Formula used for dchi^neq", "Frequency grids", "Correction of
   the INVINT integrator", "Our RT runs with the bands 3-6", "Pump intensity: third order RT response", "High pump
