@@ -147,7 +147,7 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
 ## Technical notes (`Notes/`, LaTeX, started 2026-10-14)
 Technical notes on this activity: NOT the paper, but a complete and as concise as possible explanation of what is
 done (theory, implementation, computations) and of the notation and conventions. Written in English, in LaTeX.
-- Files: `Notes/main.tex` (main file: `\documentclass[11pt,a4paper]{paper}`, then `\input{header.tex}`),
+- Files: `Notes/main.tex` (main file: `\documentclass[10pt,a4paper]{paper}`, then `\input{header.tex}`),
   `Notes/header.tex` (packages and new commands: put there the macros of the recurring symbols, e.g. the MPPI keys
   chi_(n,m), Delta eps, E_P, the pump envelope f, so that the notation stays uniform), figures in `Notes/Figures/`
   as jpeg (`\includegraphics{Figures/<name>.jpeg}`). Style of the user's example notes: header with inputenc utf8,
