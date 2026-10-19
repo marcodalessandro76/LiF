@@ -211,8 +211,12 @@ done (theory, implementation, computations) and of the notation and conventions.
   Sec. 3 "Transient absorption of LiF" (structure given by the user, 2026-10-19): 3.1 RT transient absorption (3.1.1
   setup of our RT runs at 6e7 kW/cm^2, kx16, bands 3-6, with the figure of the pump and of the probe times; 3.1.2 even
   and odd parts in the pump field with the reversed pump, origin of the spurious second order term, the comparison
-  with the chi uses the even part), 3.2 Non-linear chi analysis (3.2.1 results for the susceptibilities: to write),
-  3.3 transient absorption from the chi and comparison with the RT results (to write). Nothing after Sec. 3 is defined:
+  with the chi uses the even part), 3.2 Non-linear chi analysis (done: extraction from the keys, Eq. chi_from_keys;
+  3.2.1 convergence with the k grid, Fig. chi_kgrid; 3.2.2 convergence with the pump intensity, kx12, five intensities
+  1e6-2.56e8 kW/cm^2, Fig. chi_pump and Tab. chi_pump with the maximum changes of chi_0, chi_+, chi_- in 10-20 eV of
+  the probe grid: 0.20/0.41/0.18% at 4e6, 0.91/1.84/0.73% at 1.6e7, 3.89/7.45/3.11% at 6.4e7, 14.3/25.2/11.4% at
+  2.56e8, growth ~ I_P up to 6.4e7 (fifth order), less at 2.56e8; the RT runs at 6e7 have a few % beyond the third
+  order near the pump maximum), 3.3 transient absorption from the chi and comparison with the RT results (to write). Nothing after Sec. 3 is defined:
   do not refer to sections that do not exist. Figures: `Notes/make_figures.py` (registry FIGURES, run on ismhpc from
   ~/work/LiF/Notes with `--out ~/tmp_claude/notes_figures`, then scp the jpeg to Notes/Figures on the laptop and commit
   there; the cluster copy of the repo never commits). Our RT runs at 6e7: only 5 probe times (13-19 fs, tau -2.91 ...
