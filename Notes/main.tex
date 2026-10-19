@@ -440,6 +440,45 @@ delicate). The choice is checked by repeating the simulations with
 different intensities: each component scales as $E_{0\mathrm{p}}^{|n|}E_{0\mathrm{P}}^{|m|}$ and the extracted $\chi$
 must not change.
 
+\section{Transient absorption of LiF}
+\label{sec:lif}
+
+\subsection{Real-time pump-probe simulations}
+\label{sec:lif_rt}
+
+The reference for the transient absorption of LiF are real-time simulations of the pump-probe experiment, one for each
+probe time, which we performed with the setup of the simulations of D.~Sangalli. The electrons are independent
+particles, with a scissor on the DFT band structure, and the dynamics includes the bands 3-6: the three highest
+valence bands and the lowest conduction band. The equations of motion are integrated with the Crank-Nicolson scheme,
+without damping.
+
+The pump is a Gaussian pulse at $\wP = 1.56$~eV with $\sigma = 3.22$~fs, i.e.\ the pulse of Eq.~\eqref{eq:pump_pulse}
+up to its sign and a small term proportional to the derivative of the envelope, with the maximum at $\tP = 15.91$~fs
+and the intensity $6\cdot10^7$~kW/cm$^2$, low enough for a third order response. The probe is a weak delta kick at
+the time $\tp$. Fig.~\ref{fig:rt_setup} shows the pump and the five probe times, with delays $\tau$ from $-2.9$ to
+$+3.1$~fs around the pump maximum.
+
+For each probe time a run with pump and probe and one with the pump only give $\PPp(t)-\PPo(t)$, the polarization
+induced by the probe in presence of the pump, Eq.~\eqref{eq:chineq}. Its Fourier transform from $\tp$, with a
+Lorentzian smoothing that multiplies it by $e^{-\eta(t-\tp)}$ with $\eta = 0.6$~eV, gives the dielectric function
+$\varepsilon(\omega,\tau) = 1+4\pi\chineq(\omega,\tau)$, and the transient spectrum is
+\begin{equation}
+\deps(\omega,\tau) = \varepsilon(\omega,\tau)-\varepsilon_{\mathrm{eq}}(\omega) = 4\pi\,\dchi(\omega,\tau) ,
+\label{eq:deps}
+\end{equation}
+where $\varepsilon_{\mathrm{eq}}$ comes from a run with the probe only. Since the dynamics has no damping, the
+smoothing plays the role of the width $\eta$ of Secs.~\ref{sec:theory} and~\ref{sec:extraction}: the probe signal is
+collected over $\hbar/\eta\simeq1.1$~fs after the probe, shorter but not much shorter than $\sigma$.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.85\textwidth]{Figures/rt_setup.jpeg}
+\caption{Pump field of the real-time simulations, $\EP(t)/\EOP$ (black), with its envelope $\pm\fenv(t-\tP)$ (blue,
+dashed) and its maximum $\tP$ (dotted). The red lines are the probe times $\tp$; the top axis gives the delays
+$\tau = \tp-\tP$.}
+\label{fig:rt_setup}
+\end{figure}
+
 % Notes for the following sections (their structure is to be defined with the user):
 % - comparison of the envelope weights (Sec. 1.5): besides the accumulated weight W of Eq. (eq:W) we tested the weight
 %   at the probe time, W = f^2(tau), and the local weight W = f^2(tau+t), in which the pump acts only at the emission
