@@ -522,8 +522,43 @@ field of the RT transient spectrum $\deps$, at $\tau = +0.09$~fs, near the pump 
 \subsection{Non-linear $\chi$ analysis}
 \label{sec:lif_chi}
 
+The susceptibilities are extracted with the method of Sec.~\ref{sec:extraction} from simulations with the setup of
+the RT ones (independent particles with the scissor, bands 3-6), but with a damping $\eta = 0.3$~eV in the dynamics and
+monochromatic fields: runs with the probe only, and runs with probe and pump, at $\wP = 1.55$~eV and $10^6$~kW/cm$^2$.
+The probe frequencies are 155, from 10 to 25~eV with the step $\wP/16$; the time step is 0.01~fs and the simulations
+last 100~fs. After the extraction a Lorentzian broadening of 0.3~eV is added to the terms linear in the probe, so that
+the total width, 0.6~eV, is the smoothing of the RT spectra.
+
+The linear response $\chi^{(1)}$ is the first harmonic of the probe-only runs, and the susceptibilities of
+Sec.~\ref{sec:theory} follow from the mixing keys~\eqref{eq:chi_nm},
+\begin{equation}
+\chiz(\omega) = \frac{\chin{1}{0}(\omega)-\chi^{(1)}(\omega)}{|\EP(\wP)|^2} , \qquad
+\chi^{(3)}_\pm(\omega) = \chin{1}{\pm2}(\omega\mp2\wP) , \qquad \chi^{(2)}_\pm(\omega) = \chin{1}{\pm1}(\omega\mp\wP) :
+\label{eq:chi_from_keys}
+\end{equation}
+the key $(1,m)$ computed at the probe frequency $\omega-m\wP$ gives the output at $\omega$, and since the step of the
+probe grid divides $\wP$ these frequencies are on the grid. $\chiz$ is the difference of two runs, which have the same
+parameters.
+
 \subsubsection{Results for the susceptibilities}
 \label{sec:lif_chi_results}
+
+Fig.~\ref{fig:chi_kgrid} shows the dependence of the susceptibilities on the k grid, with the grids kx8, kx12 and kx16.
+The second order key $\chin{1}{1}$, which should vanish, decreases by a factor $\sim3$ at each refinement of the grid
+(median in 10-20~eV; the same holds for $\chin{1}{-1}$): it is the discretization error discussed in
+Sec.~\ref{sec:lif_even_odd}, and it is dropped in what follows. The third order term $\chiz$ is converged below 16~eV,
+where kx12 and kx16 differ by 3\% of the maximum on average, but not above: there its structures still change between
+kx12 and kx16 (60\% of the maximum on average, ratio of the maxima 1.4). We use the kx16 grid, the one of the RT
+simulations; the residual dependence on the grid above 16~eV is a limit of the comparison.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/chi_kgrid.jpeg}
+\caption{Dependence on the k grid of the susceptibilities extracted from the simulations with monochromatic fields
+(total broadening 0.6~eV). Left: modulus of the spurious second order key $\chin{1}{1}$ (logarithmic scale). Right:
+imaginary part of the third order term $\chiz$.}
+\label{fig:chi_kgrid}
+\end{figure}
 
 \subsection{Transient absorption from the $\chi$ and comparison with the RT results}
 \label{sec:lif_dchi}
@@ -533,10 +568,6 @@ field of the RT transient spectrum $\deps$, at $\tau = +0.09$~fs, near the pump 
 %   at the probe time, W = f^2(tau), and the local weight W = f^2(tau+t), in which the pump acts only at the emission
 %   time (6 chi3(w; w-Omega, wP, Omega-wP) ~ chi0(w-Omega)); the accumulated weight reproduces the third order RT
 %   response at all the delays.
-% - relation between the keys chi_(1,m) of Sec. 2 and the chi of Sec. 1: chi_(1,0) = chi1 + chi0 |E_P(wP)|^2,
-%   chi_(1,+-1)(w) = chi2_+-(w +- wP), chi_(1,+-2)(w) = chi_+-(w +- 2wP) (the key (1,m) at the probe frequency w - m wP
-%   gives the output at w: shifted grids, exact if the grid step divides wP); chi0 = [chi_(1,0) - chi1]/|E_P(wP)|^2 is a
-%   small difference of two runs with the same parameters.
 % - a posteriori broadening (for the details of the computation of the chi with MPPI): the terms linear in the probe can
 %   be further broadened by a Lorentzian convolution of width Delta on the grid of the probe frequencies, which gives
 %   chi(w + i Delta) for a causal response (Delta added to the resonances in the probe frequency, the denominators that
