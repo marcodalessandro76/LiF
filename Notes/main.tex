@@ -566,23 +566,47 @@ third order term $\chiz$.}
 The extracted $\chi$ are the third order response only if the pump is weak enough. The key $(1,0)$ contains, besides
 $\chiz|\EP(\wP)|^2$, terms of fifth order proportional to $|\EP(\wP)|^4$, which after the division by $|\EP(\wP)|^2$ in
 Eq.~\eqref{eq:chi_from_keys} appear in the extracted $\chiz$ with a weight proportional to the pump intensity (and
-similarly for $\chi^{(3)}_\pm$). Fig.~\ref{fig:chi_pump} compares the $\chiz$ extracted on the kx12 grid with the pump
-intensities $10^6$, $4\cdot10^6$ and $1.6\cdot10^7$~kW/cm$^2$ (pump amplitudes $\EOP$, $2\EOP$ and $4\EOP$). The three
-curves are indistinguishable on the scale of $\chiz$. The differences with respect to $10^6$~kW/cm$^2$ are 0.2\%
-($4\cdot10^6$) and 1\% ($1.6\cdot10^7$) of $\chiz$ (median in 10-20~eV), concentrated in the resonant region above
-16~eV. Their ratio, $\sim5$, is the one expected for a term proportional to the intensity, $(16-1)/(4-1) = 5$: the fifth
-order terms are projected on $\chiz$. The same holds for $\chi^{(3)}_\pm$. The pump of our runs, $10^6$~kW/cm$^2$, is
-safely in the third order regime, and intensities up to $4\cdot10^6$~kW/cm$^2$ give the same $\chi$ with a larger
-signal.
+similarly for $\chi^{(3)}_\pm$). Fig.~\ref{fig:chi_pump} compares the $\chiz$ extracted on the kx12 grid with five
+pump intensities, from $10^6$ to $2.56\cdot10^8$~kW/cm$^2$ in steps of a factor 4 (pump amplitudes from $\EOP$ to
+$16\EOP$), and Tab.~\ref{tab:chi_pump} gives the maximum change of $\chiz$ and $\chi^{(3)}_\pm$ with respect to
+$10^6$~kW/cm$^2$. The changes are concentrated in the resonant region 17-21~eV, with the maximum around 18.5~eV, and
+they are proportional to the intensity, as expected for the fifth order terms: from $1.6\cdot10^7$ to
+$6.4\cdot10^7$~kW/cm$^2$ they grow by a factor 4.0-4.3, against $(64-1)/(16-1) = 4.2$. At $2.56\cdot10^8$~kW/cm$^2$ they
+grow less, by 3.4-3.7 against $(256-1)/(64-1) = 4.05$: the terms of higher order start to contribute.
+
+The pump of our runs, $10^6$~kW/cm$^2$, is safely in the third order regime, and intensities up to
+$4\cdot10^6$~kW/cm$^2$ give the same $\chi$ with a larger signal. The RT simulations of Sec.~\ref{sec:lif_rt_setup},
+at $6\cdot10^7$~kW/cm$^2$, are close to the run at $6.4\cdot10^7$~kW/cm$^2$: near the pump maximum the terms beyond the
+third order change their response by a few percent (up to 4\% of $\chiz$ and 7\% of $\chip$ around 18.5~eV), a limit
+to the precision of the comparison of Sec.~\ref{sec:lif_dchi}.
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth]{Figures/chi_pump.jpeg}
-\caption{Third order term $\chiz$ extracted on the kx12 grid with three pump intensities (damping 0.3~eV, no a
-posteriori broadening). Left: imaginary part (the run at $1.6\cdot10^7$~kW/cm$^2$ has only 39 probe frequencies,
-dots). Right: difference with respect to the $\chiz$ extracted at $10^6$~kW/cm$^2$, in percent of its maximum.}
+\caption{Third order term $\chiz$ extracted on the kx12 grid with five pump intensities (damping 0.3~eV, no a
+posteriori broadening). Left: imaginary part (the runs above $4\cdot10^6$~kW/cm$^2$ have only 39 probe frequencies,
+symbols). Right: modulus of the difference with respect to the $\chiz$ extracted at $10^6$~kW/cm$^2$, in percent of
+its maximum.}
 \label{fig:chi_pump}
 \end{figure}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{ccccc}
+\toprule
+$I_{\mathrm{P}}$ (kW/cm$^2$) & amplitude & $\chiz$ & $\chip$ & $\chim$ \\
+\midrule
+$4\cdot10^6$    & $2\EOP$  & 0.20 & 0.41 & 0.18 \\
+$1.6\cdot10^7$  & $4\EOP$  & 0.91 & 1.84 & 0.73 \\
+$6.4\cdot10^7$  & $8\EOP$  & 3.89 & 7.45 & 3.11 \\
+$2.56\cdot10^8$ & $16\EOP$ & 14.3 & 25.2 & 11.4 \\
+\bottomrule
+\end{tabular}
+\caption{Maximum change of the third order terms extracted on the kx12 grid with the pump intensity $I_{\mathrm{P}}$,
+with respect to those extracted at $10^6$~kW/cm$^2$ (amplitude $\EOP$), in percent of the maximum of each term
+(probe frequencies of the runs in 10-20~eV).}
+\label{tab:chi_pump}
+\end{table}
 
 \subsection{Transient absorption from the $\chi$ and comparison with the RT results}
 \label{sec:lif_dchi}
