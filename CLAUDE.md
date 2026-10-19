@@ -166,8 +166,9 @@ done (theory, implementation, computations) and of the notation and conventions.
   implementation come in the later sections. Vectors in bold (`\bm`) with Cartesian indices until the fields are
   taken along x. Only a delta probe (no monochromatic probe). Display equations must fit the line (split with align,
   check the log for Overfull \hbox). Bibliography in `Notes/biblio.bib` (bibtex, unsrt); do NOT cite the
-  Attaccalite-Sangalli draft (these notes replace it). Compile checks: `main.pdf` is often locked by the PDF viewer,
-  so compile a copy in the scratchpad (latexmk) and leave the build in `Notes/` to the user.
+  Attaccalite-Sangalli draft (these notes replace it). After each change Claude builds `Notes/main.pdf` in place
+  with latexmk (user's request, 2026-10-19) and checks the log (errors, Overfull \hbox, undefined references); if the
+  PDF is locked by the viewer (Acrobat: "I can't write on file main.pdf"), ask the user to close it.
 - Sources: this file (conventions, results, numbers) and the markdown cells of the notebooks (tracked in git, they can
   be read on the laptop): `Dchi-neq_Analysis.ipynb` ("Formula used for dchi^neq", "Frequency grids", "Correction of
   the INVINT integrator", "Our RT runs with the bands 3-6", "Pump intensity: third order RT response", "High pump
@@ -202,6 +203,53 @@ done (theory, implementation, computations) and of the notation and conventions.
   7. Results: chi3 vs RT third order (accumulated envelope: amplitude 1.04-1.07, rms 0.17-0.26), 6e9 beyond the
      perturbative regime (orders above the third, odd part small).
   8. Open points (k convergence of the cubic terms, bands above 6 for 18-22 eV, residual 5% / 0.07 eV).
+- State (2026-10-19): Sec. 1 (theory) of `Notes/main.tex` is done and agreed with the user; the other sections are
+  empty. The Results section has a LaTeX comment with the comparison of the envelope weights (probe time, local,
+  accumulated) to be developed there.
+
+### Model of Sec. 1 of the notes (reference for checking and implementing it)
+Atomic units, E(t) = int dw E(w) e^{-iwt} (E(w) = (2pi)^-1 int dt E(t)e^{iwt}), fields along x, delta probe
+E_p(t) = E0p delta(t-t_p) -> E_p(w-Omega)/E_p(w) = e^{-i Omega t_p}. chi^neq = (P_Pp - P_P)/E_p = chi1 + dchi with
+dchi^(2) = 2 int dOmega e^{-i Omega t_p} chi2(w;w-Omega,Omega) E_P(Omega) and
+dchi^(3) = 3 int dOmega e^{-i Omega t_p} int dw1 chi3(w;w-Omega,w1,Omega-w1) E_P(w1)E_P(Omega-w1).
+- Monochromatic sine pump E0P sin(wP(t-t_P)), E_P(+-wP) = +-(iE0P/2)e^{+-iwP t_P}, tau = t_p - t_P:
+  dchi = (iE0P/2)[chi2_+ e^{-iwP tau} - chi2_- e^{iwP tau}] + (E0P^2/4)[chi_0 - chi_+ e^{-2iwP tau} - chi_- e^{2iwP tau}],
+  chi2_+-(w) = 2chi2(w;w-+wP,+-wP), chi_0(w) = 6chi3(w;w,wP,-wP), chi_+-(w) = 3chi3(w;w-+2wP,+-wP,+-wP). In MPPI keys:
+  chi_0 = (chi_(1,0)-chi1)/(E0P_run^2/4), chi_+-(w) = chi_(1,+-2)(w-+2wP), chi2_+-(w) = chi_(1,+-1)(w-+wP).
+- Gaussian pulse E0P f(t-t_P) sin(wP(t-t_P)), f(t) = e^{-t^2/2sigma^2}: E_P = E^+ + E^-, E^+-(w) = +-(iE0P/2)
+  (sigma/sqrt(2pi)) e^{iw t_P} e^{-(w-+wP)^2 sigma^2/2}. Second order: exact, two terms with E^+-. Third order: chi3 taken
+  out of the integral over w1 at w1 = +-wP (pump arguments off resonance), Omega dependence kept:
+  dchi^(3) = int dOmega e^{-i Omega t_p}[6chi3(w;w-Omega,wP,Omega-wP)S_0 + 3chi3(w;w-Omega,wP,Omega-wP)S_+2
+  + 3chi3(w;w-Omega,-wP,Omega+wP)S_-2], S_0 = int dw1 E^+(w1)E^-(Omega-w1) = (E0P^2/4)(sigma/2sqrt(pi)) e^{i Omega t_P}
+  e^{-Omega^2 sigma^2/4}, S_+-2 = -(same with Omega -+ 2wP).
+- Envelope at the probe time (chi independent of Omega over hbar/sigma): the monochromatic result with f(tau) (second
+  order) and f^2(tau) (third order). Valid if hbar/eta << sigma (pump envelope constant during the probe dynamics,
+  eta = width of the transitions = total broadening, 0.6 eV in our comparison); underestimates before the pump
+  maximum, overestimates after it.
+- Accumulated envelope (third order): independent two-level transitions, pump shift d eps(t) = c_eps (E0P^2/4) f^2(t-t_P)
+  (dynamical Stark / Franz-Keldysh), response function R_eps(t) = i|d|^2 e^{-i eps t - eta t}; accumulated phase ->
+  dR_eps(t) = -i c_eps (E0P^2/4) R_eps(t) int_0^t f^2(tau+t')dt'; the unknown sum_eps(-i c_eps)R_eps(t) = R_0(t)/t is
+  fixed by requiring the monochromatic chi_0 (calibration, not a physical case), with chi_0(w) = int_0^inf dt R_0(t)
+  e^{iwt}, R_0(t) = (2pi)^-1 int dw chi_0(w) e^{-iwt}. Result dR = (E0P^2/4) W(tau,t) R_0(t),
+  W(tau,t) = (1/t) int_0^t f^2(tau+t')dt' = (sqrt(pi) sigma/2t)[erf((tau+t)/sigma) - erf(tau/sigma)], and
+  dchi^(3)(w,tau) = (E0P^2/4) int_0^inf dt e^{iwt} W(tau,t)[R_0 - R_+ e^{-2iwP tau} - R_- e^{2iwP tau}] (same W on the
+  +-2wP terms: extension, not derived). Limits: W -> 1 (sigma -> inf, monochromatic), W -> f^2(tau) (hbar/eta << sigma).
+  Equivalent in frequency: 6chi3(w;w-Omega,wP,Omega-wP) = (1/Omega) int_{w-Omega}^{w} chi_0(w')dw' (version discarded
+  from the notes: the user found the time form clearer; useful as an independent numerical check).
+
+### To do after the notes (not started: the user wants to go on with the notes first)
+1. Check that `dchi_neq` and `dchi_neq_t` (+ `envelope_weight`, `envelope_conv`) of `Dchi-neq_Analysis.ipynb` implement
+   the model above: chi_0 = x3 = (chi_(1,0)-chi1_sin)/(EP**2/4) with the same broadening on both; shifted grids
+   (n = 2wP/step = 32, keys (1,+-2) sliced [:-2n] / [2n:]); signs and phases of the +-2wP terms (minus from the sine
+   pump, phases with the RT pump frequency `wP_phase`); f^2 = exp(-tau^2/sigma^2) with sigma from the ypp header (field
+   width) and t_P of QSFIELD 5SIGMA; W of `envelope_weight('accumulated')` = Eq. above (for s < 0 it returns f^2(tau));
+   `envelope_conv` = inverse DFT on the probe grid, times W, direct DFT (period 2 pi hbar/step = 42.7 fs; for the
+   (1,+-2) keys the transform is done on the input grid and then shifted: equivalent because a frequency shift is a
+   phase in time, to be verified); the INVINT correction applied to dchi at the output frequency (for the shifted
+   keys the probe enters at w-+2wP: check whether the energy map and the dt/2 phase are applied consistently); the
+   neglected derivative term of the QSFIELD pump. A numerical check: the frequency form above must give the same result.
+2. Implement the construction of chi^neq in MPPI (plan and prototypes written in the MPPI CLAUDE.md, section
+   "Planned: transient response chi^neq"). To be done in a MPPI session, after the notes.
 
 ## Cluster ismhpc
 - Reached from the laptop with `ssh -o BatchMode=yes -o ClearAllForwardings=yes ismhpc '...'` (host in

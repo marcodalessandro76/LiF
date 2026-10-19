@@ -175,7 +175,7 @@ Sec.~\ref{sec:rt}). The spectrum of the pulse has two peaks, $\EP(\omega) = E^+(
 E^\pm(\omega) = \pm\frac{i\EOP}{2}\,\frac{\sigma}{\sqrt{2\pi}}\,e^{i\omega\tP}\,e^{-(\omega\mp\wP)^2\sigma^2/2} ,
 \label{eq:pump_spectrum}
 \end{equation}
-centered at $\pm\wP$ with width $1/\sigma$ ($\hbar/\sigma\simeq0.2$~eV): $E^+$ and $E^-$ are the spectra of the two
+centered at $\pm\wP$ with width $\hbar/\sigma\simeq0.2$~eV: $E^+$ and $E^-$ are the spectra of the two
 terms $a(t)e^{-i\wP t}$ and $a^*(t)e^{i\wP t}$ of Eq.~\eqref{eq:pump_pulse}.
 
 \paragraph{Second order.} With $\EP = E^++E^-$, Eq.~\eqref{eq:dchi2} is the sum of two terms,
@@ -185,7 +185,7 @@ terms $a(t)e^{-i\wP t}$ and $a^*(t)e^{i\wP t}$ of Eq.~\eqref{eq:pump_pulse}.
 &+ 2\int d\Omega\,e^{-i\Omega\tp}\,\chi^{(2)}(\omega;\omega-\Omega,\Omega)\,E^-(\Omega) ,
 \label{eq:dchi2_pulse}
 \end{align}
-in which the Gaussians $E^\pm$ restrict the pump frequency $\Omega$ to a range of width $1/\sigma$ around $+\wP$ or
+in which the Gaussians $E^\pm$ restrict the pump frequency $\Omega$ to a range of width $\hbar/\sigma$ around $+\wP$ or
 $-\wP$. No approximation is made. For $\sigma\to\infty$ the normalized Gaussians become $\delta$-functions,
 $(\sigma/\sqrt{2\pi})\,e^{-(\Omega\mp\wP)^2\sigma^2/2}\to\delta(\Omega\mp\wP)$, and
 \begin{equation*}
@@ -201,9 +201,9 @@ these are the values of the susceptibilities at the centers of the two ranges.
 $E^a(\omega_1)E^b(\Omega-\omega_1)$, $a,b = \pm$, each different from zero only for $\omega_1$ close to $a\wP$ and
 $\Omega$ close to $(a+b)\wP$: $E^+E^-$ and $E^-E^+$ with $\Omega\simeq0$, $E^+E^+$ with $\Omega\simeq2\wP$ and $E^-E^-$
 with $\Omega\simeq-2\wP$. At fixed $\Omega$ the integral over $\omega_1$ runs over the ways $\Omega$ is shared between
-the two pump photons, with $\omega_1$ within $1/\sigma$ of $\pm\wP$. In $\chi^{(3)}(\omega;\omega-\Omega,\omega_1,
+the two pump photons, with $\omega_1$ within $\hbar/\sigma$ of $\pm\wP$. In $\chi^{(3)}(\omega;\omega-\Omega,\omega_1,
 \Omega-\omega_1)$ a change of $\omega_1$ at fixed $\Omega$ changes only the two pump arguments, which stay close to
-$\pm\wP$, far below the gap: there $\chi^{(3)}$ changes on a scale of eV, much larger than $1/\sigma$. So $\chi^{(3)}$
+$\pm\wP$, far below the gap: there $\chi^{(3)}$ changes on a scale of eV, much larger than $\hbar/\sigma$. So $\chi^{(3)}$
 can be taken out of the integral over $\omega_1$, at the center of the peak $\omega_1 = \pm\wP$ (the second pump
 argument, $\Omega-\omega_1$, follows from the sum of the frequencies). A change of $\Omega$ also changes the probe
 argument $\omega-\Omega$, which is resonant: this dependence is kept. The two cross terms give the same contribution
@@ -227,13 +227,13 @@ S_0(\Omega) = \frac{\EOP^2}{4}\,\frac{\sigma}{2\sqrt{\pi}}\,e^{i\Omega\tP}\,e^{-
 S_{\pm2}(\Omega) = -\frac{\EOP^2}{4}\,\frac{\sigma}{2\sqrt{\pi}}\,e^{i\Omega\tP}\,e^{-(\Omega\mp2\wP)^2\sigma^2/4} :
 \label{eq:S3}
 \end{equation}
-they restrict $\Omega$ to a range of width $\sqrt{2}/\sigma$ around 0 and $\pm2\wP$ (the minus sign of $S_{\pm2}$ is
+they restrict $\Omega$ to a range of width $\sqrt{2}\,\hbar/\sigma$ around 0 and $\pm2\wP$ (the minus sign of $S_{\pm2}$ is
 $(\pm i)^2$). At the centers the susceptibilities are those of the monochromatic pump,
 $6\chi^{(3)}(\omega;\omega,\wP,-\wP) = \chiz(\omega)$ and
 $3\chi^{(3)}(\omega;\omega\mp2\wP,\pm\wP,\pm\wP) = \chi^{(3)}_\pm(\omega)$, Eq.~\eqref{eq:chi3_mono}.
 
 \paragraph{$\chi$ independent of $\Omega$: envelope at the probe time.} If the susceptibilities do not change over the
-ranges of $\Omega$ selected by the pump (widths $1/\sigma$ and $\sqrt{2}/\sigma$), they can be taken out of the integrals at the centers of the
+ranges of $\Omega$ selected by the pump (widths $\hbar/\sigma$ and $\sqrt{2}\,\hbar/\sigma$), they can be taken out of the integrals at the centers of the
 ranges, and the integrals left are Gaussian. With the delay $\tau = \tp-\tP$, at second order
 \begin{equation}
 \int d\Omega\,e^{-i\Omega\tp}\,E^\pm(\Omega) = \pm\frac{i\EOP}{2}\,\fenv(\tau)\,e^{\mp i\wP\tau} ,
@@ -263,90 +263,80 @@ $D(\omega-\Omega)$ with $D(\omega) = 1/(\varepsilon-\omega-i\eta)$. The conditio
 
 In time this condition has a simple meaning. The delta probe starts at $\tp$ a dynamics of the system: it creates a
 polarization that oscillates at the transition energies and lasts a time $\hbar/\eta$ (a line of width $\eta$
-corresponds to a polarization damped as $e^{-\eta s}$, with $s = t-\tp$). The response at the frequency $\omega$ is built over all
+corresponds to a polarization damped as $e^{-\eta(t-\tp)}$). The response at the frequency $\omega$ is built over all
 this time, and the pump changes it as long as the polarization lives, not only at $\tp$. What enters is therefore the
 pump intensity between $\tp$ and $\tp+\hbar/\eta$, and the approximation replaces it with its value at $\tp$: the pump
 envelope must be constant during the dynamics started by the probe, $\hbar/\eta\ll\sigma$. This is the condition
 $\eta\gg\hbar/\sigma$ seen in time.
-
-The convolution theorem makes this statement precise. $S_0$ is the spectrum of the intensity envelope,
-$S_0(\Omega) = (2\pi)^{-1}\int dt\,(\EOP^2/4)\,\fenv^2(t-\tP)\,e^{i\Omega t}$, so the term with $S_0$ in
-Eq.~\eqref{eq:dchi3_pulse} is
-\begin{equation}
-6\int d\Omega\,e^{-i\Omega\tp}\,\chi^{(3)}(\omega;\omega-\Omega,\wP,\Omega-\wP)\,S_0(\Omega)
-= \frac{\EOP^2}{4}\int ds\,K(\omega,s)\,\fenv^2(\tau+s) ,
-\label{eq:kernel}
-\end{equation}
-with
-\begin{equation*}
-K(\omega,s) = \frac{6}{2\pi}\int d\Omega\,\chi^{(3)}(\omega;\omega-\Omega,\wP,\Omega-\wP)\,e^{i\Omega s} :
-\end{equation*}
-an average of the intensity envelope at the times $\tp+s$ after the probe, with a weight $K$ given by the dependence of
-$\chi^{(3)}$ on $\Omega$ (the other terms behave in the same way). A constant $\chi^{(3)}$ gives
-$K = \chiz\,\delta(s)$, i.e.\ Eq.~\eqref{eq:dchi_probetime}. The resonant dependence gives instead
-\begin{equation}
-\frac{1}{2\pi}\int d\Omega\,D(\omega-\Omega)\,e^{i\Omega s} = i\,e^{i(\omega-\varepsilon)s-\eta s}\,\theta(s) ,
-\label{eq:g_transform}
-\end{equation}
-a weight that is zero before the probe (the pump cannot change the response to a probe that has not arrived yet) and
-lasts $\hbar/\eta$ after it: the duration of the dynamics started by the probe.
-
 The approximation is best at the pump maximum, where the envelope is flat, and fails first on its slopes: before the
 maximum the intensity grows during the probe dynamics and Eq.~\eqref{eq:dchi_probetime} underestimates the effect of
 the pump, after the maximum it overestimates it.
 
-\paragraph{$\chi$ dependent on $\Omega$: accumulated envelope.} The susceptibilities of a monochromatic
-pump give $\chi^{(3)}$ only at the centers $\Omega = 0,\pm2\wP$: the dependence on $\Omega$ requires a model. We formulate it for the third
-order term. The probe is resonant: at $\tp$ it creates coherences between valence and conduction states, which
-oscillate at the transition energies. The pump is far below the gap: the polarization it induces follows the field
-adiabatically (virtual transitions, no memory) and its effect is to shift the transition energies while the probe
-coherences live. For the delta probe the response is the transform of the response function
-$R(s) = P(\tp+s)/E_{0\mathrm{p}}$,
+\paragraph{$\chi$ dependent on $\Omega$: accumulated envelope.} The susceptibilities of a monochromatic pump give
+$\chi^{(3)}$ only at the centers $\Omega = 0,\pm2\wP$: the dependence on $\Omega$ requires a model, which we build in
+time for the third order term. At $\tp$ the probe creates coherences between valence and conduction states, which
+oscillate at the transition energies and decay with the width $\eta$. The pump, far below the gap, creates no real
+excitations: its effect is to shift the transition energies while it is on. We assume that the shift follows the
+intensity envelope of the pump,
 \begin{equation}
-\chi(\omega) = \int_0^\infty ds\,R(s)\,e^{i\omega s} , \qquad
-R(s) = \frac{1}{2\pi}\int d\omega\,\chi(\omega)\,e^{-i\omega s} ,
-\label{eq:R}
+\delta\varepsilon(t) = c_\varepsilon\,\frac{\EOP^2}{4}\,\fenv^2(t-\tP) ,
+\label{eq:shift}
 \end{equation}
-and a transition of energy $\varepsilon$ and dipole $d$ contributes $R_\varepsilon(s) = i|d|^2e^{-i\varepsilon s-\eta s}$,
-i.e.\ $|d|^2D(\omega)$ to $\chi^{(1)}$ (resonant term). We assume that the pump shifts the transition energy by
-$\delta\varepsilon(t) = c_\varepsilon|a(t)|^2$ (dynamical Stark and Franz-Keldysh shifts). The coherence accumulates
-the phase $-\int_{\tp}^{\tp+s}\delta\varepsilon\,dt'$ and, to first order in $\delta\varepsilon$,
+with a constant $c_\varepsilon$ for each transition (dynamical Stark and Franz-Keldysh shifts), and treat each pair of
+valence and conduction states as an independent two-level system.
+
+For the delta probe a transition of energy $\varepsilon$ and dipole $d$ gives a coherence that oscillates and
+decays: the polarization at the time $t$ after the probe is $P_\varepsilon(\tp+t) = E_{0\mathrm{p}}\,R_\varepsilon(t)$,
+with the response function
 \begin{equation}
-\delta R_\varepsilon(s) = -ic_\varepsilon\,R_\varepsilon(s)\int_0^s|a(\tp+s')|^2\,ds' :
+R_\varepsilon(t) = i|d|^2e^{-i\varepsilon t-\eta t} \, , \quad t>0 \, .
+\label{eq:R_eps}
+\end{equation}
+With the energy $\varepsilon+\delta\varepsilon(t)$ the
+coherence accumulates the extra phase $-\int_{\tp}^{\tp+t}\delta\varepsilon\,dt'$ and, to first order in
+$\delta\varepsilon$ (third order in the fields), with the delay $\tau = \tp-\tP$,
+\begin{equation}
+\delta R_\varepsilon(t) = -ic_\varepsilon\,\frac{\EOP^2}{4}\,R_\varepsilon(t)\int_0^t\fenv^2(\tau+t')\,dt' :
 \label{eq:dR}
 \end{equation}
-all the times between the probe and the emission count the same. With a constant envelope, $|a|^2 = \EOP^2/4$,
-$\delta R_\varepsilon(s) = (\EOP^2/4)\,R^{(3)}_\varepsilon(s)$ with $R^{(3)}_\varepsilon(s) = -ic_\varepsilon s\,R_\varepsilon(s)$,
-whose transform is the contribution of the transition to $\chiz$ (a rigid shift of the line). With the pulse
-\begin{align}
-\delta R_\varepsilon(s) &= \frac{\EOP^2}{4}\,R^{(3)}_\varepsilon(s)\,W(\tau,s) , \nonumber\\
-W(\tau,s) &= \frac{1}{s}\int_0^s\fenv^2(\tau+s')\,ds'
-= \frac{\sqrt{\pi}\,\sigma}{2s}\left[\mathrm{erf}\Big(\frac{\tau+s}{\sigma}\Big)
+the polarization at the time $t$ feels the pump at all the times between the probe and $t$, with the same weight.
+
+The integral does not depend on the transition. In the sum over the transitions we then need only
+$\sum_\varepsilon(-ic_\varepsilon)R_\varepsilon(t)$, which contains the unknown $c_\varepsilon$, $\varepsilon$ and $d$.
+It is fixed by requiring that the model reproduces the susceptibility $\chiz$ computed with a monochromatic pump: there
+$\fenv = 1$, the integral is $t$ and the sum of Eq.~\eqref{eq:dR} must give $(\EOP^2/4)\,R_0(t)$, with the response
+function of $\chiz$,
+\begin{equation}
+\chiz(\omega) = \int_0^\infty dt\,R_0(t)\,e^{i\omega t} , \qquad
+R_0(t) = \frac{1}{2\pi}\int d\omega\,\chiz(\omega)\,e^{-i\omega t}
+\label{eq:R0}
+\end{equation}
+(the factor $1/2\pi$ is in the inverse transform because $\chi$ is the ratio of the transforms of $P$ and
+$E_{\mathrm{p}}$). Hence $\sum_\varepsilon(-ic_\varepsilon)R_\varepsilon(t) = R_0(t)/t$ and, with the pulse,
+\begin{equation}
+\delta R(t) = \frac{\EOP^2}{4}\,W(\tau,t)\,R_0(t) , \qquad
+W(\tau,t) = \frac{1}{t}\int_0^t\fenv^2(\tau+t')\,dt'
+= \frac{\sqrt{\pi}\,\sigma}{2t}\left[\mathrm{erf}\Big(\frac{\tau+t}{\sigma}\Big)
 -\mathrm{erf}\Big(\frac{\tau}{\sigma}\Big)\right] ,
 \label{eq:W}
-\end{align}
-the mean intensity envelope between the probe and the emission. $W$ is the same for all the transitions, so the sum
-gives the same relation for the total $R^{(3)}$, which is the transform~\eqref{eq:R} of $\chiz$: the single
-$c_\varepsilon$, $\varepsilon$ and $d$ are not needed. The limits are the expected ones: $W\to\fenv^2(\tau)$ for
-$s\ll\sigma$ (Eq.~\eqref{eq:dchi_probetime}) and $W\to1$ for $\sigma\to\infty$ (Eq.~\eqref{eq:dchi_mono}). In
-frequency the model corresponds, for each transition, to
-$6\chi^{(3)}(\omega;\omega-\Omega,\wP,\Omega-\wP)\propto c_\varepsilon\,D(\omega)\,D(\omega-\Omega)$: a resonant denominator at the output and one
-at the input frequency of the probe, the dependence on $\Omega$ of Eq.~\eqref{eq:g_transform}.
+\end{equation}
+where $W$, the ratio between the intensity accumulated with the pulse and with a constant envelope, is the mean
+intensity envelope between the probe and $t$. The single $c_\varepsilon$, $\varepsilon$ and $d$ are not needed: $\chiz$
+is transformed to time, multiplied by $W$ and transformed back.
 
-The model holds for the term $\Omega\simeq0$, where the pump acts through $|a(t)|^2$. In the terms $\Omega\simeq\pm2\wP$
-it acts through $a(t)^2e^{\mp2i\wP t}$, which oscillates with period 1.33~fs, comparable with $\hbar/\eta$, and the
-Stark shift picture does not apply. We apply the same $W$ to their envelope and keep the phases $e^{\mp2i\wP\tau}$ (an
-extension, not derived). The transient response is therefore
+In the terms at $\pm2\wP$ the pump enters through the parts of $\EP(t)^2$ that oscillate at $\pm2\wP$,
+$\propto\fenv^2(t-\tP)\,e^{\mp2i\wP(t-\tP)}$, with period $\pi/\wP$ comparable with $\hbar/\eta$: they are not a shift
+of the transition energies and the model does not apply. We apply the same $W$ to their envelope and keep the phases
+$e^{\mp2i\wP\tau}$ (an extension, not derived). The transient response is therefore
 \begin{equation}
-\dchi^{(3)}(\omega,\tau) = \frac{\EOP^2}{4}\int_0^\infty ds\,e^{i\omega s}\,W(\tau,s)
-\left[R_0(s) - R_+(s)\,e^{-2i\wP\tau} - R_-(s)\,e^{2i\wP\tau}\right] ,
+\dchi^{(3)}(\omega,\tau) = \frac{\EOP^2}{4}\int_0^\infty dt\,e^{i\omega t}\,W(\tau,t)
+\left[R_0(t) - R_+(t)\,e^{-2i\wP\tau} - R_-(t)\,e^{2i\wP\tau}\right] ,
 \label{eq:dchi_accumulated}
 \end{equation}
-where $R_0$ and $R_\pm$ are the transforms~\eqref{eq:R} of $\chiz$ and $\chi^{(3)}_\pm$. For $W = \fenv^2(\tau)$ it
-reduces to the third order term of Eq.~\eqref{eq:dchi_probetime}. For comparison we also tested the local weight
-$W = \fenv^2(\tau+s)$, in which the pump acts only at the emission time ($6\chi^{(3)}(\omega;\omega-\Omega,\wP,\Omega-\wP)\simeq\chiz(\omega-\Omega)$).
-The accumulated weight is the one that reproduces the third order RT response at all the delays
-(Sec.~\ref{sec:results}).
+where $R_\pm$ are the response functions of $\chi^{(3)}_\pm$, defined as in Eq.~\eqref{eq:R0}. For $\sigma\to\infty$, $W\to1$ and
+Eq.~\eqref{eq:dchi_accumulated} gives the monochromatic result~\eqref{eq:dchi_mono}. When the probe coherence decays
+before the envelope changes, $\hbar/\eta\ll\sigma$, only $t\ll\sigma$ contributes, $W\to\fenv^2(\tau)$, and it gives the
+envelope at the probe time~\eqref{eq:dchi_probetime}.
 
 \section{Conventions}
 \label{sec:conventions}
@@ -362,6 +352,10 @@ The accumulated weight is the one that reproduces the third order RT response at
 
 \section{Results}
 \label{sec:results}
+% From Sec. 1.5 (to be developed): besides the accumulated weight W of Eq. (eq:W) we tested the weight at the
+% probe time, W = f^2(tau), and the local weight W = f^2(tau+t), in which the pump acts only at the emission time
+% (6 chi3(w; w-Omega, wP, Omega-wP) ~ chi0(w-Omega)); the accumulated weight reproduces the third order RT response
+% at all the delays.
 
 \section{Open points}
 \label{sec:open}
