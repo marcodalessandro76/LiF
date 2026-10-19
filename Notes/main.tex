@@ -540,8 +540,8 @@ the key $(1,m)$ computed at the probe frequency $\omega-m\wP$ gives the output a
 probe grid divides $\wP$ these frequencies are on the grid. $\chiz$ is the difference of two runs, which have the same
 parameters.
 
-\subsubsection{Results for the susceptibilities}
-\label{sec:lif_chi_results}
+\subsubsection{Convergence with the k-grid}
+\label{sec:lif_chi_kgrid}
 
 Fig.~\ref{fig:chi_kgrid} shows the dependence of the susceptibilities on the k grid, with the grids kx8, kx12 and kx16.
 The second order key $\chin{1}{1}$, which should vanish, decreases by a factor $\sim3$ at each refinement of the grid
@@ -555,9 +555,33 @@ simulations; the residual dependence on the grid above 16~eV is a limit of the c
 \centering
 \includegraphics[width=\textwidth]{Figures/chi_kgrid.jpeg}
 \caption{Dependence on the k grid of the susceptibilities extracted from the simulations with monochromatic fields
-(total broadening 0.6~eV). Left: modulus of the spurious second order key $\chin{1}{1}$ (logarithmic scale). Right:
-imaginary part of the third order term $\chiz$.}
+(total broadening 0.6~eV). Left: modulus of the spurious second order key $\chin{1}{1}$. Right: imaginary part of the
+third order term $\chiz$.}
 \label{fig:chi_kgrid}
+\end{figure}
+
+\subsubsection{Convergence with respect to the pump intensity}
+\label{sec:lif_chi_pump}
+
+The extracted $\chi$ are the third order response only if the pump is weak enough. The key $(1,0)$ contains, besides
+$\chiz|\EP(\wP)|^2$, terms of fifth order proportional to $|\EP(\wP)|^4$, which after the division by $|\EP(\wP)|^2$ in
+Eq.~\eqref{eq:chi_from_keys} appear in the extracted $\chiz$ with a weight proportional to the pump intensity (and
+similarly for $\chi^{(3)}_\pm$). Fig.~\ref{fig:chi_pump} compares the $\chiz$ extracted on the kx12 grid with the pump
+intensities $10^6$, $4\cdot10^6$ and $1.6\cdot10^7$~kW/cm$^2$ (pump amplitudes $\EOP$, $2\EOP$ and $4\EOP$). The three
+curves are indistinguishable on the scale of $\chiz$. The differences with respect to $10^6$~kW/cm$^2$ are 0.2\%
+($4\cdot10^6$) and 1\% ($1.6\cdot10^7$) of $\chiz$ (median in 10-20~eV), concentrated in the resonant region above
+16~eV. Their ratio, $\sim5$, is the one expected for a term proportional to the intensity, $(16-1)/(4-1) = 5$: the fifth
+order terms are projected on $\chiz$. The same holds for $\chi^{(3)}_\pm$. The pump of our runs, $10^6$~kW/cm$^2$, is
+safely in the third order regime, and intensities up to $4\cdot10^6$~kW/cm$^2$ give the same $\chi$ with a larger
+signal.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/chi_pump.jpeg}
+\caption{Third order term $\chiz$ extracted on the kx12 grid with three pump intensities (damping 0.3~eV, no a
+posteriori broadening). Left: imaginary part (the run at $1.6\cdot10^7$~kW/cm$^2$ has only 39 probe frequencies,
+dots). Right: difference with respect to the $\chiz$ extracted at $10^6$~kW/cm$^2$, in percent of its maximum.}
+\label{fig:chi_pump}
 \end{figure}
 
 \subsection{Transient absorption from the $\chi$ and comparison with the RT results}

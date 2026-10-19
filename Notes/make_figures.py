@@ -20,7 +20,7 @@ from mppi import Optics as O
 from mppi.Utilities import Constants as Const
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-NL_CHI = os.path.join(HERE, '..', 'NL_Chi')
+NL_CHI = os.environ.get('LIF_NL_CHI', os.path.join(HERE, '..', 'NL_Chi'))   # data folder (env variable for tests)
 RT_DIR = os.path.join(NL_CHI, 'kx16_nb100_NoTr_E100')    # RT pump-probe runs (YamboNL_Analysis.ipynb)
 T_PROBES = [13.0, 14.5, 16.0, 17.5, 19.0]                  # probe times of the RT runs (fs)
 
@@ -169,7 +169,7 @@ def fig_chi_kgrid(out, erange=(10, 25)):
     fig, axes = plt.subplots(1, 2, figsize=(7, 2.7))
     for g in GRIDS:
         c, ls = style[g]
-        axes[0].semilogy(f[s], np.abs(r[g + '_1_1'][s]), color=c, ls=ls, lw=1.2, label=g)
+        axes[0].plot(f[s], np.abs(r[g + '_1_1'][s]), color=c, ls=ls, lw=1.2, label=g)
         axes[1].plot(f[s], chi0[g][s].imag, color=c, ls=ls, lw=1.2, label=g)
     axes[0].set_ylabel(r'$|\chi_{(1,1)}|$ (au)')
     axes[1].set_ylabel(r'Im $\chi^{(3)}_0$ (au)')
@@ -197,7 +197,86 @@ def fig_chi_kgrid(out, erange=(10, 25)):
                   np.abs(chi0[g][sel]).max() / np.abs(chi0['kx16'][sel]).max()))
 
 
-FIGURES = {'rt_setup': fig_rt_setup, 'rt_even_odd': fig_rt_even_odd, 'chi_kgrid': fig_chi_kgrid}
+NAMES_PUMP_KX12 = {1e6: NAME_PP,
+                   4e6: 'Pp-Ep_1e3-EP_4e6-PE_1.55-nlenrange_10.0-25.016-nlensteps_155-bands_3-6-damp_0.3-sin-nltime_100',
+                   1.6e7: 'Pp-Ep_1e3-EP_1.6e7-PE_1.55-nlenrange_10.0-25.113-nlensteps_39-bands_3-6-damp_0.3-sin-nltime_100'}
+
+
+def chi_pumps_kx12(out):
+    """
+    Third order terms extracted from the kx12 P&p runs with the pump intensities 1e6, 4e6 and 1.6e7 kW/cm^2 (no a
+    posteriori broadening: the 1.6e7 run has only 39 frequencies). Cached in out/chi_pumps_kx12.npz.
+    """
+    cache = os.path.join(out, 'chi_pumps_kx12.npz')
+    if os.path.exists(cache):
+        return dict(np.load(cache))
+    folder = os.path.join(NL_CHI, GRIDS['kx12'])
+    d_sine = P.YamboNLDBParser(os.path.join(folder, NAME_SINE, 'ndb.Nonlinear'), verbose=False)
+    sf = O.Xn_single_frequency(d_sine, X_order=3, verbose=False)
+    chi1, f1 = sf.compute_Xn()[0][1], sf.fields_freqs * Const.HaToeV
+    res = {}
+    for I, name in NAMES_PUMP_KX12.items():
+        d = P.YamboNLDBParser(os.path.join(folder, name, 'ndb.Nonlinear'), verbose=False)
+        fm = O.Xn_frequency_mixing(d, X_order=(1, 2), verbose=False)
+        mix = fm.compute_Xn()[0]
+        f = fm.probe_freqs * Const.HaToeV
+        idx = np.array([np.argmin(np.abs(f1 - x)) for x in f])
+        assert np.allclose(f1[idx], f, atol=1e-6)
+        EP = d.Efield2[0]['amplitude']
+        tag = '%.1e' % I
+        res[tag + '_freqs'] = f
+        res[tag + '_chi0'] = (mix[(1, 0)] - chi1[idx]) / (EP**2 / 4)
+        res[tag + '_chip'] = mix[(1, 2)]
+        res[tag + '_chim'] = mix[(1, -2)]
+        print('chi_pumps_kx12: pump %.1e done (E0P %.3e au, %d frequencies)' % (I, EP, len(f)), flush=True)
+    np.savez(cache, **res)
+    return res
+
+
+def fig_chi_pump(out, erange=(10, 25)):
+    """
+    Third order term chi_0 extracted with different pump intensities (kx12, damping 0.3 eV) and its change w.r.t. the
+    lowest intensity: the fifth order terms, projected on chi_0, change it proportionally to the intensity.
+    """
+    r = chi_pumps_kx12(out)
+    ref, f = r['1.0e+06_chi0'], r['1.0e+06_freqs']
+    w = (f >= 10) & (f <= 20)
+    norm = np.abs(ref[w]).max()
+    style = {'1.0e+06': ('k', '-', None), '4.0e+06': ('b', '--', None), '1.6e+07': ('r', 'none', 'o')}
+    label = {'1.0e+06': r'$10^6$', '4.0e+06': r'$4\cdot10^6$', '1.6e+07': r'$1.6\cdot10^7$'}
+
+    fig, axes = plt.subplots(1, 2, figsize=(7, 2.7))
+    for tag, (c, ls, m) in style.items():
+        x, y = r[tag + '_freqs'], r[tag + '_chi0']
+        s = (x >= erange[0]) & (x <= erange[1])
+        axes[0].plot(x[s], y[s].imag, color=c, ls=ls, marker=m, ms=3, lw=1.2, label=label[tag] + ' kW/cm$^2$')
+        if tag != '1.0e+06':
+            idx = np.array([np.argmin(np.abs(f - xx)) for xx in x])
+            d = 100 * np.abs(y - ref[idx]) / norm
+            axes[1].plot(x[s], d[s], color=c, ls='-' if m else ls, marker=m, ms=3, lw=1)
+            ww = (x >= 10) & (x <= 20)
+            rel = np.abs(y - ref[idx]) / np.abs(ref[idx])
+            print('chi_pump: %s, chi_0 change w.r.t. 1e6 in 10-20 eV: mean %.2f%% of the max, median relative %.2f%%'
+                  % (tag, d[ww].mean(), 100 * np.median(rel[ww])))
+            for key in ['chip', 'chim']:
+                rk = np.abs(r[tag + '_' + key] - r['1.0e+06_' + key][idx]) / np.abs(r['1.0e+06_' + key][idx])
+                print('          %s: median relative change %.2f%%' % (key, 100 * np.median(rk[ww])))
+    axes[0].set_ylabel(r'Im $\chi^{(3)}_0$ (au)')
+    axes[0].axhline(0, color='gray', lw=0.5)
+    axes[1].set_ylabel(r'$|\chi^{(3)}_0-\chi^{(3)}_0(10^6)|$ (% of the max)')
+    for ax in axes:
+        ax.set_xlabel('probe energy (eV)')
+        ax.set_xlim(erange)
+        ax.set_xticks(np.arange(erange[0], erange[1] + 0.1, 5))
+    fig.tight_layout()
+    fig.legend(*axes[0].get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=3,
+               frameon=False)
+    fig.savefig(os.path.join(out, 'chi_pump.jpeg'))
+    plt.close(fig)
+
+
+FIGURES = {'rt_setup': fig_rt_setup, 'rt_even_odd': fig_rt_even_odd, 'chi_kgrid': fig_chi_kgrid,
+           'chi_pump': fig_chi_pump}
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Figures of the technical notes on LiF')

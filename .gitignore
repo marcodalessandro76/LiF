@@ -20,3 +20,4 @@ Notes/*.blg
 Notes/*.fls
 Notes/*.fdb_latexmk
 Notes/*.synctex.gz
+__pycache__/
