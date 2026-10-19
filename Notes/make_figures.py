@@ -16,6 +16,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from mppi import Parsers as P
+from mppi import Optics as O
 from mppi.Utilities import Constants as Const
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -83,7 +84,47 @@ def fig_rt_setup(out):
     print('rt_setup: t_P = %.3f fs, sigma = %.3f fs, tau =' % (t_P, sigma), np.round(np.array(t_p) - t_P, 3))
 
 
-FIGURES = {'rt_setup': fig_rt_setup}
+def rt_eps(run, ref=None, eta=0.6):
+    # energy (eV) and eps along x from the delta probe of the run, minus the polarization of ref (pump-only run), with a
+    # Lorentzian smoothing eta (eV)
+    return O.Linear_Response(np.array(run.IO_TIME_points), run.Polarization[0], run.Efield[0],
+                             pol_ref=None if ref is None else ref.Polarization[0], eta=eta)
+
+
+def fig_rt_even_odd(out, t_probe=16.0, pump_int=6e7, erange=(10, 25)):
+    """
+    Even and odd parts in the pump field of the RT Delta eps (bands 3-6) at one probe time, from the runs with the pump
+    along +x and -x.
+    """
+    E, eps_eq = rt_eps(load_nl(rt_id('3-6', None, 10.0)))                 # probe-only run
+    ref_p, ref_m = load_nl(rt_id('3-6', pump_int)), load_nl(rt_id('3-6', pump_int, neg=True))
+    run_p, run_m = load_nl(rt_id('3-6', pump_int, t_probe)), load_nl(rt_id('3-6', pump_int, t_probe, neg=True))
+    eps_p, eps_m = rt_eps(run_p, ref_p)[1], rt_eps(run_m, ref_m)[1]
+    even, odd = (eps_p + eps_m) / 2 - eps_eq, (eps_p - eps_m) / 2
+    tau = run_p.Efield[0]['initial_time'] / Const.FsToAu - pump_center(ref_p)[0]
+    s = (E >= erange[0]) & (E <= erange[1])
+
+    fig, axes = plt.subplots(1, 2, figsize=(7, 2.6), sharex=True)
+    for ax, part, lab in zip(axes, [np.real, np.imag], ['Re', 'Im']):
+        ax.plot(E[s], 1e3 * part(even[s]), 'k', lw=1.2, label='even part (third order)')
+        ax.plot(E[s], 1e3 * part(odd[s]), 'r--', lw=1.2, label='odd part (second order)')
+        ax.axhline(0, color='gray', lw=0.5)
+        ax.set_xlabel('probe energy (eV)')
+        ax.set_ylabel(r'%s $\Delta\varepsilon$ ($10^{-3}$)' % lab)
+        ax.set_xlim(erange)
+        ax.set_xticks(np.arange(erange[0], erange[1] + 0.1, 5))
+    fig.suptitle(r'pump $%s\cdot10^{%d}$ kW/cm$^2$, $\tau$ = %+.2f fs' % (('%.0e' % pump_int)[0],
+                 int(np.log10(pump_int)), tau), fontsize=9, y=0.97)
+    fig.tight_layout()
+    fig.legend(*axes[0].get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=2,
+               frameon=False)
+    fig.savefig(os.path.join(out, 'rt_even_odd.jpeg'))
+    plt.close(fig)
+    print('rt_even_odd: tau = %+.2f fs, max|even| %.2e, max|odd| %.2e' % (tau, np.abs(even[s]).max(),
+                                                                          np.abs(odd[s]).max()))
+
+
+FIGURES = {'rt_setup': fig_rt_setup, 'rt_even_odd': fig_rt_even_odd}
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Figures of the technical notes on LiF')

@@ -479,6 +479,31 @@ $\tau = \tp-\tP$.}
 \label{fig:rt_setup}
 \end{figure}
 
+\subsection{Even and odd parts in the pump field}
+\label{sec:lif_even_odd}
+
+LiF is centrosymmetric: the second order susceptibility vanishes, and the transient response is even in the pump
+field and starts at third order, the quadratic term of Eq.~\eqref{eq:dchi_mono}. In the simulations, however, the
+finite grid of k points breaks this symmetry and gives a spurious response linear in the pump field, the term with
+$\chi^{(2)}_\pm$ of Eq.~\eqref{eq:dchi_mono}, which decreases with the density of the grid. The two contributions are
+separated by repeating the simulations with the pump reversed, $\EP\to-\EP$: the odd part
+$[\deps(\EP)-\deps(-\EP)]/2$ contains the terms linear in $\EP$ (second order), the even part
+$[\deps(\EP)+\deps(-\EP)]/2$ the terms quadratic in $\EP$ (third order), up to higher orders, negligible at this
+intensity.
+
+Fig.~\ref{fig:rt_even_odd} shows that at $6\cdot10^7$~kW/cm$^2$ the spurious odd part is as large as the even one,
+with a different shape; the same holds at all the probe times (ratio of the maxima of the two parts between 1.0 and 1.7
+in 10-25~eV). The comparison with the transient response obtained from the $\chi$, which contains only the physical
+third order terms, must therefore be made with the even part of the RT results.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/rt_even_odd.jpeg}
+\caption{Real (left) and imaginary (right) part of the even (third order) and odd (second order) parts in the pump
+field of the RT transient spectrum $\deps$, at $\tau = +0.09$~fs, near the pump maximum.}
+\label{fig:rt_even_odd}
+\end{figure}
+
 % Notes for the following sections (their structure is to be defined with the user):
 % - comparison of the envelope weights (Sec. 1.5): besides the accumulated weight W of Eq. (eq:W) we tested the weight
 %   at the probe time, W = f^2(tau), and the local weight W = f^2(tau+t), in which the pump acts only at the emission

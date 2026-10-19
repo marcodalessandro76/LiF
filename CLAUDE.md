@@ -168,7 +168,9 @@ done (theory, implementation, computations) and of the notation and conventions.
   check the log for Overfull \hbox). Bibliography in `Notes/biblio.bib` (bibtex, unsrt); do NOT cite the
   Attaccalite-Sangalli draft (these notes replace it). After each change Claude builds `Notes/main.pdf` in place
   with latexmk (user's request, 2026-10-19) and checks the log (errors, Overfull \hbox, undefined references); if the
-  PDF is locked by the viewer (Acrobat: "I can't write on file main.pdf"), ask the user to close it.
+  PDF is locked by the viewer (Acrobat: "I can't write on file main.pdf"), ask the user to close it. After a failed
+  run latexmk does not recompile unchanged sources and reports the old errors (the log is not rewritten): use
+  `latexmk -g` (force) once the lock is gone.
 - Sources: this file (conventions, results, numbers) and the markdown cells of the notebooks (tracked in git, they can
   be read on the laptop): `Dchi-neq_Analysis.ipynb` ("Formula used for dchi^neq", "Frequency grids", "Correction of
   the INVINT integrator", "Our RT runs with the bands 3-6", "Pump intensity: third order RT response", "High pump
