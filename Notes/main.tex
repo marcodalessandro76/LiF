@@ -449,8 +449,9 @@ must not change.
 The reference for the transient absorption of LiF are real-time simulations of the pump-probe experiment, one for each
 probe time, which we performed with the setup of the simulations of D.~Sangalli. The electrons are independent
 particles, with a scissor on the DFT band structure, and the dynamics includes the bands 3-6: the three highest
-valence bands and the lowest conduction band. The equations of motion are integrated with the Crank-Nicolson scheme,
-without damping.
+valence bands and the lowest conduction band. The k points are those of the kx16 grid (648 points in the irreducible
+zone, reduced with the 8 symmetries that do not involve inversion or time reversal). The equations of motion are
+integrated with the Crank-Nicolson scheme, without damping.
 
 The pump is a Gaussian pulse at $\wP = 1.56$~eV with $\sigma = 3.22$~fs, i.e.\ the pulse of Eq.~\eqref{eq:pump_pulse}
 up to its sign and a small term proportional to the derivative of the envelope, with the maximum at $\tP = 15.91$~fs
@@ -483,9 +484,13 @@ $\tau = \tp-\tP$.}
 \label{sec:lif_even_odd}
 
 LiF is centrosymmetric: the second order susceptibility vanishes, and the transient response is even in the pump
-field and starts at third order, the quadratic term of Eq.~\eqref{eq:dchi_mono}. In the simulations, however, the
-finite grid of k points breaks this symmetry and gives a spurious response linear in the pump field, the term with
-$\chi^{(2)}_\pm$ of Eq.~\eqref{eq:dchi_mono}, which decreases with the density of the grid. The two contributions are
+field and starts at third order, the quadratic term of Eq.~\eqref{eq:dchi_mono}. The simulations, however, give also a
+spurious response linear in the pump field, the term with $\chi^{(2)}_\pm$ of Eq.~\eqref{eq:dchi_mono}. The k grid by
+itself does not break the inversion symmetry: it contains $-\bm{k}$ for each $\bm{k}$, with the same energies and
+dipoles. According to our tests the spurious term comes from the coupling with the field, which is built from the
+polarization written as a Berry phase: its derivatives with respect to $\bm{k}$ are evaluated on the discrete grid, and
+this discretization breaks the symmetry. Indeed the spurious term decreases quickly with the density of the grid (by a
+factor $\sim3$ from the kx12 to the kx16 grid in the $\chi$ extracted with two fields). The two contributions are
 separated by repeating the simulations with the pump reversed, $\EP\to-\EP$: the odd part
 $[\deps(\EP)-\deps(-\EP)]/2$ contains the terms linear in $\EP$ (second order), the even part
 $[\deps(\EP)+\deps(-\EP)]/2$ the terms quadratic in $\EP$ (third order), up to higher orders, negligible at this
@@ -495,6 +500,12 @@ Fig.~\ref{fig:rt_even_odd} shows that at $6\cdot10^7$~kW/cm$^2$ the spurious odd
 with a different shape; the same holds at all the probe times (ratio of the maxima of the two parts between 1.0 and 1.7
 in 10-25~eV). The comparison with the transient response obtained from the $\chi$, which contains only the physical
 third order terms, must therefore be made with the even part of the RT results.
+
+The relative weight of the spurious term decreases with the pump intensity, since the odd part scales as $\EOP$ and the
+even one as $\EOP^2$: at $6\cdot10^9$~kW/cm$^2$, the intensity of the simulations of D.~Sangalli ($\EOP$ ten times
+larger), the odd part is only 6-13\% of the even one. At that intensity, however, the response is no longer
+perturbative, and the RT results cannot be compared with the third order response obtained from the $\chi$: this is
+shown below, with the results obtained from the $\chi$.
 
 \begin{figure}[h!]
 \centering
