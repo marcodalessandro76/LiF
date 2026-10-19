@@ -207,9 +207,16 @@ done (theory, implementation, computations) and of the notation and conventions.
   8. Open points (k convergence of the cubic terms, bands above 6 for 18-22 eV, residual 5% / 0.07 eV).
 - State (2026-10-19): Sec. 1 (theory) of `Notes/main.tex` is done and agreed with the user; Sec. 2 (extraction of the
   chi from the RT polarization with sine fields: switch-on and damping, harmonic fit for one and two fields, mixing
-  keys chi_(n,m), field amplitudes, a posteriori broadening; a general description of the method of MPPI, no
-  implementation details) is in progress. The structure of the following sections is NOT defined: the user removed
-  the stubs and wants to define it step by step; do not refer to sections that do not exist. A LaTeX comment at the
+  keys chi_(n,m), field amplitudes; a general description of the method of MPPI, no implementation details) is done.
+  Sec. 3 "Transient absorption of LiF" (structure given by the user, 2026-10-19): 3.1 RT transient absorption (3.1.1
+  setup of our RT runs at 6e7 kW/cm^2, kx16, bands 3-6, with the figure of the pump and of the probe times; 3.1.2 even
+  and odd parts in the pump field with the reversed pump, origin of the spurious second order term, the comparison
+  with the chi uses the even part), 3.2 Non-linear chi analysis (3.2.1 results for the susceptibilities: to write),
+  3.3 transient absorption from the chi and comparison with the RT results (to write). Nothing after Sec. 3 is defined:
+  do not refer to sections that do not exist. Figures: `Notes/make_figures.py` (registry FIGURES, run on ismhpc from
+  ~/work/LiF/Notes with `--out ~/tmp_claude/notes_figures`, then scp the jpeg to Notes/Figures on the laptop and commit
+  there; the cluster copy of the repo never commits). Our RT runs at 6e7: only 5 probe times (13-19 fs, tau -2.91 ...
+  +3.09 fs); more delays later (each run ~50 min on 1 node, two runs per delay with the reversed pump). A LaTeX comment at the
   end of main.tex keeps notes for later (comparison of the envelope weights; relation between the keys chi_(1,m) and
   the chi of Sec. 1, shifted grids, chi0 from the difference of two runs).
 
