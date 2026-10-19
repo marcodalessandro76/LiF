@@ -197,25 +197,31 @@ def fig_chi_kgrid(out, erange=(10, 25)):
                   np.abs(chi0[g][sel]).max() / np.abs(chi0['kx16'][sel]).max()))
 
 
+SCAN39 = 'nlenrange_10.0-25.113-nlensteps_39'                  # 39 frequencies of the test grid (step wP/4)
 NAMES_PUMP_KX12 = {1e6: NAME_PP,
                    4e6: 'Pp-Ep_1e3-EP_4e6-PE_1.55-nlenrange_10.0-25.016-nlensteps_155-bands_3-6-damp_0.3-sin-nltime_100',
-                   1.6e7: 'Pp-Ep_1e3-EP_1.6e7-PE_1.55-nlenrange_10.0-25.113-nlensteps_39-bands_3-6-damp_0.3-sin-nltime_100'}
+                   1.6e7: 'Pp-Ep_1e3-EP_1.6e7-PE_1.55-%s-bands_3-6-damp_0.3-sin-nltime_100' % SCAN39,
+                   6.4e7: 'Pp-Ep_1e3-EP_6.4e7-PE_1.55-%s-bands_3-6-damp_0.3-sin-nltime_100' % SCAN39,
+                   2.56e8: 'Pp-Ep_1e3-EP_2.56e8-PE_1.55-%s-bands_3-6-damp_0.3-sin-nltime_100' % SCAN39}
 
 
 def chi_pumps_kx12(out):
     """
-    Third order terms extracted from the kx12 P&p runs with the pump intensities 1e6, 4e6 and 1.6e7 kW/cm^2 (no a
-    posteriori broadening: the 1.6e7 run has only 39 frequencies). Cached in out/chi_pumps_kx12.npz.
+    Third order terms extracted from the kx12 P&p runs with the pump intensities of NAMES_PUMP_KX12 (no a posteriori
+    broadening: the runs above 4e6 kW/cm^2 have only 39 frequencies). The runs not yet done are skipped. Cached in
+    out/chi_pumps_kx12.npz: the intensities already in the cache are not computed again.
     """
     cache = os.path.join(out, 'chi_pumps_kx12.npz')
-    if os.path.exists(cache):
-        return dict(np.load(cache))
+    res = dict(np.load(cache)) if os.path.exists(cache) else {}
     folder = os.path.join(NL_CHI, GRIDS['kx12'])
+    todo = {I: name for I, name in NAMES_PUMP_KX12.items() if '%.1e_chi0' % I not in res
+            and os.path.exists(os.path.join(folder, name, 'ndb.Nonlinear'))}
+    if not todo:
+        return res
     d_sine = P.YamboNLDBParser(os.path.join(folder, NAME_SINE, 'ndb.Nonlinear'), verbose=False)
     sf = O.Xn_single_frequency(d_sine, X_order=3, verbose=False)
     chi1, f1 = sf.compute_Xn()[0][1], sf.fields_freqs * Const.HaToeV
-    res = {}
-    for I, name in NAMES_PUMP_KX12.items():
+    for I, name in todo.items():
         d = P.YamboNLDBParser(os.path.join(folder, name, 'ndb.Nonlinear'), verbose=False)
         fm = O.Xn_frequency_mixing(d, X_order=(1, 2), verbose=False)
         mix = fm.compute_Xn()[0]
@@ -242,11 +248,15 @@ def fig_chi_pump(out, erange=(10, 25)):
     ref, f = r['1.0e+06_chi0'], r['1.0e+06_freqs']
     w = (f >= 10) & (f <= 20)
     norm = np.abs(ref[w]).max()
-    style = {'1.0e+06': ('k', '-', None), '4.0e+06': ('b', '--', None), '1.6e+07': ('r', 'none', 'o')}
-    label = {'1.0e+06': r'$10^6$', '4.0e+06': r'$4\cdot10^6$', '1.6e+07': r'$1.6\cdot10^7$'}
+    style = {'1.0e+06': ('k', '-', None), '4.0e+06': ('b', '--', None), '1.6e+07': ('r', 'none', 'o'),
+             '6.4e+07': ('m', 'none', 's'), '2.6e+08': ('g', 'none', '^')}
+    label = {'1.0e+06': r'$10^6$', '4.0e+06': r'$4\cdot10^6$', '1.6e+07': r'$1.6\cdot10^7$',
+             '6.4e+07': r'$6.4\cdot10^7$', '2.6e+08': r'$2.56\cdot10^8$'}
 
     fig, axes = plt.subplots(1, 2, figsize=(7, 2.7))
     for tag, (c, ls, m) in style.items():
+        if tag + '_chi0' not in r:
+            continue
         x, y = r[tag + '_freqs'], r[tag + '_chi0']
         s = (x >= erange[0]) & (x <= erange[1])
         axes[0].plot(x[s], y[s].imag, color=c, ls=ls, marker=m, ms=3, lw=1.2, label=label[tag] + ' kW/cm$^2$')
@@ -269,7 +279,7 @@ def fig_chi_pump(out, erange=(10, 25)):
         ax.set_xlim(erange)
         ax.set_xticks(np.arange(erange[0], erange[1] + 0.1, 5))
     fig.tight_layout()
-    fig.legend(*axes[0].get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=3,
+    fig.legend(*axes[0].get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=5,
                frameon=False)
     fig.savefig(os.path.join(out, 'chi_pump.jpeg'))
     plt.close(fig)

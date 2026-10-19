@@ -264,6 +264,33 @@ dchi^(3) = 3 int dOmega e^{-i Omega t_p} int dw1 chi3(w;w-Omega,w1,Omega-w1) E_P
 2. Implement the construction of chi^neq in MPPI (plan and prototypes written in the MPPI CLAUDE.md, section
    "Planned: transient response chi^neq"). To be done in a MPPI session, after the notes.
 
+### Handoff (2026-10-19): kx12 pump test at higher intensities (for the CLI session on the cluster)
+Prepared by the laptop session; the user launches it from the cluster session. Goal: extend Fig. 4 of the notes
+(Sec. 3.2.2, chi_0 extracted with different pump intensities, kx12) beyond 1.6e7 kW/cm^2, to see how the fifth (and
+higher) order terms projected on chi_0 grow. New section of `YamboNL_Analysis.ipynb` after the kx12 pump test,
+"Pump intensity test on the kx12 grid at higher intensities": dataset `study_pump_kx12_high`, two P&p runs on kx12
+with the 39 frequencies of the test grid and the pump 6.4e7 and 2.56e8 kW/cm^2 (8 E_P and 16 E_P), `num_tasks=2`
+(two nodes on all12h at the same time, 1-2 h each; check that no more than 3 nodes are in use). `fmt_int` now uses 3
+significant digits (ids `EP_6.4e7` and `EP_2.56e8`; the ids of the existing runs do not change).
+1. `cd ~/work/LiF && git pull`; dry run: `cd NL_Chi && ~/miniconda3/bin/python ~/tmp_claude/launch_dataset.py
+   study_pump_kx12_high --dry` (prints the two ids and skip flags, submits nothing).
+2. Launch: `nohup ~/miniconda3/bin/python ~/tmp_claude/launch_dataset.py study_pump_kx12_high >
+   ~/tmp_claude/pump_kx12_high.log 2>&1 &`; monitor with `squeue -u $USER` and the job outputs.
+3. Check the corrupted frequencies of both runs (kx12 runs had silently wrong groups of frequencies, see the section
+   "Restart of the corrupted frequencies"): the old criterion |chi_(1,0) - chi1|/|chi1| > 1e-2 does not work at these
+   intensities (the third order term is large). Use max|P(t)| of each frequency (`YamboNLDBParser(...).Polarization`):
+   it is dominated by the response to the pump and almost the same at all the frequencies; a corrupted group (indices
+   with the same remainder modulo the number of `NL_CPU` w-groups, usually from its 3rd frequency on) has it reduced by
+   20-50%. Cross-check with chi_0 at the same frequencies of the 1.6e7 run (the change must grow smoothly with I_P).
+   Repair with the restart mechanism of that section (`backup_run_files`, `remove_fragments`, `missing_fragments`,
+   restart with `skip=False, clean_restart=False, activate_BeeOND=False`), adding the cells to the notebook.
+4. Figure: `cd ~/work/LiF/Notes && LIF_NL_CHI=$HOME/work/LiF/NL_Chi ~/miniconda3/bin/python make_figures.py chi_pump
+   --out ~/tmp_claude/notes_figures` (it adds the new intensities to the cache `chi_pumps_kx12.npz` and prints the
+   median changes of chi_0, chi_+ and chi_- w.r.t. 1e6). Report the numbers to the user; the laptop session copies
+   `chi_pump.jpeg` and updates the notes (the right panel may need a log scale with five intensities).
+5. If the notebook was modified on the cluster (restart cells), commit and push it from the cluster with the user's
+   go; the laptop session does not edit `YamboNL_Analysis.ipynb` in the meantime.
+
 ## Cluster ismhpc
 - Reached from the laptop with `ssh -o BatchMode=yes -o ClearAllForwardings=yes ismhpc '...'` (host in
   `~/.ssh/config`, jump through `narro`; ClearAllForwardings avoids the LocalForward 4444 clash). CentOS 7 /
