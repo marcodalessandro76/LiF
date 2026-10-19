@@ -203,9 +203,13 @@ done (theory, implementation, computations) and of the notation and conventions.
   7. Results: chi3 vs RT third order (accumulated envelope: amplitude 1.04-1.07, rms 0.17-0.26), 6e9 beyond the
      perturbative regime (orders above the third, odd part small).
   8. Open points (k convergence of the cubic terms, bands above 6 for 18-22 eV, residual 5% / 0.07 eV).
-- State (2026-10-19): Sec. 1 (theory) of `Notes/main.tex` is done and agreed with the user; the other sections are
-  empty. The Results section has a LaTeX comment with the comparison of the envelope weights (probe time, local,
-  accumulated) to be developed there.
+- State (2026-10-19): Sec. 1 (theory) of `Notes/main.tex` is done and agreed with the user; Sec. 2 (extraction of the
+  chi from the RT polarization with sine fields: switch-on and damping, harmonic fit for one and two fields, mixing
+  keys chi_(n,m), field amplitudes, a posteriori broadening; a general description of the method of MPPI, no
+  implementation details) is in progress. The structure of the following sections is NOT defined: the user removed
+  the stubs and wants to define it step by step; do not refer to sections that do not exist. A LaTeX comment at the
+  end of main.tex keeps notes for later (comparison of the envelope weights; relation between the keys chi_(1,m) and
+  the chi of Sec. 1, shifted grids, chi0 from the difference of two runs).
 
 ### Model of Sec. 1 of the notes (reference for checking and implementing it)
 Atomic units, E(t) = int dw E(w) e^{-iwt} (E(w) = (2pi)^-1 int dt E(t)e^{iwt}), fields along x, delta probe

@@ -169,8 +169,7 @@ We now consider a pump pulse with a Gaussian envelope,
 \fenv(t) = e^{-t^2/2\sigma^2} ,
 \label{eq:pump_pulse}
 \end{equation}
-with the slowly varying amplitude $a(t) = (i\EOP/2)\,\fenv(t-\tP)\,e^{i\wP\tP}$ ($\sigma = 3.2$~fs in the RT runs,
-Sec.~\ref{sec:rt}). The spectrum of the pulse has two peaks, $\EP(\omega) = E^+(\omega)+E^-(\omega)$, with
+with the slowly varying amplitude $a(t) = (i\EOP/2)\,\fenv(t-\tP)\,e^{i\wP\tP}$ ($\sigma = 3.2$~fs in the RT runs). The spectrum of the pulse has two peaks, $\EP(\omega) = E^+(\omega)+E^-(\omega)$, with
 \begin{equation}
 E^\pm(\omega) = \pm\frac{i\EOP}{2}\,\frac{\sigma}{\sqrt{2\pi}}\,e^{i\omega\tP}\,e^{-(\omega\mp\wP)^2\sigma^2/2} ,
 \label{eq:pump_spectrum}
@@ -338,27 +337,122 @@ Eq.~\eqref{eq:dchi_accumulated} gives the monochromatic result~\eqref{eq:dchi_mo
 before the envelope changes, $\hbar/\eta\ll\sigma$, only $t\ll\sigma$ contributes, $W\to\fenv^2(\tau)$, and it gives the
 envelope at the probe time~\eqref{eq:dchi_probetime}.
 
-\section{Conventions}
-\label{sec:conventions}
+\section{Susceptibilities from the real-time polarization}
+\label{sec:extraction}
 
-\section{Computation of $\chi$ with yambo\_nl}
-\label{sec:yambo_nl}
+The susceptibilities of Sec.~\ref{sec:theory} are extracted from real-time simulations: the equations of motion of
+the electrons are integrated in presence of monochromatic fields and the polarization $P(t)$ is analysed in terms of
+its harmonics. Monochromatic fields single out the frequency arguments of the $\chi$; the delta probe of
+Sec.~\ref{sec:theory} is then built from them. This section describes the method.
 
-\section{Numerical issues}
-\label{sec:numerics}
+\subsection{Monochromatic fields and dephasing}
+\label{sec:extraction_damping}
 
-\section{Real-time runs}
-\label{sec:rt}
+Each simulation uses a sine field switched on at the time $t_0$,
+\begin{equation}
+E(t) = E_0\sin(\omega(t-t_0))\,\theta(t-t_0) , \qquad E(\pm\omega) = \pm\frac{iE_0}{2}\,e^{\pm i\omega t_0} ,
+\label{eq:sine_field}
+\end{equation}
+with the complex amplitudes of the monochromatic field, as in Eq.~\eqref{eq:sine_pump}. The frequency is fixed in each
+run, and a set of runs samples the frequency range of interest.
 
-\section{Results}
-\label{sec:results}
-% From Sec. 1.5 (to be developed): besides the accumulated weight W of Eq. (eq:W) we tested the weight at the
-% probe time, W = f^2(tau), and the local weight W = f^2(tau+t), in which the pump acts only at the emission time
-% (6 chi3(w; w-Omega, wP, Omega-wP) ~ chi0(w-Omega)); the accumulated weight reproduces the third order RT response
-% at all the delays.
+The field is monochromatic only long after $t_0$. The sudden switch-on excites the system at all its transition
+energies, and besides the response at the harmonics of $\omega$ the polarization contains free oscillations at the
+transition energies. In a closed system they never decay and they would hide the response to the field. For this
+reason a damping $\eta$ is added to the dynamics: the coherences between occupied and empty states decay as
+$e^{-\eta t}$, the free oscillations die out, and after a dephasing time $t_{\mathrm{deph}}$ of a few times $1/\eta$, $P(t)$ is a
+stationary superposition of harmonics of the fields. The damping is also
+the width of the resonances: each transition gives a Lorentzian line of width $\eta$, as $D(\omega)$ of
+Sec.~\ref{sec:theory_pulse}, and structures narrower than $\eta$ are not resolved. The simulation must last the
+dephasing time plus the time needed to analyse the stationary signal.
 
-\section{Open points}
-\label{sec:open}
+\subsection{One field}
+\label{sec:extraction_single}
+
+In the stationary regime $P(t)$ is periodic with the period of the field and contains its harmonics,
+\begin{equation}
+P(t) = P_0 + \sum_{n\geq1}\left[P(n\omega)\,e^{-in\omega t} + c.c.\right] .
+\label{eq:P_harmonics}
+\end{equation}
+At the lowest order in the field the $n$-th harmonic comes from $n$ photons at $\omega$ and the constant term from one
+photon at $\omega$ and one at $-\omega$ (optical rectification, with the two orderings of the frequencies),
+\begin{equation}
+P(n\omega) = \chi^{(n)}(n\omega;\omega,\dots,\omega)\,E(\omega)^n , \qquad
+P_0 = 2\chi^{(2)}(0;\omega,-\omega)\,|E(\omega)|^2 ,
+\label{eq:P_single}
+\end{equation}
+with corrections of relative order $E_0^2$. The components are obtained by a least squares fit of $P(t)$, in a
+window after $t_{\mathrm{deph}}$, with
+\begin{equation}
+P(t) = B_0 + \sum_{n=1}^{N}A_n\sin(n\omega t+\phi_n) , \qquad P(n\omega) = \frac{iA_n}{2}\,e^{-i\phi_n} , \qquad
+P_0 = B_0 ,
+\label{eq:fit}
+\end{equation}
+which is linear in the unknowns $B_0$, $A_n\cos\phi_n$ and $A_n\sin\phi_n$. Since $P(t)$ is periodic, one period of the
+field is enough to separate the harmonics. All the harmonics with a sizeable amplitude must be in the fit: a missing
+one is projected onto the others. The susceptibilities are the ratios between the components and the powers of the
+field amplitude, e.g.\ $\chi^{(1)}(\omega) = P(\omega)/E(\omega)$.
+
+The linear response can also be obtained at all the frequencies with a single run, with a delta field
+$E(t) = E_0\,\delta(t-t_0)$: then $\chi^{(1)}(\omega) = P(\omega)/E(\omega)$ is the Fourier transform of $P(t)$, with the
+same damping. It is an independent check of the first harmonic of the sine runs.
+
+\subsection{Two fields: frequency mixing}
+\label{sec:extraction_mixing}
+
+The pump-probe susceptibilities are extracted from simulations with two sine fields: a probe at $\omega$, one run for
+each frequency of a grid, and a pump at the fixed frequency $\wP$, with the amplitudes $E_{\mathrm{p}}(\pm\omega)$ and
+$\EP(\pm\wP)$ of Eq.~\eqref{eq:sine_field}. In the stationary regime the polarization contains all the combinations of
+the two frequencies,
+\begin{equation}
+P(t) = P_0 + \sum_{n,m}\left[P(n\omega+m\wP)\,e^{-i(n\omega+m\wP)t} + c.c.\right] ,
+\label{eq:P_mixing}
+\end{equation}
+where $n$ and $m$ are integers of any sign and each positive frequency $n\omega+m\wP$ is counted once. We define the
+mixing susceptibilities
+\begin{equation}
+\chin{n}{m}(\omega) = \frac{P(n\omega+m\wP)}{E_{\mathrm{p}}(\pm\omega)^{|n|}\,\EP(\pm\wP)^{|m|}} ,
+\label{eq:chi_nm}
+\end{equation}
+where the signs are those of $n$ and $m$: the ratio between a component of $P$ and the product of the field
+amplitudes that produce it. With this definition $\chin{n}{m}$ includes the number of orderings of the frequencies (the
+degeneracy factor), e.g.\ $\chin{1}{1}(\omega) = 2\chi^{(2)}(\omega+\wP;\omega,\wP)$.
+
+The components are obtained, as for one field, by a least squares fit of $P(t)$ with
+\begin{equation}
+P(t) = B_0 + \sum_{n,m}A_{nm}\sin(\Omega_{nm}t+\phi_{nm}) , \qquad
+P(\Omega_{nm}) = \frac{iA_{nm}}{2}\,e^{-i\phi_{nm}} , \qquad P_0 = B_0 ,
+\label{eq:fit_mixing}
+\end{equation}
+on the frequencies $\Omega_{nm} = n\omega+m\wP$ of all the components with a sizeable amplitude: the ones linear in the
+probe and also the harmonics of the pump $(0,m)$, which do not depend on the probe and are much larger. Two
+combinations with the same frequency cannot be separated. Now $P(t)$ is not periodic, and two components at a distance
+$\Delta$ in frequency are separated only over a window longer than $2\pi/\Delta$: the window, which starts after
+$t_{\mathrm{deph}}$, must be several times $2\pi/\Delta_{\min}$, where $\Delta_{\min}$ is the minimum distance between
+the frequencies of the fit.
+
+\subsection{Field amplitudes}
+\label{sec:extraction_amplitudes}
+
+The amplitudes of the fields must be small enough that the corrections of higher order to each component are
+negligible, and large enough that the components are above the numerical noise of the fit (the weakest components, of the highest orders, are the most
+delicate). The choice is checked by repeating the simulations with
+different intensities: each component scales as $E_{0\mathrm{p}}^{|n|}E_{0\mathrm{P}}^{|m|}$ and the extracted $\chi$
+must not change.
+
+% Notes for the following sections (their structure is to be defined with the user):
+% - comparison of the envelope weights (Sec. 1.5): besides the accumulated weight W of Eq. (eq:W) we tested the weight
+%   at the probe time, W = f^2(tau), and the local weight W = f^2(tau+t), in which the pump acts only at the emission
+%   time (6 chi3(w; w-Omega, wP, Omega-wP) ~ chi0(w-Omega)); the accumulated weight reproduces the third order RT
+%   response at all the delays.
+% - relation between the keys chi_(1,m) of Sec. 2 and the chi of Sec. 1: chi_(1,0) = chi1 + chi0 |E_P(wP)|^2,
+%   chi_(1,+-1)(w) = chi2_+-(w +- wP), chi_(1,+-2)(w) = chi_+-(w +- 2wP) (the key (1,m) at the probe frequency w - m wP
+%   gives the output at w: shifted grids, exact if the grid step divides wP); chi0 = [chi_(1,0) - chi1]/|E_P(wP)|^2 is a
+%   small difference of two runs with the same parameters.
+% - a posteriori broadening (for the details of the computation of the chi with MPPI): the terms linear in the probe can
+%   be further broadened by a Lorentzian convolution of width Delta on the grid of the probe frequencies, which gives
+%   chi(w + i Delta) for a causal response (Delta added to the resonances in the probe frequency, the denominators that
+%   depend only on the pump unchanged); not applied to the other components (an n-photon resonance would get n Delta).
 
 \bibliographystyle{unsrt}
 \bibliography{biblio}
