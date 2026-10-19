@@ -291,6 +291,20 @@ significant digits (ids `EP_6.4e7` and `EP_2.56e8`; the ids of the existing runs
 5. If the notebook was modified on the cluster (restart cells), commit and push it from the cluster with the user's
    go; the laptop session does not edit `YamboNL_Analysis.ipynb` in the meantime.
 
+Outcome (2026-10-19, CLI session on the cluster): both runs done (jobs 59718/59719, 1h19). 6.4e7 correct at all the 39
+frequencies (max|P| within 0.6% of the neighbours). 2.56e8: group 2 corrupted from its 3rd frequency (indices 10, 14,
+..., 38, max|P| 63%), as in the 1.6e7 run; the restart with NL_CPU 4.8 (job 59720) repaired 10 and 14 but the group
+was corrupted again from its 3rd frequency (18-38, 75%); the remaining 6 were recomputed by the chunk repair (2 per
+job, jobs 59721-3), all correct (within 0.2%). Wrong fragments kept as `_corrupted` / `_corrupted_repair1`, backups
+`_backup_orig` / `_backup_repair1`; cells in the section "Repair of the kx12 run with pump 2.56e8" of the notebook
+(`chunk_repair` is now defined in a cell of its own, which `launch_dataset.py` always executes). `chi_pump.jpeg` in
+`~/tmp_claude/notes_figures` (cache updated). Changes w.r.t. 1e6 in 10-20 eV (chi_0 mean % of the max / median
+relative; chi_+ and chi_- median relative): 4e6 0.05/0.19%, 0.25%, 0.55%; 1.6e7 0.25/1.0%, 1.1%, 2.3%; 6.4e7
+0.93/3.8%, 3.6%, 6.1%; 2.56e8 3.35/12.5%, 11.0%, 21.4%. From 1.6e7 on a factor 4 in I_P multiplies the change by
+3.5-3.8 (~ I_P: fifth order projected on the chi); the change is concentrated in 17-21 eV (peak ~18.5 eV, 14% of the
+max at 2.56e8); chi_- changes about twice as much as chi_0 and chi_+. The linear scale of the right panel is still
+readable (the 4e6 curve is flat at zero).
+
 ## Cluster ismhpc
 - Reached from the laptop with `ssh -o BatchMode=yes -o ClearAllForwardings=yes ismhpc '...'` (host in
   `~/.ssh/config`, jump through `narro`; ClearAllForwardings avoids the LocalForward 4444 clash). CentOS 7 /
