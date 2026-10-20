@@ -331,6 +331,18 @@ the class of MPPI, which implements the formulas of Sec. 1 of the notes. MPPI f0
   "Cluster ismhpc"); commit and push from the cluster only with the user's go; the laptop session does not edit these
   files in the meantime.
 
+Outcome (2026-10-20, CLI session on the cluster): checks before the change, max |difference| / max |dchi|: `from_Xn`
+(broadening 0.3) gives exactly the chi_0, chi_+- of the notebook on the same output grid; 'probe time' vs `dchi_neq`
+(62 delays of D. Sangalli and our 5) 2e-9, 'probe time'/'accumulated' vs `dchi_neq_t` 2e-9/3.5e-9 (only constants,
+e.g. wP of the runs 1.550000148). Done: `Dchi-neq_Analysis.ipynb` builds `tr = O.Transient_Response.from_Xn(freq_mix,
+single, broadening=0.3, centrosymmetric=True)` in the chi cell (`chi1_sin`, `freqs`, `EP` taken from `tr`), uses
+`tr.dchi(..., pump='probe time'|'accumulated', sigma, wP=1.56)` + `invint_correction`; `dchi_neq`, `dchi_neq_t`,
+`envelope_weight`, `envelope_conv` removed; the local weight is kept as `dchi_local` (on `O.Utils.time_weighted`, with
+5e-10 from the old one) and the test with other weights on the (1,+-2) terms is done with two instances (only chi_0,
+only chi_+-); markdown cells point to the class. `make_figures.py`: `envelope_weight`, `time_weighted`, `dchi_from_chi`
+replaced by the arrays constructor + the same `dchi_local`. Notebook re-executed: all the printed numbers identical to
+the previous version; `dchi_rt` and `dchi_rt_6e9`: printed numbers identical and jpeg identical pixel by pixel.
+
 ### Handoff (2026-10-19): kx12 pump test at higher intensities (for the CLI session on the cluster)
 Prepared by the laptop session; the user launches it from the cluster session. Goal: extend Fig. 4 of the notes
 (Sec. 3.2.2, chi_0 extracted with different pump intensities, kx12) beyond 1.6e7 kW/cm^2, to see how the fifth (and

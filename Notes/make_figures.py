@@ -15,10 +15,10 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from scipy.special import erf
 from scipy.optimize import minimize_scalar
 from mppi import Parsers as P
 from mppi import Optics as O
+from mppi.Optics.Utils import time_weighted
 from mppi.Utilities import Constants as Const
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -301,48 +301,21 @@ def invint_correction(freqs, chi, dt=0.01):
                      for y in chi.reshape(-1, chi.shape[-1])]).reshape(chi.shape)
 
 
-def envelope_weight(tau, t, sigma, model):
-    # intensity envelope (|E_P|^2 in units of E0P^2/4) that weights the response at the time t (fs) after a probe at the
-    # delay tau (fs): 'probe time' f^2(tau), 'local' f^2(tau+t) (pump at the emission time), 'accumulated'
-    # W(tau,t) = (1/t) int_0^t f^2(tau+t') dt', with f^2 = exp(-t^2/sigma^2)
-    f2 = np.exp(-(tau / sigma)**2)
-    if model == 'probe time':
-        return f2 * np.ones_like(t)
-    if model == 'local':
-        return np.exp(-((tau + np.maximum(t, 0)) / sigma)**2)
-    tt = np.where(t > 1e-9, t, 1.)
-    W = np.sqrt(np.pi) * sigma / (2 * tt) * (erf((tau + tt) / sigma) - erf(tau / sigma))
-    return np.where(t > 1e-9, W, f2)
-
-
-def time_weighted(freqs, chi, W):
-    # chi(w) on the uniform grid freqs (eV) -> int dt e^{iwt} W(t) R(t), with R(t) the response function of chi (discrete
-    # Fourier transforms on the grid: the period in t is 2 pi hbar/step, 42.7 fs for the step wP/16)
-    t = np.fft.fftfreq(len(freqs), (freqs[1] - freqs[0]) / (2 * np.pi * HB))
-    E = np.exp(-1j * np.outer(t, freqs) / HB)
-    return E.conj().T @ ((E @ chi) * W(t)) / len(freqs)
-
-
-def dchi_from_chi(freqs, chi0, key_p2, key_m2, taus, E0P, sigma, wP, model):
+def dchi_local(tr, taus, E0P, sigma, wP):
     """
-    Third order dchi(w,tau) (au) for a delta probe at the delay tau from the maximum of the pump E0P f sin(wP(t-t_P)):
-    (E0P^2/4) int dt e^{iwt} W(tau,t) [R_0 - R_+ e^{-2i wP tau} - R_- e^{2i wP tau}] (Sec. 1.5 of the notes), with
-    chi_+(w) = chi_(1,2)(w-2wP) and chi_-(w) = chi_(1,-2)(w+2wP) read on the probe grid freqs with the pump of the yambo_nl
-    runs (2 WP_NL = n steps), the phases with the pump frequency wP (eV) of the RT runs. Returns the output frequencies
-    freqs[n:-n] and dchi, shape (len(taus), len(freqs)-2n).
+    As tr.dchi(taus, E0P, pump='accumulated', sigma=sigma, wP=wP) of the MPPI Transient_Response tr, with the local weight
+    f^2(tau+t) (the pump acts at the emission time; not in MPPI, the notes quote its result): each third order term is
+    weighted in time on the probe grid of the runs and read on the output grid tr.w.
     """
-    step = freqs[1] - freqs[0]
-    n = int(round(2 * WP_NL / step))
-    assert abs(n * step - 2 * WP_NL) < 1e-3 * step, '2 wP is not a multiple of the frequency step'
+    f, n = tr.freqs / Const.HaToeV, int(round(2 * tr.wP / tr.step))
+    chi0 = (tr.keys[(1, 0)] - tr.chi1) / (tr.E0P**2 / 4)
     out = []
     for tau in taus:
-        W = lambda t: envelope_weight(tau, t, sigma, model)
+        W = lambda t: np.exp(-((tau * Const.FsToAu + np.maximum(t, 0)) / (sigma * Const.FsToAu))**2)
         ph = np.exp(-2j * wP / HB * tau)
-        # the time weight of the keys (1,+-2) is applied on their own grid and then shifted: a shift in frequency is a
-        # phase in time, which does not change W R
-        out.append(E0P**2 / 4 * (time_weighted(freqs, chi0, W)[n:-n] - time_weighted(freqs, key_p2, W)[:-2 * n] * ph
-                                 - time_weighted(freqs, key_m2, W)[2 * n:] / ph))
-    return freqs[n:-n], np.array(out)
+        out.append(E0P**2 / 4 * (time_weighted(f, chi0, W)[n:-n] - time_weighted(f, tr.keys[(1, 2)], W)[:-2 * n] * ph
+                                 - time_weighted(f, tr.keys[(1, -2)], W)[2 * n:] / ph))
+    return tr.w, np.array(out)
 
 
 def compare(w, y, ref, erange):
@@ -390,11 +363,13 @@ def fig_dchi_rt(out, pump_int=6e7, erange=(13.6, 21.3), name='dchi_rt'):
     # chi of the kx16 grid, total broadening 0.6 eV
     r = chi_kgrids(out)
     f = r['freqs']
-    chi0 = (r['kx16_1_0'] - r['kx16_chi1']) / (r['kx16_EP']**2 / 4)
+    tr = O.Transient_Response(f, r['kx16_chi1'], {key: r['kx16_%d_%d' % key] for key in MIX_KEYS}, r['kx16_EP'], WP_NL,
+                              centrosymmetric=True, verbose=False)
     models = {'probe time': ('r', '--', 'envelope at the probe time'), 'accumulated': ('b', '-', 'accumulated envelope')}
     deps = {}
     for m in ['probe time', 'local', 'accumulated']:
-        w, d = dchi_from_chi(f, chi0, r['kx16_1_2'], r['kx16_1_-2'], taus, E0P, sigma, wP, m)
+        # the phases use the RT pump frequency wP, the shifted grids the one of the yambo_nl runs
+        w, d = dchi_local(tr, taus, E0P, sigma, wP) if m == 'local' else tr.dchi(taus, E0P, pump=m, sigma=sigma, wP=wP)
         deps[m] = 4 * np.pi * invint_correction(w, d)
     rt = [np.interp(w, E, y.real) + 1j * np.interp(w, E, y.imag) for y in even]
     print('dchi_rt: pump %.1e kW/cm^2, E0P %.4e au (%.4f times the yambo_nl pump, sqrt(I ratio) %.4f), wP %.3f eV, '
