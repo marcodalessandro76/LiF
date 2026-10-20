@@ -596,6 +596,10 @@ Next:
    `~/tmp_claude/launch_dataset.py <dataset> [--prepare "<first line of a '# restart preparation' cell>"] [--dry]`.
    kx16 repair launched 2026-10-09 (jobs 59071/59072, slownodes, NL_CPU 4.8). A report for the yambo developers is to
    be written in a dedicated notebook.
+   2026-10-20: the investigation of the origin (source analysis, test runs) is carried on by the "Cluster admin"
+   session (`~/sysadmin/CLAUDE.md`, section "Open issue: yambo_nl silently corrupted frequencies": all the cases A-H,
+   the clean runs, the plan of the tests); this session keeps the repairs of the LiF runs and
+   `YamboNL_Corrupted_Frequencies.ipynb`, and brings here the outcome reported there.
 4. Decide whether to move the old MPPI Analysis_Optics (LiF version) here.
 
 ## Outcome of the handoff (2026-10-10, CLI session on the cluster)
