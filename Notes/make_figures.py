@@ -354,23 +354,38 @@ def compare(w, y, ref, erange):
     return (np.linalg.norm(y[s] - ref[s]) / np.linalg.norm(ref[s]), np.abs(y[s]).max() / np.abs(ref[s]).max(), shift)
 
 
-def fig_dchi_rt(out, pump_int=6e7, erange=(13.6, 21.3)):
+def rt_even(pump_int):
     """
-    Transient spectrum Delta eps at the five probe times: third order RT response (even part in the pump field, bands
-    3-6) vs 4 pi dchi from the kx16 chi (total broadening 0.6 eV, INVINT correction) with the envelope at the probe time
-    and with the accumulated envelope.
+    Even part in the pump field of the RT Delta eps (bands 3-6) at the probe times T_PROBES, from the runs with the pump
+    along +x and -x. Returns the energies (eV), eps_eq of the probe-only run, the list of the even parts, the delays
+    (fs), t_P and sigma (fs), E0P (au) and the pump frequency (eV).
     """
-    # RT runs: even part and delays
     E, eps_eq = rt_eps(load_nl(rt_id('3-6', None, 10.0)))
     ref_p, ref_m = load_nl(rt_id('3-6', pump_int)), load_nl(rt_id('3-6', pump_int, neg=True))
     t_P, sigma = pump_center(ref_p)
     pump = ref_p.Efield2[0]
-    E0P, wP = pump['amplitude'], pump['freq_range'][0] * Const.HaToeV
     even, taus = [], []
     for tp in T_PROBES:
         run_p, run_m = load_nl(rt_id('3-6', pump_int, tp)), load_nl(rt_id('3-6', pump_int, tp, neg=True))
         even.append((rt_eps(run_p, ref_p)[1] + rt_eps(run_m, ref_m)[1]) / 2 - eps_eq)
         taus.append(run_p.Efield[0]['initial_time'] / Const.FsToAu - t_P)
+    return E, eps_eq, even, taus, t_P, sigma, pump['amplitude'], pump['freq_range'][0] * Const.HaToeV
+
+
+def fig_dchi_rt(out, pump_int=6e7, erange=(13.6, 21.3), name='dchi_rt'):
+    """
+    Transient spectrum Delta eps at the five probe times: RT response (even part in the pump field, bands 3-6) vs
+    4 pi dchi from the kx16 chi (total broadening 0.6 eV, INVINT correction) with the envelope at the probe time and
+    with the accumulated envelope. For a pump different from 6e7 kW/cm^2 (beyond the third order) only the accumulated
+    envelope is plotted, and the RT response is also compared (printed numbers) with the third order RT response, the
+    even part at 6e7 rescaled by pump_int/6e7.
+    """
+    E, eps_eq, even, taus, t_P, sigma, E0P, wP = rt_even(pump_int)
+    if pump_int != 6e7:
+        third = [y * pump_int / 6e7 for y in rt_even(6e7)[2]]
+        lab_rt = 'RT (even part)'
+    else:
+        third, lab_rt = None, 'RT, third order (even part)'
 
     # chi of the kx16 grid, total broadening 0.6 eV
     r = chi_kgrids(out)
@@ -393,12 +408,21 @@ def fig_dchi_rt(out, pump_int=6e7, erange=(13.6, 21.3)):
     for k, tau in enumerate(taus):
         print('  tau %+.2f fs | ' % tau + ' | '.join('%s %.2f / %.2f / %+.2f' % ((m,) + compare(w, deps[m][k], rt[k],
                                                                                               erange)) for m in deps))
+    if third is not None:
+        rt3 = [np.interp(w, E, y.real) + 1j * np.interp(w, E, y.imag) for y in third]
+        print('dchi_rt: RT third order (6e7 x %d) vs RT %.0e and accumulated chi vs RT third order: rel. rms / ratio of '
+              'the maxima / best shift (eV)' % (round(pump_int / 6e7), pump_int))
+        for k, tau in enumerate(taus):
+            print('  tau %+.2f fs | third order vs RT %.2f / %.2f / %+.2f | chi vs third order %.2f / %.2f / %+.2f'
+                  % ((tau,) + compare(w, rt3[k], rt[k], erange) + compare(w, deps['accumulated'][k], rt3[k], erange)))
 
+    if third is not None:
+        models = {'accumulated': models['accumulated']}
     s = (E >= w[0]) & (E <= w[-1])
     fig, axes = plt.subplots(len(taus), 2, figsize=(7, 1.75 * len(taus)), sharex=True)
     for k, tau in enumerate(taus):
         for ax, part, lab in zip(axes[k], [np.real, np.imag], ['Re', 'Im']):
-            ax.plot(E[s], 1e3 * part(even[k][s]), 'k', lw=1.2, label='RT, third order (even part)')
+            ax.plot(E[s], 1e3 * part(even[k][s]), 'k', lw=1.2, label=lab_rt)
             for m, (c, ls, ml) in models.items():
                 ax.plot(w, 1e3 * part(deps[m][k]), color=c, ls=ls, lw=1, label=r'from the $\chi$, ' + ml)
             ax.axhline(0, color='gray', lw=0.5)
@@ -408,14 +432,15 @@ def fig_dchi_rt(out, pump_int=6e7, erange=(13.6, 21.3)):
         ax.set_xlabel('probe energy (eV)')
         ax.set_xlim(13, 22)
     fig.tight_layout()
-    fig.legend(*axes[0, 0].get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, 0.005), ncol=3,
-               frameon=False)
-    fig.savefig(os.path.join(out, 'dchi_rt.jpeg'))
+    fig.legend(*axes[0, 0].get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, 0.005),
+               ncol=len(models) + 1, frameon=False)
+    fig.savefig(os.path.join(out, name + '.jpeg'))
     plt.close(fig)
 
 
 FIGURES = {'rt_setup': fig_rt_setup, 'rt_even_odd': fig_rt_even_odd, 'chi_kgrid': fig_chi_kgrid,
-           'chi_pump': fig_chi_pump, 'dchi_rt': fig_dchi_rt}
+           'chi_pump': fig_chi_pump, 'dchi_rt': fig_dchi_rt,
+           'dchi_rt_6e9': lambda out: fig_dchi_rt(out, pump_int=6e9, name='dchi_rt_6e9')}
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Figures of the technical notes on LiF')

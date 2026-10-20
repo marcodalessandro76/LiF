@@ -222,13 +222,33 @@ done (theory, implementation, computations) and of the notation and conventions.
   of the pump neglected, INVINT correction (with it 1+4pi chi1 = eps_eq of the RT probe-only run: 4.4% rms in 10-25 eV,
   edge -0.015 eV; without it 15.6% and 0.29 eV); in 13.6-21.3 eV rel. rms / ratio of the maxima: probe time
   0.17-0.77 / 0.69-1.70, accumulated 0.17-0.26 / 1.04-1.07, local weight 0.65-1.38; residual ~5% and a shift of
-  0.06-0.07 eV at/after the maximum). Nothing after Sec. 3 is defined:
+  0.06-0.07 eV at/after the maximum; 3.3.1 third order regime, 3.3.2 high pump intensity: Fig. dchi_rt_6e9 = RT even
+  part at 6e9 vs chi with the accumulated envelope only (user's choice): rel. rms 0.96/0.76/0.61/0.42/0.32, chi larger
+  by 12-42%, 0.12-0.16 eV lower; the RT 6e9 vs the third order RT (6e7 even x 100, printed only): rms 0.83 -> 0.09,
+  20-25% smaller and 0.14 eV higher up to the maximum, third order again at +3.09 fs). Nothing after Sec. 3 is defined:
   do not refer to sections that do not exist. Figures: `Notes/make_figures.py` (registry FIGURES, run on ismhpc from
   ~/work/LiF/Notes with `--out ~/tmp_claude/notes_figures`, then scp the jpeg to Notes/Figures on the laptop and commit
   there; the cluster copy of the repo never commits). Our RT runs at 6e7: only 5 probe times (13-19 fs, tau -2.91 ...
   +3.09 fs); more delays later (each run ~50 min on 1 node, two runs per delay with the reversed pump). A LaTeX comment at the
   end of main.tex keeps notes for later (comparison of the envelope weights; relation between the keys chi_(1,m) and
   the chi of Sec. 1, shifted grids, chi0 from the difference of two runs).
+
+### Reminder for the article (2026-10-20, NOT for the technical notes)
+The technical notes are for the discussion with the colleagues; the user does not want these elements there. To be
+included in the document that prepares the article:
+1. Introduction (goal, the two approaches, LiF, IR pump and XUV probe).
+2. Computational details (table or appendix): DFT (functional, lattice, 100 bands, scissor 6.0 eV + stretch 0.05),
+   k grids (IBZ points, the 8 symmetries without inversion/time reversal), codes and versions (Lumen 2.1.0, yambo 5.3,
+   MPPI), parameters of the chi runs and of the RT runs, intensity -> amplitude E0 = sqrt(4 pi I/c) (1e6 kW/cm^2 ->
+   1.194e-4 au); the notes never name the codes.
+3. Conclusions and open points (k convergence of the cubic terms above 16 eV, bands above 6 for 18-22 eV, more delays
+   at 6e7, the +-2wP terms of the envelope model not derived, residual 5% / 0.07 eV, higher order chi at 6e9).
+4. Relation with the simulations of D. Sangalli: our 1-15 6e9 run = his (3e-7); bands 1-15 vs 3-6 (same below 17.5 eV,
+   different above 18 eV).
+5. Validation of the extraction: AnharmonicOscillator (1e-6-1e-3), chi1 sine vs delta (1-2%).
+6. A posteriori broadening: chi(w + i Delta), only the terms linear in the probe (now a comment at the end of main.tex).
+7. Silently corrupted frequencies of yambo_nl (appendix, or only the dedicated notebook).
+8. Outlook: Delta R/R (the experimental observable, Davide's 72 deg), excitonic (HSEX) runs.
 
 ### Model of Sec. 1 of the notes (reference for checking and implementing it)
 Atomic units, E(t) = int dw E(w) e^{-iwt} (E(w) = (2pi)^-1 int dt E(t)e^{iwt}), fields along x, delta probe
