@@ -294,10 +294,42 @@ dchi^(3) = 3 int dOmega e^{-i Omega t_p} int dw1 chi3(w;w-Omega,w1,Omega-w1) E_P
    Partial check (2026-10-20): `fig_dchi_rt` of `Notes/make_figures.py` implements the formulas of the notes
    independently (`dchi_from_chi`, `envelope_weight`, `time_weighted`, `invint_correction`) and gives the same numbers
    as `dchi_neq`/`dchi_neq_t` (rms and ratios of the maxima of all the weights to the second decimal).
-2. Implement the construction of chi^neq in MPPI: a class in `Optics` with the monochromatic pump, the envelope at the
-   probe time and the accumulated envelope. NEXT WORK (user's decision, 2026-10-20), done in the MPPI session; plan,
-   reference implementation (`Notes/make_figures.py`), validation numbers and open points in the MPPI CLAUDE.md,
-   section "Transient response chi^neq". Once in MPPI, `make_figures.py` and `Dchi-neq_Analysis.ipynb` can use it.
+2. DONE (2026-10-20, MPPI f0f8add): class `Transient_Response` in MPPI Optics, see the handoff below.
+
+### Handoff (2026-10-20): use the MPPI class `Transient_Response` in the LiF notebooks (for the session on the cluster)
+Goal: replace the local implementations of dchi (`dchi_neq`, `dchi_neq_t`, `envelope_weight`, `envelope_conv` of
+`NL_Chi/Dchi-neq_Analysis.ipynb`; `dchi_from_chi`, `envelope_weight`, `time_weighted` of `Notes/make_figures.py`) with
+the class of MPPI, which implements the formulas of Sec. 1 of the notes. MPPI f0f8add is already pulled in
+`~/Applications/MPPI` (85 tests pass on the cluster). The tutorial is the last section of MPPI `Analysis_Optics.ipynb`.
+- API (MPPI units: energies in eV, times in fs, fields in au; `from mppi import Optics as O`):
+  `tr = O.Transient_Response.from_Xn(mix, single, broadening=0.3, centrosymmetric=True)` with `mix` the
+  `Xn_frequency_mixing` of the P&p runs (X_order (1,2) or (1,3)) and `single` the `Xn_single_frequency` of the sine runs
+  on the SAME probe grid (true for the 155-frequency runs). It computes chi1 and the keys with the same broadening (as
+  `chi_kgrids` of make_figures), takes E0P_run and wP (1.55 eV) of the runs, checks that the step divides 2wP (32
+  steps) and builds chi_0, chi_+- on the output grid `tr.w` (13.1-21.8 eV). `centrosymmetric=True` drops the keys
+  (1,+-1) (the k discretization error). `tr.components()` gives chi_0, chi_+, chi_- on `tr.w`.
+  `w, dchi = tr.dchi(taus, E0P, pump='accumulated' | 'probe time' | 'monochromatic', sigma=sigma, wP=wP_RT)`:
+  taus = t_p - t_P (fs), E0P the RT pump amplitude (au), sigma the FIELD envelope width (fs, FWHM/(2 sqrt(2 ln 2)) of
+  the ypp/yambo header, as in `pump_center`), wP = 1.56 eV of the RT runs for the phases only (the grid shift always
+  uses the 1.55 eV of the chi runs, as `wP_phase` did). dchi has shape (len(taus), len(w)), Delta eps = 4 pi dchi.
+  Arrays constructor for the cases without a common grid (e.g. the 39-frequency pump tests vs the 155 sine run):
+  `O.Transient_Response(freqs_eV, chi1, keys, E0P_run, wP_eV, centrosymmetric=True)` with chi1 at the matching
+  frequencies (as in `chi_pumps_kx12`; same broadening on chi1 and keys).
+- NOT in MPPI (user's decisions): the INVINT correction (keep `invint_correction` here and apply it to the output as
+  now, `4*np.pi*invint_correction(w, dchi)`, dt = 0.01 fs); the derivative term of the QSFIELD pump (neglected); the
+  'local' weight f^2(tau+t) (the notes quote its result: keep a local version only if that number is still computed);
+  the accumulated envelope for the second order terms (ValueError; irrelevant here, LiF is centrosymmetric). The class
+  uses the pump E0P f sin(wP(t-t_P)): the minus sign of QSFIELD PHPI90 does not change the third order.
+- Already checked by the MPPI session (2026-10-20, on the cache `~/tmp_claude/notes_figures/chi_kgrids_0.30.npz`,
+  kx16, arrays constructor, taus -2.91 ... +3.09 fs, E0P 9.25e-4, sigma 3.219 fs, wP 1.56 eV): the class gives the
+  dchi of `dchi_from_chi` on the same output grid (91 frequencies, 13.10-21.82 eV) with max |difference| / max |dchi|
+  2e-9 (probe time) and 3.5e-9 (accumulated). So the numbers of Sec. 3.3 of the notes do not change. In the notebook,
+  check also `from_Xn` against the current chi (same broadening) and the old `dchi_neq`/`dchi_neq_t`, and report to the
+  user before deleting the old functions; keep the RT side (`load_rt_runs`, `rt_eps`, `rt_even`, `compare`,
+  `reflectivity`, plots) here.
+- Workflow: edit and run the notebooks on the cluster (analysis notebooks may be executed on the login node, see
+  "Cluster ismhpc"); commit and push from the cluster only with the user's go; the laptop session does not edit these
+  files in the meantime.
 
 ### Handoff (2026-10-19): kx12 pump test at higher intensities (for the CLI session on the cluster)
 Prepared by the laptop session; the user launches it from the cluster session. Goal: extend Fig. 4 of the notes
@@ -438,6 +470,9 @@ readable (the 4e6 curve is flat at zero).
     the delta and the sine/P&p runs, so it cancels in the internal comparisons. It can be removed by adding dt/2 to the
     `initial_time` of the fields (`efield['initial_time']` for `Linear_Response`, and consistently for the Xn classes);
     to be done for the comparison with the RT runs of Davide (dt = 3 as, negligible delay).
+- MPPI >= f0f8add (2026-10-20): `O.Transient_Response` (transient response dchi from the chi, monochromatic pump,
+  envelope at the probe time, accumulated envelope; see the handoff of 2026-10-20 above), `O.Utils.time_weighted`,
+  `AnharmonicOscillator.delta_probe_response` (exact P_Pp - P_P of the oscillator for a delta probe with any pump).
 - MPPI tutorials useful as reference: `Analysis_Optics.ipynb` and `Model_AnharmonicOscillator.ipynb` (classical
   anharmonic oscillator with analytical chi: the Optics module reproduces chi1, chi2, chi3 and the mixing keys to
   1e-6-1e-3), `Tutorial_YamboNLDBParser.ipynb`. `mppi.Models.AnharmonicOscillator` can be used to test any new analysis
