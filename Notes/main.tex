@@ -611,11 +611,70 @@ with respect to those extracted at $10^6$~kW/cm$^2$ (amplitude $\EOP$), in perce
 \subsection{Transient absorption from the $\chi$ and comparison with the RT results}
 \label{sec:lif_dchi}
 
+The transient spectrum $\deps = 4\pi\dchi$ is computed from the susceptibilities of the kx16 grid (Sec.~\ref{sec:lif_chi},
+total width 0.6~eV) with the pump of the RT simulations of Sec.~\ref{sec:lif_rt_setup}: $6\cdot10^7$~kW/cm$^2$
+($\EOP = 9.25\cdot10^{-4}$~au, 7.75 times the pump amplitude of the $\chi$ runs), $\sigma = 3.22$~fs and the five delays
+of Fig.~\ref{fig:rt_setup}. It is compared with the third order RT response, the even part of
+Sec.~\ref{sec:lif_even_odd}. We use both the envelope at the probe time, Eq.~\eqref{eq:dchi_probetime}, and the
+accumulated envelope, Eq.~\eqref{eq:dchi_accumulated}; for the latter $\chiz$ and $\chi^{(3)}_\pm$ are transformed to
+time with a discrete Fourier transform on the grid of the probe frequencies (period $2\pi\hbar/\Delta\omega = 42.7$~fs,
+much longer than the decay time $\hbar/\eta\simeq1.1$~fs of the response functions), multiplied by $W(\tau,t)$ and
+transformed back.
+
+Some details of the computation:
+\begin{itemize}
+\item since $\chi^{(3)}_\pm(\omega)$ is the key $\chin{1}{\pm2}$ at the probe frequency $\omega\mp2\wP$,
+Eq.~\eqref{eq:chi_from_keys}, and the probe frequencies span 10-24.9~eV, $\dchi$ is defined in 13.1-21.8~eV;
+\item the keys are read with the pump frequency of the $\chi$ runs ($2\wP = 3.10$~eV, 32 steps of the grid), the phases
+$e^{\mp2i\wP\tau}$ use the one of the RT runs, 1.56~eV: the difference of 0.02~eV is negligible in the arguments of the
+$\chi$, with a width of 0.6~eV, but not in the phases (0.1~rad at $\tau = 3$~fs);
+\item the term of the RT pump proportional to the derivative of the envelope (Sec.~\ref{sec:lif_rt_setup}) is
+neglected: it changes the intensity envelope by a few percent at most and acts on the phases of the terms at
+$\pm2\wP$ as a change of the pump frequency by $\hbar/\wP\sigma^2\simeq0.03$~eV;
+\item the integrator of the $\chi$ runs, with the time step $dt = 0.01$~fs, evolves a transition of energy $E$ with the
+energy $E_{\mathrm{eff}} = (2\hbar/dt)\arctan(E\,dt/2\hbar)$, which red shifts the resonances by
+$E^3dt^2/12\hbar^2$ (0.04-0.18~eV in 13-21~eV), and applies the fields with a delay $dt/2$, which multiplies the
+response at the frequency $\omega$ by $e^{i\omega dt/2}$ (0.13~rad at 17~eV). Both effects are removed from $\dchi$
+at the frequency of the spectrum, $\dchi(\omega)\to\dchi(\omega_{\mathrm{eff}})\,e^{-i\omega_{\mathrm{eff}}dt/2}$. With
+the same correction $1+4\pi\chi^{(1)}$ reproduces the equilibrium spectrum $\varepsilon_{\mathrm{eq}}$ of the RT
+simulations (relative difference 4\% in 10-25~eV, absorption edge within 0.02~eV, against 16\% and 0.3~eV without
+it). The RT simulations, with the Crank-Nicolson scheme and $dt = 3$~as, need no correction.
+\end{itemize}
+
+Fig.~\ref{fig:dchi_rt} shows the comparison. As measures we use, in 13.6-21.3~eV, the relative difference
+$\|\deps_\chi-\deps_{\mathrm{RT}}\|/\|\deps_{\mathrm{RT}}\|$ (norm of the complex spectra on the grid) and the ratio of
+the maxima of $|\deps_\chi|$ and $|\deps_{\mathrm{RT}}|$. With the envelope at the probe time the spectra from the
+$\chi$ have the right shape and size near the pump maximum ($\tau = -1.41$~fs: relative difference 0.17, ratio of the
+maxima 0.95), but away from it their size is wrong in the way described in Sec.~\ref{sec:theory}: too small before
+the maximum (ratio 0.69 at $\tau = -2.91$~fs) and too large after it (1.20, 1.44 and 1.70 at $\tau = +0.09$, $+1.59$
+and $+3.09$~fs), where they also have sharper structures in 17-21~eV. Indeed $\hbar/\eta\simeq1.1$~fs is not much
+shorter than $\sigma$. The accumulated envelope removes this error: at all the delays the ratio of the maxima is
+1.04-1.07 and the relative difference 0.17-0.26, with no free parameter. The weight $W$, a convolution in frequency
+with the spectrum of the envelope, also smooths the structures after the maximum. For comparison, a weight with the
+envelope at the emission time, $\fenv^2(\tau+t)$, in which the pump acts only when the polarization is emitted,
+overcorrects (ratio of the maxima 1.38 at $\tau = -2.91$~fs, 0.65-0.84 after the maximum).
+
+What is left is an excess of $\sim5$\% of the amplitude and, at and after the pump maximum, a shift of the spectra
+from the $\chi$ to lower energies by 0.06-0.07~eV (the rigid shift that minimizes the difference). The RT simulations
+and the $\chi$ use the same k grid and the same bands, so the convergence of Sec.~\ref{sec:lif_chi_kgrid} does not
+enter the comparison. The residual is of the size of the effects neglected: the orders above the third in the RT
+response at $6\cdot10^7$~kW/cm$^2$ (a few percent near the pump maximum, Sec.~\ref{sec:lif_chi_pump}), the model of the
+envelope, in particular for the terms at $\pm2\wP$, the derivative term of the pump and the different treatment of the
+width (a damping in the dynamics of the $\chi$ runs, a smoothing of the Fourier transform in the RT ones). The third
+order transient absorption of the RT simulations is therefore reproduced by the susceptibilities of the
+monochromatic runs, combined with the accumulated envelope.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/dchi_rt.jpeg}
+\caption{Transient spectrum $\deps$ at the five delays (pump $6\cdot10^7$~kW/cm$^2$, kx16 grid, bands 3-6): third
+order RT response (even part in the pump field, black) and $4\pi\dchi$ from the $\chi$ with the envelope at the probe
+time, Eq.~\eqref{eq:dchi_probetime} (red, dashed), and with the accumulated envelope, Eq.~\eqref{eq:dchi_accumulated}
+(blue). Left: real part; right: imaginary part.}
+\label{fig:dchi_rt}
+\end{figure}
+
 % Notes for the following sections (their structure is to be defined with the user):
-% - comparison of the envelope weights (Sec. 1.5): besides the accumulated weight W of Eq. (eq:W) we tested the weight
-%   at the probe time, W = f^2(tau), and the local weight W = f^2(tau+t), in which the pump acts only at the emission
-%   time (6 chi3(w; w-Omega, wP, Omega-wP) ~ chi0(w-Omega)); the accumulated weight reproduces the third order RT
-%   response at all the delays.
 % - a posteriori broadening (for the details of the computation of the chi with MPPI): the terms linear in the probe can
 %   be further broadened by a Lorentzian convolution of width Delta on the grid of the probe frequencies, which gives
 %   chi(w + i Delta) for a causal response (Delta added to the resonances in the probe frequency, the denominators that

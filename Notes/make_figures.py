@@ -15,6 +15,8 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from scipy.special import erf
+from scipy.optimize import minimize_scalar
 from mppi import Parsers as P
 from mppi import Optics as O
 from mppi.Utilities import Constants as Const
@@ -285,8 +287,135 @@ def fig_chi_pump(out, erange=(10, 25)):
     plt.close(fig)
 
 
+HB = Const.Planck_reduced_ev_fs      # hbar (eV fs)
+WP_NL = 1.55                          # pump frequency of the yambo_nl runs (eV)
+
+
+def invint_correction(freqs, chi, dt=0.01):
+    # removes the effects of the INVINT integrator of the yambo_nl runs (time step dt, fs) from chi on the grid freqs (eV)
+    # of the output polarization: chi(w_eff) exp(-i w_eff dt/2), w_eff = (2 hbar/dt) arctan(w dt/2 hbar) (red shift of
+    # the resonances and delay dt/2 of the fields)
+    weff = 2 * HB / dt * np.arctan(freqs * dt / (2 * HB))
+    chi = np.asarray(chi) * np.exp(-1j * freqs / HB * dt / 2)
+    return np.array([np.interp(weff, freqs, y.real) + 1j * np.interp(weff, freqs, y.imag)
+                     for y in chi.reshape(-1, chi.shape[-1])]).reshape(chi.shape)
+
+
+def envelope_weight(tau, t, sigma, model):
+    # intensity envelope (|E_P|^2 in units of E0P^2/4) that weights the response at the time t (fs) after a probe at the
+    # delay tau (fs): 'probe time' f^2(tau), 'local' f^2(tau+t) (pump at the emission time), 'accumulated'
+    # W(tau,t) = (1/t) int_0^t f^2(tau+t') dt', with f^2 = exp(-t^2/sigma^2)
+    f2 = np.exp(-(tau / sigma)**2)
+    if model == 'probe time':
+        return f2 * np.ones_like(t)
+    if model == 'local':
+        return np.exp(-((tau + np.maximum(t, 0)) / sigma)**2)
+    tt = np.where(t > 1e-9, t, 1.)
+    W = np.sqrt(np.pi) * sigma / (2 * tt) * (erf((tau + tt) / sigma) - erf(tau / sigma))
+    return np.where(t > 1e-9, W, f2)
+
+
+def time_weighted(freqs, chi, W):
+    # chi(w) on the uniform grid freqs (eV) -> int dt e^{iwt} W(t) R(t), with R(t) the response function of chi (discrete
+    # Fourier transforms on the grid: the period in t is 2 pi hbar/step, 42.7 fs for the step wP/16)
+    t = np.fft.fftfreq(len(freqs), (freqs[1] - freqs[0]) / (2 * np.pi * HB))
+    E = np.exp(-1j * np.outer(t, freqs) / HB)
+    return E.conj().T @ ((E @ chi) * W(t)) / len(freqs)
+
+
+def dchi_from_chi(freqs, chi0, key_p2, key_m2, taus, E0P, sigma, wP, model):
+    """
+    Third order dchi(w,tau) (au) for a delta probe at the delay tau from the maximum of the pump E0P f sin(wP(t-t_P)):
+    (E0P^2/4) int dt e^{iwt} W(tau,t) [R_0 - R_+ e^{-2i wP tau} - R_- e^{2i wP tau}] (Sec. 1.5 of the notes), with
+    chi_+(w) = chi_(1,2)(w-2wP) and chi_-(w) = chi_(1,-2)(w+2wP) read on the probe grid freqs with the pump of the yambo_nl
+    runs (2 WP_NL = n steps), the phases with the pump frequency wP (eV) of the RT runs. Returns the output frequencies
+    freqs[n:-n] and dchi, shape (len(taus), len(freqs)-2n).
+    """
+    step = freqs[1] - freqs[0]
+    n = int(round(2 * WP_NL / step))
+    assert abs(n * step - 2 * WP_NL) < 1e-3 * step, '2 wP is not a multiple of the frequency step'
+    out = []
+    for tau in taus:
+        W = lambda t: envelope_weight(tau, t, sigma, model)
+        ph = np.exp(-2j * wP / HB * tau)
+        # the time weight of the keys (1,+-2) is applied on their own grid and then shifted: a shift in frequency is a
+        # phase in time, which does not change W R
+        out.append(E0P**2 / 4 * (time_weighted(freqs, chi0, W)[n:-n] - time_weighted(freqs, key_p2, W)[:-2 * n] * ph
+                                 - time_weighted(freqs, key_m2, W)[2 * n:] / ph))
+    return freqs[n:-n], np.array(out)
+
+
+def compare(w, y, ref, erange):
+    # rel. rms distance, ratio of the maxima of the moduli and best rigid shift (eV, > 0 to the right) of the complex
+    # spectrum y(w) w.r.t. ref(w) in erange
+    s = (w >= erange[0]) & (w <= erange[1])
+    shifted = lambda a: np.interp(w[s] - a, w, y.real) + 1j * np.interp(w[s] - a, w, y.imag)
+    shift = minimize_scalar(lambda a: np.sum(np.abs(shifted(a) - ref[s])**2), bounds=(-1, 1), method='bounded').x
+    return (np.linalg.norm(y[s] - ref[s]) / np.linalg.norm(ref[s]), np.abs(y[s]).max() / np.abs(ref[s]).max(), shift)
+
+
+def fig_dchi_rt(out, pump_int=6e7, erange=(13.6, 21.3)):
+    """
+    Transient spectrum Delta eps at the five probe times: third order RT response (even part in the pump field, bands
+    3-6) vs 4 pi dchi from the kx16 chi (total broadening 0.6 eV, INVINT correction) with the envelope at the probe time
+    and with the accumulated envelope.
+    """
+    # RT runs: even part and delays
+    E, eps_eq = rt_eps(load_nl(rt_id('3-6', None, 10.0)))
+    ref_p, ref_m = load_nl(rt_id('3-6', pump_int)), load_nl(rt_id('3-6', pump_int, neg=True))
+    t_P, sigma = pump_center(ref_p)
+    pump = ref_p.Efield2[0]
+    E0P, wP = pump['amplitude'], pump['freq_range'][0] * Const.HaToeV
+    even, taus = [], []
+    for tp in T_PROBES:
+        run_p, run_m = load_nl(rt_id('3-6', pump_int, tp)), load_nl(rt_id('3-6', pump_int, tp, neg=True))
+        even.append((rt_eps(run_p, ref_p)[1] + rt_eps(run_m, ref_m)[1]) / 2 - eps_eq)
+        taus.append(run_p.Efield[0]['initial_time'] / Const.FsToAu - t_P)
+
+    # chi of the kx16 grid, total broadening 0.6 eV
+    r = chi_kgrids(out)
+    f = r['freqs']
+    chi0 = (r['kx16_1_0'] - r['kx16_chi1']) / (r['kx16_EP']**2 / 4)
+    models = {'probe time': ('r', '--', 'envelope at the probe time'), 'accumulated': ('b', '-', 'accumulated envelope')}
+    deps = {}
+    for m in ['probe time', 'local', 'accumulated']:
+        w, d = dchi_from_chi(f, chi0, r['kx16_1_2'], r['kx16_1_-2'], taus, E0P, sigma, wP, m)
+        deps[m] = 4 * np.pi * invint_correction(w, d)
+    rt = [np.interp(w, E, y.real) + 1j * np.interp(w, E, y.imag) for y in even]
+    print('dchi_rt: pump %.1e kW/cm^2, E0P %.4e au (%.4f times the yambo_nl pump, sqrt(I ratio) %.4f), wP %.3f eV, '
+          't_P %.3f fs, sigma %.3f fs' % (pump_int, E0P, E0P / r['kx16_EP'], np.sqrt(pump_int / 1e6), wP, t_P, sigma))
+    eq = np.interp(f, E, eps_eq.real) + 1j * np.interp(f, E, eps_eq.imag) - 1
+    for lab, c in [('no correction', r['kx16_chi1']), ('INVINT correction', invint_correction(f, r['kx16_chi1']))]:
+        print('dchi_rt: 4 pi chi1 (%s) vs eps_eq - 1 of the RT probe-only run: in 10-25 eV rel. rms %.3f, ratio of the '
+              'maxima %.3f; best shift of the edge (12-17.3 eV) %+.3f eV' % ((lab,) + compare(f, 4 * np.pi * c, eq,
+              (10, 25))[:2] + compare(f, 4 * np.pi * c, eq, (12, 17.3))[2:]))
+    print('dchi_rt: chi vs RT even part in %.1f-%.1f eV: rel. rms / ratio of the maxima / best shift (eV)' % erange)
+    for k, tau in enumerate(taus):
+        print('  tau %+.2f fs | ' % tau + ' | '.join('%s %.2f / %.2f / %+.2f' % ((m,) + compare(w, deps[m][k], rt[k],
+                                                                                              erange)) for m in deps))
+
+    s = (E >= w[0]) & (E <= w[-1])
+    fig, axes = plt.subplots(len(taus), 2, figsize=(7, 1.75 * len(taus)), sharex=True)
+    for k, tau in enumerate(taus):
+        for ax, part, lab in zip(axes[k], [np.real, np.imag], ['Re', 'Im']):
+            ax.plot(E[s], 1e3 * part(even[k][s]), 'k', lw=1.2, label='RT, third order (even part)')
+            for m, (c, ls, ml) in models.items():
+                ax.plot(w, 1e3 * part(deps[m][k]), color=c, ls=ls, lw=1, label=r'from the $\chi$, ' + ml)
+            ax.axhline(0, color='gray', lw=0.5)
+            ax.set_ylabel(r'%s $\Delta\varepsilon$ ($10^{-3}$)' % lab)
+            ax.text(0.02, 0.92, r'$\tau$ = %+.2f fs' % tau, transform=ax.transAxes, va='top', fontsize=8)
+    for ax in axes[-1]:
+        ax.set_xlabel('probe energy (eV)')
+        ax.set_xlim(13, 22)
+    fig.tight_layout()
+    fig.legend(*axes[0, 0].get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, 0.005), ncol=3,
+               frameon=False)
+    fig.savefig(os.path.join(out, 'dchi_rt.jpeg'))
+    plt.close(fig)
+
+
 FIGURES = {'rt_setup': fig_rt_setup, 'rt_even_odd': fig_rt_even_odd, 'chi_kgrid': fig_chi_kgrid,
-           'chi_pump': fig_chi_pump}
+           'chi_pump': fig_chi_pump, 'dchi_rt': fig_dchi_rt}
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Figures of the technical notes on LiF')

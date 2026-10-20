@@ -216,7 +216,13 @@ done (theory, implementation, computations) and of the notation and conventions.
   1e6-2.56e8 kW/cm^2, Fig. chi_pump and Tab. chi_pump with the maximum changes of chi_0, chi_+, chi_- in 10-20 eV of
   the probe grid: 0.20/0.41/0.18% at 4e6, 0.91/1.84/0.73% at 1.6e7, 3.89/7.45/3.11% at 6.4e7, 14.3/25.2/11.4% at
   2.56e8, growth ~ I_P up to 6.4e7 (fifth order), less at 2.56e8; the RT runs at 6e7 have a few % beyond the third
-  order near the pump maximum), 3.3 transient absorption from the chi and comparison with the RT results (to write). Nothing after Sec. 3 is defined:
+  order near the pump maximum), 3.3 transient absorption from the chi and comparison with the RT results (done
+  2026-10-20: Fig. dchi_rt = RT even part at 6e7 vs 4 pi dchi from the kx16 chi at the 5 delays, envelope at the probe
+  time and accumulated; details: window 13.1-21.8 eV, keys with 2wP = 3.10 eV and phases with 1.56 eV, derivative term
+  of the pump neglected, INVINT correction (with it 1+4pi chi1 = eps_eq of the RT probe-only run: 4.4% rms in 10-25 eV,
+  edge -0.015 eV; without it 15.6% and 0.29 eV); in 13.6-21.3 eV rel. rms / ratio of the maxima: probe time
+  0.17-0.77 / 0.69-1.70, accumulated 0.17-0.26 / 1.04-1.07, local weight 0.65-1.38; residual ~5% and a shift of
+  0.06-0.07 eV at/after the maximum). Nothing after Sec. 3 is defined:
   do not refer to sections that do not exist. Figures: `Notes/make_figures.py` (registry FIGURES, run on ismhpc from
   ~/work/LiF/Notes with `--out ~/tmp_claude/notes_figures`, then scp the jpeg to Notes/Figures on the laptop and commit
   there; the cluster copy of the repo never commits). Our RT runs at 6e7: only 5 probe times (13-19 fs, tau -2.91 ...
@@ -265,6 +271,9 @@ dchi^(3) = 3 int dOmega e^{-i Omega t_p} int dw1 chi3(w;w-Omega,w1,Omega-w1) E_P
    phase in time, to be verified); the INVINT correction applied to dchi at the output frequency (for the shifted
    keys the probe enters at w-+2wP: check whether the energy map and the dt/2 phase are applied consistently); the
    neglected derivative term of the QSFIELD pump. A numerical check: the frequency form above must give the same result.
+   Partial check (2026-10-20): `fig_dchi_rt` of `Notes/make_figures.py` implements the formulas of the notes
+   independently (`dchi_from_chi`, `envelope_weight`, `time_weighted`, `invint_correction`) and gives the same numbers
+   as `dchi_neq`/`dchi_neq_t` (rms and ratios of the maxima of all the weights to the second decimal).
 2. Implement the construction of chi^neq in MPPI (plan and prototypes written in the MPPI CLAUDE.md, section
    "Planned: transient response chi^neq"). To be done in a MPPI session, after the notes.
 
