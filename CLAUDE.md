@@ -294,8 +294,10 @@ dchi^(3) = 3 int dOmega e^{-i Omega t_p} int dw1 chi3(w;w-Omega,w1,Omega-w1) E_P
    Partial check (2026-10-20): `fig_dchi_rt` of `Notes/make_figures.py` implements the formulas of the notes
    independently (`dchi_from_chi`, `envelope_weight`, `time_weighted`, `invint_correction`) and gives the same numbers
    as `dchi_neq`/`dchi_neq_t` (rms and ratios of the maxima of all the weights to the second decimal).
-2. Implement the construction of chi^neq in MPPI (plan and prototypes written in the MPPI CLAUDE.md, section
-   "Planned: transient response chi^neq"). To be done in a MPPI session, after the notes.
+2. Implement the construction of chi^neq in MPPI: a class in `Optics` with the monochromatic pump, the envelope at the
+   probe time and the accumulated envelope. NEXT WORK (user's decision, 2026-10-20), done in the MPPI session; plan,
+   reference implementation (`Notes/make_figures.py`), validation numbers and open points in the MPPI CLAUDE.md,
+   section "Transient response chi^neq". Once in MPPI, `make_figures.py` and `Dchi-neq_Analysis.ipynb` can use it.
 
 ### Handoff (2026-10-19): kx12 pump test at higher intensities (for the CLI session on the cluster)
 Prepared by the laptop session; the user launches it from the cluster session. Goal: extend Fig. 4 of the notes
