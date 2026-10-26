@@ -349,9 +349,14 @@ same comparison of Sec. 3.3, RT third order vs 4 pi dchi from the chi, with the 
 detail to be agreed with the user. Sources: markdown cells of `Dchi-neq_Analysis.ipynb` (section "Excitonic level:
 HARTREE+SEX", with the final "Outcome" cell) and of `YamboNL_Analysis.ipynb` (sections "RT pump-probe runs with
 HARTREE+SEX", "Non-linear chi with HARTREE+SEX", the broadening tests, "... with HARTREE+SEX and CRANKNIC").
-**Figures are not made yet**: they must be added to `Notes/make_figures.py` and produced on the cluster (ask the user
-to have the cluster session do it; candidates: equilibrium eps HSEX chi vs RT, analogs of `dchi_rt` (6e7, probe
-time + accumulated) and `dchi_rt_6e9` (6e9, accumulated); the notebook figures are in `~/tmp_claude/hsex_cn_*.png`).
+Figures (2026-10-26, `Notes/make_figures.py`, made on the cluster in `~/tmp_claude/notes_figures_new`, to be copied
+to `Notes/Figures` on the laptop: `scp ismhpc:tmp_claude/notes_figures_new/{eq_hsex,dchi_rt_hsex,dchi_rt_hsex_6e9}.jpeg`):
+`eq_hsex` (Im/Re eps at equilibrium, 8-20 eV: RT HSEX probe-only, 1 + 4 pi chi1 HSEX with the CRANKNIC correction,
+RT IP for reference), `dchi_rt_hsex` (as `dchi_rt`: 5x2 panels Re/Im Delta eps, 11-17 eV, RT third order = even part
+at 6e7 vs chi with the envelope at the probe time and accumulated), `dchi_rt_hsex_6e9` (as `dchi_rt_6e9`: RT even
+part at 6e9 vs chi accumulated). `make_figures.py` has `rt_id(..., level='hsex')`, `rt_even(pump_int, level)`,
+`cranknic_correction`, `chi_hsex()` (Transient_Response of the CRANKNIC runs) and `fig_dchi_rt(..., level='hsex')`
+(no local weight); its printed numbers are the ones below; `dchi_rt`/`dchi_rt_6e9` unchanged (jpeg identical).
 - Physics/setup. HARTREE+SEX = Hartree plus statically screened exchange in the dynamics (time dependent
   Bethe-Salpeter level, excitons). Collisions of D. Sangalli for the bands 3-6 (`coll-par-cv_3-6B_X59RL-50B_noSM_H339RL_kpar`:
   c-v scattering only, static screening with 59 RL and 50 bands, no small-q correction, Hartree 339 RL; COLLCut 0),

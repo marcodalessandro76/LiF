@@ -30,9 +30,10 @@ plt.rcParams.update({'font.size': 9, 'axes.labelsize': 9, 'legend.fontsize': 8, 
                      'savefig.bbox': 'tight'})
 
 
-def rt_id(bands, pump_int=None, t_probe=None, neg=False):
-    # run id of the RT runs (bands as a string, e.g. '3-6'; neg: pump along -x), as in YamboNL_Analysis.ipynb
-    idd = 'rt-ip-bands_%s' % bands
+def rt_id(bands, pump_int=None, t_probe=None, neg=False, level='ip'):
+    # run id of the RT runs (bands as a string, e.g. '3-6'; neg: pump along -x; level 'ip' or 'hsex' (HARTREE+SEX)), as
+    # in YamboNL_Analysis.ipynb
+    idd = 'rt-%s-bands_%s' % (level, bands)
     if pump_int is not None:
         idd += '-EP_%s' % ('%.0e' % pump_int).replace('e+0', 'e') + ('-neg' if neg else '')
     if t_probe is not None:
@@ -301,6 +302,61 @@ def invint_correction(freqs, chi, dt=0.01):
                      for y in chi.reshape(-1, chi.shape[-1])]).reshape(chi.shape)
 
 
+def cranknic_correction(freqs, chi, dt=0.01):
+    # removes the static energy map of the CRANKNIC integrator of the yambo_nl runs (time step dt, fs) from chi on the
+    # grid freqs (eV): chi(w_eff), w_eff = (2 hbar/dt) arctan(w dt/2 hbar) (no delay of the fields, unlike INVINT)
+    weff = 2 * HB / dt * np.arctan(freqs * dt / (2 * HB))
+    chi = np.asarray(chi)
+    return np.array([np.interp(weff, freqs, y.real) + 1j * np.interp(weff, freqs, y.imag)
+                     for y in chi.reshape(-1, chi.shape[-1])]).reshape(chi.shape)
+
+
+HSEX_CHI = 'nlenrange_7.85-20.250-nlensteps_128-bands_3-6-damp_0.6-cn-nltime_40'   # HSEX chi runs (CRANKNIC)
+_tr_hsex = []
+
+
+def chi_hsex():
+    # Transient_Response of the HARTREE+SEX chi (kx16, bands 3-6, damping 0.6 eV in the dynamics, CRANKNIC 0.01 fs,
+    # 128 probe frequencies 7.85-20.15 eV, pump 1e6 kW/cm^2), read once
+    if not _tr_hsex:
+        sine, pp = load_nl('hsex-pulse-E1_1e3-' + HSEX_CHI), load_nl('hsex-Pp-Ep_1e3-EP_1e6-PE_1.55-' + HSEX_CHI)
+        _tr_hsex.append(O.Transient_Response.from_Xn(O.Xn_frequency_mixing(pp, X_order=(1, 2), verbose=False),
+                                                     O.Xn_single_frequency(sine, X_order=3, verbose=False),
+                                                     centrosymmetric=True, verbose=False))
+    return _tr_hsex[0]
+
+
+def fig_eq_hsex(out, erange=(8, 20)):
+    """
+    Equilibrium eps with HARTREE+SEX: RT probe-only run (smoothing 0.6 eV) vs 1 + 4 pi chi1 of the HSEX chi runs (damping
+    0.6 eV, CRANKNIC correction), with the IP RT probe-only run for reference.
+    """
+    tr = chi_hsex()
+    f = tr.freqs
+    E, eq = rt_eps(load_nl(rt_id('3-6', None, 10.0, level='hsex')))
+    E_ip, eq_ip = rt_eps(load_nl(rt_id('3-6', None, 10.0)))
+    eps = {lab: 1 + 4 * np.pi * c for lab, c in [('no correction', tr.chi1),
+                                                ('CRANKNIC correction', cranknic_correction(f, tr.chi1))]}
+    ref = np.interp(f, E, eq.real) + 1j * np.interp(f, E, eq.imag) - 1
+    for lab, y in eps.items():
+        print('eq_hsex: 1 + 4 pi chi1 (%s) vs eps_eq of the RT probe-only run: in 10-20 eV rel. rms %.4f, ratio of the '
+              'maxima %.3f; best shift of the edge (11-13.5 eV) %+.3f eV' % ((lab,) + compare(f, y - 1, ref, (10, 20))[:2]
+                                                                            + compare(f, y - 1, ref, (11, 13.5))[2:]))
+    s, s_ip = (E >= erange[0]) & (E <= erange[1]), (E_ip >= erange[0]) & (E_ip <= erange[1])
+    fig, axes = plt.subplots(1, 2, figsize=(7, 2.6))
+    for ax, part, lab in zip(axes, [np.imag, np.real], ['Im', 'Re']):
+        ax.plot(E_ip[s_ip], part(eq_ip[s_ip]), color='gray', ls=':', lw=1, label='RT, IP')
+        ax.plot(E[s], part(eq[s]), 'k', lw=1.2, label='RT, HSEX')
+        ax.plot(f, part(eps['CRANKNIC correction']), 'r--', lw=1, label=r'$1+4\pi\chi^{(1)}$, HSEX')
+        ax.set_xlabel('energy (eV)')
+        ax.set_ylabel(r'%s $\varepsilon$' % lab)
+        ax.set_xlim(*erange)
+    axes[0].legend(frameon=False)
+    fig.tight_layout()
+    fig.savefig(os.path.join(out, 'eq_hsex.jpeg'))
+    plt.close(fig)
+
+
 def dchi_local(tr, taus, E0P, sigma, wP):
     """
     As tr.dchi(taus, E0P, pump='accumulated', sigma=sigma, wP=wP) of the MPPI Transient_Response tr, with the local weight
@@ -327,66 +383,72 @@ def compare(w, y, ref, erange):
     return (np.linalg.norm(y[s] - ref[s]) / np.linalg.norm(ref[s]), np.abs(y[s]).max() / np.abs(ref[s]).max(), shift)
 
 
-def rt_even(pump_int):
+def rt_even(pump_int, level='ip'):
     """
     Even part in the pump field of the RT Delta eps (bands 3-6) at the probe times T_PROBES, from the runs with the pump
     along +x and -x. Returns the energies (eV), eps_eq of the probe-only run, the list of the even parts, the delays
     (fs), t_P and sigma (fs), E0P (au) and the pump frequency (eV).
     """
-    E, eps_eq = rt_eps(load_nl(rt_id('3-6', None, 10.0)))
-    ref_p, ref_m = load_nl(rt_id('3-6', pump_int)), load_nl(rt_id('3-6', pump_int, neg=True))
+    E, eps_eq = rt_eps(load_nl(rt_id('3-6', None, 10.0, level=level)))
+    ref_p, ref_m = load_nl(rt_id('3-6', pump_int, level=level)), load_nl(rt_id('3-6', pump_int, neg=True, level=level))
     t_P, sigma = pump_center(ref_p)
     pump = ref_p.Efield2[0]
     even, taus = [], []
     for tp in T_PROBES:
-        run_p, run_m = load_nl(rt_id('3-6', pump_int, tp)), load_nl(rt_id('3-6', pump_int, tp, neg=True))
+        run_p, run_m = load_nl(rt_id('3-6', pump_int, tp, level=level)), load_nl(rt_id('3-6', pump_int, tp, True, level))
         even.append((rt_eps(run_p, ref_p)[1] + rt_eps(run_m, ref_m)[1]) / 2 - eps_eq)
         taus.append(run_p.Efield[0]['initial_time'] / Const.FsToAu - t_P)
     return E, eps_eq, even, taus, t_P, sigma, pump['amplitude'], pump['freq_range'][0] * Const.HaToeV
 
 
-def fig_dchi_rt(out, pump_int=6e7, erange=(13.6, 21.3), name='dchi_rt'):
+def fig_dchi_rt(out, pump_int=6e7, erange=(13.6, 21.3), name='dchi_rt', level='ip'):
     """
     Transient spectrum Delta eps at the five probe times: RT response (even part in the pump field, bands 3-6) vs
     4 pi dchi from the kx16 chi (total broadening 0.6 eV, INVINT correction) with the envelope at the probe time and
     with the accumulated envelope. For a pump different from 6e7 kW/cm^2 (beyond the third order) only the accumulated
     envelope is plotted, and the RT response is also compared (printed numbers) with the third order RT response, the
-    even part at 6e7 rescaled by pump_int/6e7.
+    even part at 6e7 rescaled by pump_int/6e7. With level='hsex' the RT runs and the chi are at the HARTREE+SEX level
+    (chi of chi_hsex, damping 0.6 eV in the dynamics, CRANKNIC correction; no local weight).
     """
-    E, eps_eq, even, taus, t_P, sigma, E0P, wP = rt_even(pump_int)
+    E, eps_eq, even, taus, t_P, sigma, E0P, wP = rt_even(pump_int, level)
     if pump_int != 6e7:
-        third = [y * pump_int / 6e7 for y in rt_even(6e7)[2]]
+        third = [y * pump_int / 6e7 for y in rt_even(6e7, level)[2]]
         lab_rt = 'RT (even part)'
     else:
         third, lab_rt = None, 'RT, third order (even part)'
 
-    # chi of the kx16 grid, total broadening 0.6 eV
-    r = chi_kgrids(out)
-    f = r['freqs']
-    tr = O.Transient_Response(f, r['kx16_chi1'], {key: r['kx16_%d_%d' % key] for key in MIX_KEYS}, r['kx16_EP'], WP_NL,
-                              centrosymmetric=True, verbose=False)
+    if level == 'hsex':
+        tr, correction, model_names = chi_hsex(), cranknic_correction, ['probe time', 'accumulated']
+    else:
+        # chi of the kx16 grid, total broadening 0.6 eV
+        r = chi_kgrids(out)
+        tr = O.Transient_Response(r['freqs'], r['kx16_chi1'], {key: r['kx16_%d_%d' % key] for key in MIX_KEYS},
+                                  r['kx16_EP'], WP_NL, centrosymmetric=True, verbose=False)
+        correction, model_names = invint_correction, ['probe time', 'local', 'accumulated']
+    f = tr.freqs
     models = {'probe time': ('r', '--', 'envelope at the probe time'), 'accumulated': ('b', '-', 'accumulated envelope')}
     deps = {}
-    for m in ['probe time', 'local', 'accumulated']:
+    for m in model_names:
         # the phases use the RT pump frequency wP, the shifted grids the one of the yambo_nl runs
         w, d = dchi_local(tr, taus, E0P, sigma, wP) if m == 'local' else tr.dchi(taus, E0P, pump=m, sigma=sigma, wP=wP)
-        deps[m] = 4 * np.pi * invint_correction(w, d)
+        deps[m] = 4 * np.pi * correction(w, d)
     rt = [np.interp(w, E, y.real) + 1j * np.interp(w, E, y.imag) for y in even]
-    print('dchi_rt: pump %.1e kW/cm^2, E0P %.4e au (%.4f times the yambo_nl pump, sqrt(I ratio) %.4f), wP %.3f eV, '
-          't_P %.3f fs, sigma %.3f fs' % (pump_int, E0P, E0P / r['kx16_EP'], np.sqrt(pump_int / 1e6), wP, t_P, sigma))
-    eq = np.interp(f, E, eps_eq.real) + 1j * np.interp(f, E, eps_eq.imag) - 1
-    for lab, c in [('no correction', r['kx16_chi1']), ('INVINT correction', invint_correction(f, r['kx16_chi1']))]:
-        print('dchi_rt: 4 pi chi1 (%s) vs eps_eq - 1 of the RT probe-only run: in 10-25 eV rel. rms %.3f, ratio of the '
-              'maxima %.3f; best shift of the edge (12-17.3 eV) %+.3f eV' % ((lab,) + compare(f, 4 * np.pi * c, eq,
-              (10, 25))[:2] + compare(f, 4 * np.pi * c, eq, (12, 17.3))[2:]))
-    print('dchi_rt: chi vs RT even part in %.1f-%.1f eV: rel. rms / ratio of the maxima / best shift (eV)' % erange)
+    print('%s: pump %.1e kW/cm^2, E0P %.4e au (%.4f times the yambo_nl pump, sqrt(I ratio) %.4f), wP %.3f eV, '
+          't_P %.3f fs, sigma %.3f fs' % (name, pump_int, E0P, E0P / tr.E0P, np.sqrt(pump_int / 1e6), wP, t_P, sigma))
+    if level != 'hsex':
+        eq = np.interp(f, E, eps_eq.real) + 1j * np.interp(f, E, eps_eq.imag) - 1
+        for lab, c in [('no correction', tr.chi1), ('INVINT correction', invint_correction(f, tr.chi1))]:
+            print('dchi_rt: 4 pi chi1 (%s) vs eps_eq - 1 of the RT probe-only run: in 10-25 eV rel. rms %.3f, ratio of '
+                  'the maxima %.3f; best shift of the edge (12-17.3 eV) %+.3f eV' % ((lab,) + compare(f, 4 * np.pi * c,
+                  eq, (10, 25))[:2] + compare(f, 4 * np.pi * c, eq, (12, 17.3))[2:]))
+    print('%s: chi vs RT even part in %.1f-%.1f eV: rel. rms / ratio of the maxima / best shift (eV)' % ((name,) + erange))
     for k, tau in enumerate(taus):
         print('  tau %+.2f fs | ' % tau + ' | '.join('%s %.2f / %.2f / %+.2f' % ((m,) + compare(w, deps[m][k], rt[k],
                                                                                               erange)) for m in deps))
     if third is not None:
         rt3 = [np.interp(w, E, y.real) + 1j * np.interp(w, E, y.imag) for y in third]
-        print('dchi_rt: RT third order (6e7 x %d) vs RT %.0e and accumulated chi vs RT third order: rel. rms / ratio of '
-              'the maxima / best shift (eV)' % (round(pump_int / 6e7), pump_int))
+        print('%s: RT third order (6e7 x %d) vs RT %.0e and accumulated chi vs RT third order: rel. rms / ratio of '
+              'the maxima / best shift (eV)' % (name, round(pump_int / 6e7), pump_int))
         for k, tau in enumerate(taus):
             print('  tau %+.2f fs | third order vs RT %.2f / %.2f / %+.2f | chi vs third order %.2f / %.2f / %+.2f'
                   % ((tau,) + compare(w, rt3[k], rt[k], erange) + compare(w, deps['accumulated'][k], rt3[k], erange)))
@@ -405,7 +467,7 @@ def fig_dchi_rt(out, pump_int=6e7, erange=(13.6, 21.3), name='dchi_rt'):
             ax.text(0.02, 0.92, r'$\tau$ = %+.2f fs' % tau, transform=ax.transAxes, va='top', fontsize=8)
     for ax in axes[-1]:
         ax.set_xlabel('probe energy (eV)')
-        ax.set_xlim(13, 22)
+        ax.set_xlim(*((11, 17) if level == 'hsex' else (13, 22)))
     fig.tight_layout()
     fig.legend(*axes[0, 0].get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, 0.005),
                ncol=len(models) + 1, frameon=False)
@@ -415,7 +477,10 @@ def fig_dchi_rt(out, pump_int=6e7, erange=(13.6, 21.3), name='dchi_rt'):
 
 FIGURES = {'rt_setup': fig_rt_setup, 'rt_even_odd': fig_rt_even_odd, 'chi_kgrid': fig_chi_kgrid,
            'chi_pump': fig_chi_pump, 'dchi_rt': fig_dchi_rt,
-           'dchi_rt_6e9': lambda out: fig_dchi_rt(out, pump_int=6e9, name='dchi_rt_6e9')}
+           'dchi_rt_6e9': lambda out: fig_dchi_rt(out, pump_int=6e9, name='dchi_rt_6e9'), 'eq_hsex': fig_eq_hsex,
+           'dchi_rt_hsex': lambda out: fig_dchi_rt(out, erange=(11, 17), name='dchi_rt_hsex', level='hsex'),
+           'dchi_rt_hsex_6e9': lambda out: fig_dchi_rt(out, pump_int=6e9, erange=(11, 17), name='dchi_rt_hsex_6e9',
+                                                       level='hsex')}
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Figures of the technical notes on LiF')
