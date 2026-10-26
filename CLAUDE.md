@@ -225,7 +225,12 @@ done (theory, implementation, computations) and of the notation and conventions.
   0.06-0.07 eV at/after the maximum; 3.3.1 third order regime, 3.3.2 high pump intensity: Fig. dchi_rt_6e9 = RT even
   part at 6e9 vs chi with the accumulated envelope only (user's choice): rel. rms 0.96/0.76/0.61/0.42/0.32, chi larger
   by 12-42%, 0.12-0.16 eV lower; the RT 6e9 vs the third order RT (6e7 even x 100, printed only): rms 0.83 -> 0.09,
-  20-25% smaller and 0.14 eV higher up to the maximum, third order again at +3.09 fs). Nothing after Sec. 3 is defined:
+  20-25% smaller and 0.14 eV higher up to the maximum, third order again at +3.09 fs). 2026-10-26: Sec. 3.3 retitled
+  "...: independent particles" (first sentence: IP, as 3.1-3.2); new Sec. 3.4 "...: excitonic effects" (label
+  sec:lif_hsex) from the HSEX handoff below: intro (kernel), 3.4.1 equilibrium spectrum and susceptibilities (Fig.
+  eq_hsex, bands 3-6 vs 3-12, chi runs: 128 frequencies, damping 0.6 eV, Crank-Nicolson and why, energy map
+  correction, checks), 3.4.2 comparison (Figs. dchi_rt_hsex and dchi_rt_hsex_6e9, numbers of the handoff, possible
+  reasons of the better agreement than IP). Nothing after Sec. 3 is defined:
   do not refer to sections that do not exist. Figures: `Notes/make_figures.py` (registry FIGURES, run on ismhpc from
   ~/work/LiF/Notes with `--out ~/tmp_claude/notes_figures`, then scp the jpeg to Notes/Figures on the laptop and commit
   there; the cluster copy of the repo never commits). Our RT runs at 6e7: only 5 probe times (13-19 fs, tau -2.91 ...
@@ -344,6 +349,7 @@ replaced by the arrays constructor + the same `dchi_local`. Notebook re-executed
 the previous version; `dchi_rt` and `dchi_rt_6e9`: printed numbers identical and jpeg identical pixel by pixel.
 
 ### Handoff (2026-10-26): new section of the notes, RT vs chi with the HARTREE+SEX dynamics (for the laptop session)
+DONE (2026-10-26, laptop session): Sec. 3.4 of `Notes/main.tex`, figures copied to `Notes/Figures`.
 Results of the CLI session on the cluster, to be written as a new part of Sec. 3 of `Notes/main.tex` (excitonic level:
 same comparison of Sec. 3.3, RT third order vs 4 pi dchi from the chi, with the HSEX dynamics). Structure and level of
 detail to be agreed with the user. Sources: markdown cells of `Dchi-neq_Analysis.ipynb` (section "Excitonic level:

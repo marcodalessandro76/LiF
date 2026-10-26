@@ -608,9 +608,11 @@ with respect to those extracted at $10^6$~kW/cm$^2$ (amplitude $\EOP$), in perce
 \label{tab:chi_pump}
 \end{table}
 
-\subsection{Transient absorption from the $\chi$ and comparison with the RT results}
+\subsection{Transient absorption from the $\chi$ and comparison with the RT results: independent particles}
 \label{sec:lif_dchi}
 
+In this section, as in Secs.~\ref{sec:lif_rt} and~\ref{sec:lif_chi}, the electrons are independent particles (IP);
+the comparison with the electron-hole interaction in the dynamics is in Sec.~\ref{sec:lif_hsex}.
 The transient spectrum $\deps = 4\pi\dchi$ is computed from the susceptibilities of the kx16 grid (Sec.~\ref{sec:lif_chi},
 total width 0.6~eV) with the pump of the RT simulations of Sec.~\ref{sec:lif_rt_setup}, $\sigma = 3.22$~fs and the five
 delays of Fig.~\ref{fig:rt_setup}, and compared with the even part of the RT $\deps$ (Sec.~\ref{sec:lif_even_odd}) at
@@ -705,6 +707,104 @@ intensity a quantitative description requires the susceptibilities of higher ord
 \caption{As Fig.~\ref{fig:dchi_rt}, with the pump $6\cdot10^9$~kW/cm$^2$: RT response (even part in the pump field,
 black) and $4\pi\dchi$ from the $\chi$ with the accumulated envelope (blue).}
 \label{fig:dchi_rt_6e9}
+\end{figure}
+
+\subsection{Transient absorption from the $\chi$ and comparison with the RT results: excitonic effects}
+\label{sec:lif_hsex}
+
+The comparison of Sec.~\ref{sec:lif_dchi} is repeated with the electron-hole interaction in the dynamics: the Hartree
+term plus the statically screened exchange (HSEX), the real-time counterpart of the Bethe-Salpeter equation, which
+gives the excitons. The kernel is the one of the simulations of D.~Sangalli, restricted to the valence-conduction
+transitions: static screening computed with 59 reciprocal lattice vectors and 50 bands, Hartree term with 339
+reciprocal lattice vectors. Everything else is as in the IP case: kx16 grid, bands 3-6, the same scissor, and the RT
+simulations of Sec.~\ref{sec:lif_rt_setup} (same pump, delays and smoothing of 0.6~eV) at $6\cdot10^7$ and
+$6\cdot10^9$~kW/cm$^2$, with the pump reversed to separate the even and odd parts.
+
+\subsubsection{Equilibrium spectrum and susceptibilities}
+\label{sec:lif_hsex_chi}
+
+Fig.~\ref{fig:eq_hsex} shows the equilibrium dielectric function. The electron-hole interaction moves the absorption
+to an exciton at 12.9~eV (first maximum of Im~$\varepsilon$, 2.35; edge at half height 12.26~eV), while the IP
+spectrum has the edge at 15.87~eV and the first maximum at 17.47~eV (Im~$\varepsilon$ = 1.62). With HSEX the bands 3-6 are
+not enough for a converged spectrum: the simulations of D.~Sangalli with the bands 3-12 put the edge and the exciton at
+the same energies (12.20 and 12.82~eV), but with a higher peak (Im~$\varepsilon$ = 3.01) and a larger Re~$\varepsilon$ below
+the gap (2.45 against 1.55 at 8~eV), a relative difference of 36\% on Im~$\varepsilon$ in 10-20~eV (4.6\% between the
+IP spectra with the bands 3-6 and 1-15). The comparison between the RT simulations and the $\chi$, which use the same
+bands, is not affected.
+
+The susceptibilities are extracted as in Sec.~\ref{sec:lif_chi}, with sine and pump-probe runs (pump 1.55~eV,
+$10^6$~kW/cm$^2$), with three differences:
+\begin{itemize}
+\item the probe frequencies are 128, from 7.85 to 20.15~eV with the step $\wP/16$, so that $\dchi$ is defined in
+10.95-17.05~eV, around the exciton; the comparison window is 11-17~eV;
+\item the whole width is in the dynamics, a damping of 0.6~eV, with no a posteriori broadening; the simulations last
+40~fs;
+\item the equations of motion are integrated with the Crank-Nicolson scheme (Hamiltonian at the middle of the step),
+with $dt = 0.01$~fs. The integrator of the IP $\chi$ runs, with the SEX kernel, adds a spurious broadening of the
+exciton proportional to the time step: compared with the RT simulation with the probe only, simulations with a delta
+probe and no damping show an extra width of 0.39, 0.19 and 0.09~eV for $dt$ = 0.01, 0.005 and 0.0025~fs, absent in IP.
+The Crank-Nicolson scheme has no such broadening and no delay of the fields; it has the same energy map
+$E_{\mathrm{eff}}$ of Sec.~\ref{sec:lif_dchi}, which is removed as $\dchi(\omega)\to\dchi(\omega_{\mathrm{eff}})$.
+\end{itemize}
+With this correction $1+4\pi\chi^{(1)}$ coincides with the equilibrium spectrum of the RT simulations within 0.5\% in
+10-20~eV (4.1\% and an edge shifted by 0.04~eV without it), and the damping of 0.6~eV is equivalent to the smoothing
+of the RT spectra (the smoothing that best reproduces $1+4\pi\chi^{(1)}$ is 0.598~eV). As for IP, the simulation time
+is converged (changes of $2\cdot10^{-3}$ of the maximum of $\chiz$ and $5$-$7\cdot10^{-3}$ of $\chi^{(3)}_\pm$ with the
+fit window) and the pump is in the third order regime (with $4\cdot10^6$~kW/cm$^2$ $\chiz$ changes by 0.1\% and
+$\chi^{(3)}_\pm$ by 0.3-0.4\%).
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/eq_hsex.jpeg}
+\caption{Imaginary (left) and real (right) part of the equilibrium dielectric function with HSEX (kx16, bands 3-6):
+RT simulation with the probe only (smoothing 0.6~eV, black) and $1+4\pi\chi^{(1)}$ from the sine runs (damping 0.6~eV,
+energy map removed, red, dashed). The IP spectrum of the RT simulations is shown for reference (dotted).}
+\label{fig:eq_hsex}
+\end{figure}
+
+\subsubsection{Comparison with the RT results}
+\label{sec:lif_hsex_dchi}
+
+As in IP, at $6\cdot10^7$~kW/cm$^2$ the spurious odd part of the RT response is comparable with the even one (ratio of
+the maxima 0.44-1.29 in 11-17~eV), while at $6\cdot10^9$~kW/cm$^2$ it is 4-9\% of it; the comparison is made with the
+even part, with the measures of Sec.~\ref{sec:lif_dchi_third} in 11-17~eV.
+
+At $6\cdot10^7$~kW/cm$^2$ (Fig.~\ref{fig:dchi_rt_hsex}) the envelope at the probe time fails as in IP, even more: the
+ratio of the maxima is 0.59 at $\tau = -2.91$~fs, 0.94 at $-1.41$~fs, and 1.42, 2.22 and 3.56 at $+0.09$, $+1.59$ and
+$+3.09$~fs (relative difference 0.11-1.58). With the accumulated envelope the $\chi$ reproduce the third order RT
+response up to the pump maximum within 2-3\% (relative difference 0.02-0.03, ratio of the maxima 1.00-1.03, no shift);
+after the maximum they overestimate it, by 10\% at $+1.59$~fs and 21\% at $+3.09$~fs (relative difference 0.08 and
+0.16, shift $\le0.02$~eV). Without the correction of the energy map the relative difference would be 0.18-0.27, with
+a rigid shift of 0.05~eV. Up to the pump maximum the agreement is much better than in IP (relative difference
+0.17-0.26 in 13.6-21.3~eV). Two differences may contribute: in 11-17~eV the response is dominated by a single
+excitonic line, close to the picture of transitions shifted by the pump behind the accumulated envelope, and the HSEX
+$\chi$ are more accurate (equilibrium within 0.5\%, against 4\% for the IP $\chi$, and the whole width in the
+dynamics).
+
+At $6\cdot10^9$~kW/cm$^2$ the RT response is again beyond the third order. Compared with the even part at
+$6\cdot10^7$~kW/cm$^2$ rescaled by 100, it is 26-36\% smaller up to the pump maximum (ratio of the maxima 0.64-0.74 at
+$\tau = -2.91$, $-1.41$ and $+0.09$~fs) and higher in energy by 0.06-0.09~eV; after the maximum it gets back to the
+third order (relative difference 0.17 and 0.06 at $+1.59$ and $+3.09$~fs). The $\chi$ with the accumulated envelope
+(Fig.~\ref{fig:dchi_rt_hsex_6e9}) are therefore larger than the RT response by 26-58\% (ratio of the maxima
+1.26-1.58, relative difference 0.22-0.58) and lower in energy by 0.02-0.06~eV. The picture is the one of IP, with a
+somewhat larger reduction of the amplitude by the higher orders (26-36\% against 20-25\%) and a smaller shift
+(0.06-0.09 against 0.14~eV).
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/dchi_rt_hsex.jpeg}
+\caption{As Fig.~\ref{fig:dchi_rt}, with HSEX (pump $6\cdot10^7$~kW/cm$^2$, kx16 grid, bands 3-6): third order RT
+response (even part, black) and $4\pi\dchi$ from the HSEX $\chi$ with the envelope at the probe time (red, dashed) and
+with the accumulated envelope (blue).}
+\label{fig:dchi_rt_hsex}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/dchi_rt_hsex_6e9.jpeg}
+\caption{As Fig.~\ref{fig:dchi_rt_6e9}, with HSEX (pump $6\cdot10^9$~kW/cm$^2$): RT response (even part, black) and
+$4\pi\dchi$ from the HSEX $\chi$ with the accumulated envelope (blue).}
+\label{fig:dchi_rt_hsex_6e9}
 \end{figure}
 
 % Notes for the following sections (their structure is to be defined with the user):
