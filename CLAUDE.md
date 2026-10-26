@@ -343,6 +343,65 @@ only chi_+-); markdown cells point to the class. `make_figures.py`: `envelope_we
 replaced by the arrays constructor + the same `dchi_local`. Notebook re-executed: all the printed numbers identical to
 the previous version; `dchi_rt` and `dchi_rt_6e9`: printed numbers identical and jpeg identical pixel by pixel.
 
+### Handoff (2026-10-26): new section of the notes, RT vs chi with the HARTREE+SEX dynamics (for the laptop session)
+Results of the CLI session on the cluster, to be written as a new part of Sec. 3 of `Notes/main.tex` (excitonic level:
+same comparison of Sec. 3.3, RT third order vs 4 pi dchi from the chi, with the HSEX dynamics). Structure and level of
+detail to be agreed with the user. Sources: markdown cells of `Dchi-neq_Analysis.ipynb` (section "Excitonic level:
+HARTREE+SEX", with the final "Outcome" cell) and of `YamboNL_Analysis.ipynb` (sections "RT pump-probe runs with
+HARTREE+SEX", "Non-linear chi with HARTREE+SEX", the broadening tests, "... with HARTREE+SEX and CRANKNIC").
+**Figures are not made yet**: they must be added to `Notes/make_figures.py` and produced on the cluster (ask the user
+to have the cluster session do it; candidates: equilibrium eps HSEX chi vs RT, analogs of `dchi_rt` (6e7, probe
+time + accumulated) and `dchi_rt_6e9` (6e9, accumulated); the notebook figures are in `~/tmp_claude/hsex_cn_*.png`).
+- Physics/setup. HARTREE+SEX = Hartree plus statically screened exchange in the dynamics (time dependent
+  Bethe-Salpeter level, excitons). Collisions of D. Sangalli for the bands 3-6 (`coll-par-cv_3-6B_X59RL-50B_noSM_H339RL_kpar`:
+  c-v scattering only, static screening with 59 RL and 50 bands, no small-q correction, Hartree 339 RL; COLLCut 0),
+  the same of his `td-hsex-cv-ber_*` RT runs (which use bands 3-12). kx16, bands 3-6, same scissor. Lumen `bug-fixes`.
+- Equilibrium (RT probe-only, smoothing 0.6 eV): HSEX exciton at 12.92 eV (first max of Im eps 2.35; half-height
+  edge 12.26 eV) vs IP edge 15.87 eV, first max 17.47 eV (Im eps 1.62). Our bands 3-6 HSEX vs D. Sangalli's 3-12 HSEX:
+  same edge/peak position (12.20/12.82 eV) but his peak is higher (Im eps 3.01) and Re eps(8 eV) 2.45 vs 1.55: rel.
+  rms of Im eps 36% in 10-20 eV (IP 3-6 vs 1-15: 4.6%), i.e. the bands above 6 matter much more with the excitonic kernel.
+- RT runs (`kx16_nb100_NoTr_E100/rt-hsex-*`): identical to the IP RT runs of Sec. 3.1 but with HSEX (CRANKNIC 3 as,
+  40 fs, no damping, delta probe at t_p 13-19 fs, tau = -2.91, -1.41, +0.09, +1.59, +3.09 fs; QSFIELD pump 1.56 eV,
+  sigma 3.219 fs, 6e7 and 6e9 kW/cm^2 along +-x, pump-only and probe-only references), smoothing 0.6 eV, even/odd
+  parts in the pump field. Odd/even (max in 11-17 eV): 0.44-1.29 at 6e7 (spurious second order as large as the third
+  order, as in IP), 0.04-0.09 at 6e9. RT 6e9 even vs 100 x 6e7 even (rms / ratio of the maxima / shift): 0.40/0.64/-0.07 eV,
+  0.40/0.65/-0.09, 0.32/0.74/-0.06, 0.17/0.87/-0.02, 0.06/0.95/-0.01 at the five delays: beyond third order up to the
+  maximum (26-36% smaller), third order again at +3.09 fs (as in IP, where it was 20-25% smaller and 0.14 eV higher).
+- chi runs: sine + P&p (pump 1e6 kW/cm^2, 1.55 eV), 128 probe frequencies 7.85-20.153 eV, step wP/16 (2wP = 32 steps),
+  **damping 0.6 eV in the dynamics** (no a posteriori broadening, unlike the IP chi: 0.3 + 0.3), NLtime 40 fs, NLstep
+  0.01 fs, **integrator CRANKNIC**; output grid of the transient response 10.95-17.05 eV (comparison window 11-17 eV,
+  around the exciton; the IP comparison used 13.6-21.3 eV). Tests: NLtime converged (fit truncated at 30-50 fs vs 60
+  fs: chi_0 2e-3, keys (1,+-2) 5-7e-3 of the max); pump 4e6 vs 1e6: chi_0 0.12%, chi_+- 0.3-0.4% (1e6 perturbative).
+  Runs clean (no corrupted frequency).
+- Integrator (a technical point worth a paragraph or a footnote): the first HSEX chi runs with INVINT (as for IP) were
+  much broader than the RT (like a 1 eV smoothing). Delta tests without damping vs the RT probe-only run: INVINT with
+  the SEX kernel adds a spurious broadening of the exciton proportional to the step (extra 0.39 / 0.19 / 0.09 eV at
+  NLstep 0.01 / 0.005 / 0.0025 fs; rel. rms 24% / 14% / 7.5%), absent in IP (INVINT 0.01 fs = RT within 3%). The
+  damping itself behaves as expected (uniform dephasing: delta with damping 0.6 = delta without damping smoothed by
+  0.59 eV, 2.4%; = chi1 of the sine runs within 0.1%). CRANKNIC (midpoint Hamiltonian) with 0.01 fs has no such
+  broadening: delta run = RT probe-only within 0.7% after the static energy map E_eff = (2 hbar/dt) arctan(E dt/2hbar)
+  only; CRANKNIC has no field delay dt/2 (adding the phase w dt/2 gives 10%). Hence the correction of the CRANKNIC chi
+  is `cranknic_correction`: chi(w_eff), energy map only (the INVINT one is chi(w_eff) e^{-i w_eff dt/2}); applied to
+  chi1 and to 4 pi dchi at the output frequency. Cost: CRANKNIC ~1.75-2x INVINT (8.5-9.5 h per run on 1 node).
+- Equilibrium check: 1 + 4 pi chi1 (CRANKNIC) vs RT probe-only (smoothing 0.6 eV) in 10-20 eV: rel. rms 4.1% and
+  edge shift +0.043 eV without correction, 0.46% and +0.004 eV with `cranknic_correction`. The smoothing equivalent to
+  the damping 0.6 eV is 0.598 eV: damping and smoothing are equivalent as in IP.
+- Main result, pump 6e7, RT even part vs 4 pi dchi (with `cranknic_correction`), 11-17 eV, rel. rms / ratio of the
+  maxima / best shift (eV):
+    tau -2.91: probe time 0.40/0.59/0.00,  accumulated 0.03/1.01/0.00
+    tau -1.41: probe time 0.11/0.94/0.00,  accumulated 0.02/1.00/0.00
+    tau +0.09: probe time 0.31/1.42/+0.02, accumulated 0.03/1.03/0.00
+    tau +1.59: probe time 0.84/2.22/+0.03, accumulated 0.08/1.10/+0.01
+    tau +3.09: probe time 1.58/3.56/+0.04, accumulated 0.16/1.21/+0.02
+  The accumulated envelope reproduces the RT third order at 2-3% up to the pump maximum (IP: rms 0.17-0.26 in 13.6-21.3 eV), then
+  overestimates by 10-20%; the envelope at the probe time fails as in IP (0.59-3.56). Without the correction the
+  accumulated rms is 0.18-0.27 with a rigid shift of 0.05 eV.
+- Pump 6e9, RT even part vs chi (accumulated, corrected): 0.58/1.58/+0.06, 0.58/1.55/+0.06, 0.43/1.39/+0.06,
+  0.26/1.26/+0.04, 0.22/1.26/+0.02: chi larger by 26-58%, RT beyond the third order (consistent with the 6e9 vs 6e7 x
+  100 numbers above). Same qualitative picture as IP (chi larger by 12-42%, 0.12-0.16 eV lower).
+- Not for the notes (kept in the notebooks): the INVINT HSEX chi runs (`...-sin-nltime_40`, kept on disk) and their
+  comparison with two RT smoothings (0.6 and 0.976 eV).
+
 ### Handoff (2026-10-19): kx12 pump test at higher intensities (for the CLI session on the cluster)
 Prepared by the laptop session; the user launches it from the cluster session. Goal: extend Fig. 4 of the notes
 (Sec. 3.2.2, chi_0 extracted with different pump intensities, kx12) beyond 1.6e7 kW/cm^2, to see how the fifth (and
@@ -427,7 +486,14 @@ readable (the 4e6 curve is flat at zero).
 
 ## QuantumESPRESSO and Yambo: things learned
 - QE 7.0 (`pw.x`). Yambo: the Lumen 2.1.0 fork, rebuilt on 2026-10-01 in `~/Applications/Lumen` (core, nl-project,
-  rt-project; executables yambo, ypp, yambo_nl, yambo_rt, p2y in `gpl-gcc_10.2/bin`).
+  rt-project; executables yambo, ypp, yambo_nl, yambo_rt, p2y in `gpl-gcc_10.2/bin`). **Since 2026-10-23 the
+  default in the PATH (`~/.bashrc`) is the Lumen `bug-fixes` branch** (commit 5ec7644, build
+  `~/Applications/Lumen/bug-fixes-gcc_10.2`): `yambo`, `yambo_nl`, `ypp`, `ypp_nl`, `p2y`, `a2y` come from it;
+  `yambo_rt`, `ypp_rt` (not built there) still from the master build. Differences: Berry phase polarization with
+  forced periodicity (string phase mod pi, `Berry_polarization_EQ.F`; the input flag `FrNoPerP` that should
+  disable it is never read in that branch) and 112 other commits, so new results may not be bit-identical to
+  the master runs. Shells, tmux panes and Jupyter kernels opened before must be restarted (or `source ~/.bashrc`)
+  to pick up the new PATH; jobs inherit the PATH of the shell that submits them. Details in `~/sysadmin/CLAUDE.md`.
 - The nscf used for p2y must use `force_symmorphic=True` (default of MPPI PwInput >= 1.3): with non-symmorphic
   symmetries this yambo silently activates no runlevel (inputs with only setup variables, report named `r-..._ypp`).
 - p2y always ends with MPI_ABORT after writing the wavefunctions, but the SAVE is fine.
@@ -448,6 +514,9 @@ readable (the 4e6 curve is flat at zero).
   spectrum by ~2 eV (17.4 -> 15.4 eV), dt = 0.01 fs by ~0.1 eV; the field acts with a delay dt/2 (phase w dt/2, also
   the delta kick). CRANKNIC (midpoint Hamiltonian, 2x cost) has the same static phase error. Use NLstep = 0.01 fs.
 - yambo truncates the job string (-J) at 100 characters: keep the run ids of MPPI datasets within 100 characters.
+- yambo_nl INVINT with the SEX kernel (HARTREE+SEX): spurious broadening of the exciton proportional to NLstep
+  (+0.39 eV at 0.01 fs): use CRANKNIC (0.01 fs, energy map only, no dt/2 field delay; `cranknic_correction` of
+  `Dchi-neq_Analysis.ipynb`) for the HSEX runs. In IP INVINT 0.01 fs is fine.
 - `UseDipoles` (fixed dipoles instead of the Berry coupling) gives only the linear response correctly.
 
 ## MPPI for the analysis (user side)
@@ -600,6 +669,21 @@ Next:
    session (`~/sysadmin/CLAUDE.md`, section "Open issue: yambo_nl silently corrupted frequencies": all the cases A-H,
    the clean runs, the plan of the tests); this session keeps the repairs of the LiF runs and
    `YamboNL_Corrupted_Frequencies.ipynb`, and brings here the outcome reported there.
+   2026-10-22, outcome of the sysadmin tests (details in `~/sysadmin/CLAUDE.md`, "Reproducer 1-4"): 15 test runs
+   with short `-J`/`-C` names and no BeeOND (input of case C, also exact) all clean; 4 exact replicas of the
+   production MPPI job script of case C (BeeOND `-O`, long names) gave 1 corrupted run, exactly like case C (group 2
+   from index 10, c 0.64). Suspects: the long `-J`/`-C` names and/or the BeeOND `-O` directory (not separated yet);
+   the source analysis found no state carried across frequencies. The investigation is paused (no instrumented
+   build for now). **For this session: whenever a yambo_nl run of the project turns out corrupted, tell the user
+   and write a note for the sysadmin session** (the user carries it there, where the occurrences are collected in
+   "New occurrences"), with: date, job ID, node, run folder; grid, run type (sine / P&p, pump intensity),
+   `NLEnSteps`, `NLtime`, `NL_CPU`, nodes; BeeOND (`activate_BeeOND`, `-O`) yes/no and the `-J`/`-C` names; fresh
+   run or restart (frequencies per group to compute); corrupted groups, first wrong 0-based index and its position
+   in the group, all wrong indices, c and max|P| ratio; anything unusual in the job output or LOG. Report also the
+   clean runs with the same setup (frequency loop, 1 node, `NL_CPU` 4.8, >2 frequencies per group) with BeeOND
+   yes/no: the statistics need them. Keep the wrong fragments (`_corrupted*`) and the job outputs as usual.
+   Since 2026-10-23 the runs use the Lumen `bug-fixes` build (see "QuantumESPRESSO and Yambo"): say for every
+   reported run which build ran it (the header of the report `r-*` says `Branch is master` or `Branch is bug-fixes`).
 4. Decide whether to move the old MPPI Analysis_Optics (LiF version) here.
 
 ## Outcome of the handoff (2026-10-10, CLI session on the cluster)
