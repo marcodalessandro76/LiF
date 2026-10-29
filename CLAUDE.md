@@ -413,6 +413,53 @@ part at 6e9 vs chi accumulated). `make_figures.py` has `rt_id(..., level='hsex')
 - Not for the notes (kept in the notebooks): the INVINT HSEX chi runs (`...-sin-nltime_40`, kept on disk) and their
   comparison with two RT smoothings (0.6 and 0.976 eV).
 
+### Handoff (2026-10-29): RT vs chi maps and the oscillations at +-2wP, HSEX (for the laptop session)
+User's decision: the content of the last two sections of `Dchi-neq_Analysis.ipynb` ("Maps vs the delay: RT of
+D. Sangalli vs the HSEX chi" and "Oscillations at +-2wP: RT vs the AC part of the chi (HSEX, pump 6e9 kW/cm^2)") goes
+at the END of the notes (after Sec. 3.4; structure and level of detail to be agreed with the user). Sources: the
+markdown cells of those sections (method, formulas, two "Outcome" cells). Only Delta Im eps for now: Delta R/R is left
+aside (user's choice, 2026-10-29). Figures: NOT yet in `Notes/make_figures.py`; ask the cluster session to add them
+(the three figures of the two sections: maps, 2wP panels, traces vs the delay) once the structure is agreed.
+- Data. RT: HSEX runs of D. Sangalli (`td-hsex-cv-ber_*`, bands 3-12, same collisions as ours, QSFIELD 1.56 eV, sigma
+  3.219 fs, 6e9 kW/cm^2 along +x only, so the total response and not the even part; smoothing 0.6 eV), 61 runs: the
+  reference at -10.66 fs and 60 delays -7.41..+7.34 fs, step 0.25 fs (5.3 points per period of 2wP, 1.33 fs). chi: the
+  HSEX CRANKNIC chi (bands 3-6, `cranknic_correction`), accumulated envelope, same pump, delays and reference. 11-17 eV.
+- Maps (Delta Im eps, rel. rms / ratio of the maxima RT/chi): all delays 0.21/0.80; tau < -1.5 fs 0.23/0.80;
+  |tau| < 1.5 fs 0.18/0.85; tau > 1.5 fs 0.24/1.12. Same structures (bleach 12.8 eV, induced absorption 13.4 eV,
+  bands at ~15 and ~16 eV, fringes at 2wP with the same tilt), same shape at tau = 0.09 fs. With our RT 3-6 (even part)
+  the chi were 26-58% larger: the RT 3-12 is 20-30% larger than the RT 3-6 at 6e9, so the better agreement is partly a
+  compensation between the bands above 6 and the orders above the third. The chi map is third order (6e7 = 6e9/100).
+- Oscillations: dchi = (E0P^2/4)[chi_0 - chi_+ e^{-2i wP tau} - chi_- e^{2i wP tau}]; DC part chi_0 (follows the
+  envelope, the cycle average), AC part chi_+- (fringes, period pi/wP = 1.33 fs because the third order is even in
+  E_P; seen only with a probe shorter than the pump cycle). Physical picture discussed with the user: interference
+  between the direct probe absorption at w and the three-photon path (probe photon at w -+ 2wP plus two pump photons);
+  the tilt of the fringes comes from the energy dependence of the phase of chi_+- (mixing of their real and imaginary
+  parts); the maxima of the 2wP amplitude are near the exciton (12.3 eV) and at 16.0 eV ~ E_x + 2 hbar wP = 16.04 eV
+  (replica of the exciton: chi_+ is resonant at w - 2wP = E_x), the minimum at ~14.6 eV ~ E_x + hbar wP. The relation
+  with the dynamical Franz-Keldysh effect (Volkov et al., PRB 107, 184304 (2023)) was discussed but put aside by the
+  user: do not write it without asking.
+  - chi AC part: `Transient_Response` with the key (1,0) = chi1 (chi_0 = 0) and the keys (1,+-2), accumulated envelope.
+  - RT AC part: high-pass in the delay, y minus its Gaussian smoothing (width s = 0.55 fs: keeps 3% of the 2wP
+    oscillation, ~all of the envelope part). Check on the chi map: high-pass of the full map vs exact AC part 9.6% rms
+    (3.9% from the attenuation of the AC part), 2wP amplitude kept 96%, phase unchanged (<= 0.005 rad).
+  - 2wP component: at each energy y(tau) ~ f^2(tau) Re[a e^{2i wP tau}] = f^2 |a| cos(2 wP tau + arg a), f^2 =
+    exp(-tau^2/sigma^2) fixed; a = 2 sum_i y f^2 e^{-2i wP tau_i} / sum_i f^4 (|tau_i| < 6 fs; least squares fit with
+    the 4wP cross term neglected). |a| = amplitude of the fringes at the pump maximum (a weighted average: the true
+    envelope is asymmetric and peaks slightly before tau = 0); arg a fixes the crests, tau_k = (2 pi k - arg a)/2wP
+    (0.1 rad = 0.02 fs); its slope gives the tilt, dtau_k/dw = -(d arg a/dw)/2wP; a phase jump of ~pi where |a| -> 0
+    (14.6 eV) = fringes in antiphase above and below. The figure of the traces vs the delay at 12.3, 13.5, 15.5,
+    16.0 eV shows the RT points, their fit and the chi AC part (it explains |a| and arg a).
+  - Results: phase RT = chi within 0.01-0.26 rad where the component is large (12.0-13.7, 15.0-16.3 eV; 0.44 rad at
+    15.0 eV near the minimum): tilt and change of sign are those of chi_+-. Amplitude: map rel. rms 0.39, ratio of the
+    maxima 0.88; RT/chi (same filter) 0.82 at 12.3 eV, 1.01 at 16.0 eV, 1.45 at 13.95 and 0.64 at 15.0 eV (RT minimum
+    deeper and narrower); by delay window (median) 0.91 before the maximum, 0.82 around it, 1.08 after it (RT reduced
+    near the pump maximum, beyond the third order as the DC part). Envelope model: probe time vs accumulated |a|
+    0.98-1.09, phase <= 0.06 rad (insensitive, unlike the DC part). Other components of the RT: wP 13%, 3wP 7%, 4wP 5%
+    of the 2wP one (n = 1, 3 odd in the pump field: spurious terms, pump along +x only; n = 4 fifth order, small).
+  - Caveats: bands 3-12 (RT) vs 3-6 (chi), so the amplitude agreement is partly a compensation and the phase is the
+    clean test; our RT runs (5 delays 1.5 fs apart) do not resolve the 2wP oscillations (a third order comparison at
+    6e7, even part, needs delays with a step <= 0.3 fs around the pump maximum).
+
 ### Handoff (2026-10-19): kx12 pump test at higher intensities (for the CLI session on the cluster)
 Prepared by the laptop session; the user launches it from the cluster session. Goal: extend Fig. 4 of the notes
 (Sec. 3.2.2, chi_0 extracted with different pump intensities, kx12) beyond 1.6e7 kW/cm^2, to see how the fifth (and
