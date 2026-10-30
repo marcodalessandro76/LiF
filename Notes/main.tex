@@ -450,7 +450,7 @@ must not change.
 \label{sec:lif_rt_setup}
 
 The reference for the transient absorption of LiF are real-time simulations of the pump-probe experiment, one for each
-probe time, which we performed with the setup of the simulations of D.~Sangalli. The electrons are independent
+probe time. The electrons are independent
 particles, with a scissor on the DFT band structure, and the dynamics includes the bands 3-6: the three highest
 valence bands and the lowest conduction band. The k points are those of the kx16 grid (648 points in the irreducible
 zone, reduced with the 8 symmetries that do not involve inversion or time reversal). The equations of motion are
@@ -505,8 +505,7 @@ in 10-25~eV). The comparison with the transient response obtained from the $\chi
 third order terms, must therefore be made with the even part of the RT results.
 
 The relative weight of the spurious term decreases with the pump intensity, since the odd part scales as $\EOP$ and the
-even one as $\EOP^2$: at $6\cdot10^9$~kW/cm$^2$, the intensity of the simulations of D.~Sangalli ($\EOP$ ten times
-larger), the odd part is only 6-13\% of the even one. At that intensity, however, the even part is not only third
+even one as $\EOP^2$: at $6\cdot10^9$~kW/cm$^2$ ($\EOP$ ten times larger) the odd part is only 6-13\% of the even one. At that intensity, however, the even part is not only third
 order: near the pump maximum the terms of fifth order in the fields are 25-45\% of the third order ones. The RT
 results are still valid, but their comparison with the response obtained from the $\chi$, which we compute up to third
 order, would require higher order susceptibilities.
@@ -616,8 +615,8 @@ the comparison with the electron-hole interaction in the dynamics is in Sec.~\re
 The transient spectrum $\deps = 4\pi\dchi$ is computed from the susceptibilities of the kx16 grid (Sec.~\ref{sec:lif_chi},
 total width 0.6~eV) with the pump of the RT simulations of Sec.~\ref{sec:lif_rt_setup}, $\sigma = 3.22$~fs and the five
 delays of Fig.~\ref{fig:rt_setup}, and compared with the even part of the RT $\deps$ (Sec.~\ref{sec:lif_even_odd}) at
-two intensities: $6\cdot10^7$~kW/cm$^2$, where it is the third order response, and $6\cdot10^9$~kW/cm$^2$, the
-intensity of the simulations of D.~Sangalli. We use both the envelope at the probe time, Eq.~\eqref{eq:dchi_probetime}, and the
+two intensities: $6\cdot10^7$~kW/cm$^2$, where it is the third order response, and $6\cdot10^9$~kW/cm$^2$, where the
+higher orders contribute. We use both the envelope at the probe time, Eq.~\eqref{eq:dchi_probetime}, and the
 accumulated envelope, Eq.~\eqref{eq:dchi_accumulated}; for the latter $\chiz$ and $\chi^{(3)}_\pm$ are transformed to
 time with a discrete Fourier transform on the grid of the probe frequencies (period $2\pi\hbar/\Delta\omega = 42.7$~fs,
 much longer than the decay time $\hbar/\eta\simeq1.1$~fs of the response functions), multiplied by $W(\tau,t)$ and
@@ -683,8 +682,7 @@ time, Eq.~\eqref{eq:dchi_probetime} (red, dashed), and with the accumulated enve
 \subsubsection{High pump intensity}
 \label{sec:lif_dchi_high}
 
-At $6\cdot10^9$~kW/cm$^2$ ($\EOP = 9.25\cdot10^{-3}$~au) the RT simulations are those of D.~Sangalli, with the bands
-3-6 of the $\chi$. The even part still removes the spurious second order term (the odd part is 6-13\% of it,
+At $6\cdot10^9$~kW/cm$^2$ ($\EOP = 9.25\cdot10^{-3}$~au) the even part still removes the spurious second order term (the odd part is 6-13\% of it,
 Sec.~\ref{sec:lif_even_odd}), but it is no longer third order. Compared with the third order RT response, the even part
 at $6\cdot10^7$~kW/cm$^2$ rescaled by 100, it is smaller by 20-25\% up to the pump maximum (ratio of the maxima
 1.23-1.36 at $\tau = -2.91$, $-1.41$ and $+0.09$~fs) and shifted to higher energies, by 0.14~eV before the maximum. The
@@ -714,8 +712,7 @@ black) and $4\pi\dchi$ from the $\chi$ with the accumulated envelope (blue).}
 
 The comparison of Sec.~\ref{sec:lif_dchi} is repeated with the electron-hole interaction in the dynamics: the Hartree
 term plus the statically screened exchange (HSEX), the real-time counterpart of the Bethe-Salpeter equation, which
-gives the excitons. The kernel is the one of the simulations of D.~Sangalli, restricted to the valence-conduction
-transitions: static screening computed with 59 reciprocal lattice vectors and 50 bands, Hartree term with 339
+gives the excitons. The kernel is restricted to the valence-conduction transitions: static screening computed with 59 reciprocal lattice vectors and 50 bands, Hartree term with 339
 reciprocal lattice vectors. Everything else is as in the IP case: kx16 grid, bands 3-6, the same scissor, and the RT
 simulations of Sec.~\ref{sec:lif_rt_setup} (same pump, delays and smoothing of 0.6~eV) at $6\cdot10^7$ and
 $6\cdot10^9$~kW/cm$^2$, with the pump reversed to separate the even and odd parts.
@@ -726,7 +723,7 @@ $6\cdot10^9$~kW/cm$^2$, with the pump reversed to separate the even and odd part
 Fig.~\ref{fig:eq_hsex} shows the equilibrium dielectric function. The electron-hole interaction moves the absorption
 to an exciton at 12.9~eV (first maximum of Im~$\varepsilon$, 2.35; edge at half height 12.26~eV), while the IP
 spectrum has the edge at 15.87~eV and the first maximum at 17.47~eV (Im~$\varepsilon$ = 1.62). With HSEX the bands 3-6 are
-not enough for a converged spectrum: the simulations of D.~Sangalli with the bands 3-12 put the edge and the exciton at
+not enough for a converged spectrum: RT simulations with the bands 3-12 put the edge and the exciton at
 the same energies (12.20 and 12.82~eV), but with a higher peak (Im~$\varepsilon$ = 3.01) and a larger Re~$\varepsilon$ below
 the gap (2.45 against 1.55 at 8~eV), a relative difference of 36\% on Im~$\varepsilon$ in 10-20~eV (4.6\% between the
 IP spectra with the bands 3-6 and 1-15). The comparison between the RT simulations and the $\chi$, which use the same
@@ -810,11 +807,11 @@ $4\pi\dchi$ from the HSEX $\chi$ with the accumulated envelope (blue).}
 \subsection{Dependence on the delay and oscillations at $2\wP$ (HSEX)}
 \label{sec:lif_delay}
 
-The comparisons above use five delays, 1.5~fs apart. The RT simulations of D.~Sangalli at the HSEX level give the
+The comparisons above use five delays, 1.5~fs apart. A second set of RT simulations at the HSEX level gives the
 transient response at 60 delays, from $-7.41$ to $+7.34$~fs with a step of 0.25~fs, which resolves its dependence on the
 delay, including the oscillations at $2\wP$ (period $\pi/\wP = 1.33$~fs, 5.3 delays per period). They have the same
-kernel and pump as our HSEX simulations ($6\cdot10^9$~kW/cm$^2$), but the bands 3-12 and the pump along $+x$ only: they
-give the total response, which contains the spurious odd part (4-9\% of the even one in our simulations at this
+kernel and pump as the HSEX simulations of Sec.~\ref{sec:lif_hsex} ($6\cdot10^9$~kW/cm$^2$), but the bands 3-12 and the
+pump along $+x$ only: they give the total response, which contains the spurious odd part (4-9\% of the even one at this
 intensity, Sec.~\ref{sec:lif_hsex_dchi}), and the reference is the earliest delay, $-10.66$~fs. We compare them with
 the transient response from the HSEX $\chi$ of Sec.~\ref{sec:lif_hsex_chi} (bands 3-6, accumulated envelope, the same
 pump, delays and reference), for $\Delta$Im~$\varepsilon$ in 11-17~eV. The RT simulations are beyond the third order at
@@ -829,8 +826,8 @@ band at $\sim$15~eV and the positive one at $\sim$16~eV, and the fringes at $2\w
 maximum the two spectra have the same shape. The relative difference is 0.21 over all the delays (0.23 before the
 pump maximum, $\tau < -1.5$~fs, 0.18 around it, $|\tau| < 1.5$~fs, and 0.24 after it), and the ratio of the maxima
 RT/$\chi$ is 0.80, 0.85 and 1.12 in the same windows: the RT response is smaller than the third order one up to the
-pump maximum and slightly larger after it. The agreement is better than with our RT simulations with the bands 3-6,
-where the $\chi$ were larger by 26-58\% (Sec.~\ref{sec:lif_hsex_dchi}): at this intensity the RT response with the
+pump maximum and slightly larger after it. The agreement is better than with the RT simulations with the bands 3-6 of
+Sec.~\ref{sec:lif_hsex}, where the $\chi$ were larger by 26-58\% (Sec.~\ref{sec:lif_hsex_dchi}): at this intensity the RT response with the
 bands 3-12 is 20-30\% larger than the one with the bands 3-6, so the agreement is partly a compensation between the
 bands above 6 and the orders above the third.
 
@@ -838,7 +835,7 @@ bands above 6 and the orders above the third.
 \centering
 \includegraphics[width=\textwidth]{Figures/maps_hsex.jpeg}
 \caption{$\Delta$Im~$\varepsilon$ as a function of the delay and of the probe energy (HSEX, pump
-$6\cdot10^9$~kW/cm$^2$): RT simulations of D.~Sangalli (bands 3-12) and transient response from the $\chi$ (bands 3-6,
+$6\cdot10^9$~kW/cm$^2$): RT simulations (bands 3-12) and transient response from the $\chi$ (bands 3-6,
 accumulated envelope), same color scale. Right: the two spectra at $\tau = +0.09$~fs (dashed lines of the maps).}
 \label{fig:maps_hsex}
 \end{figure}
@@ -903,7 +900,7 @@ harmonics.
 \centering
 \includegraphics[width=\textwidth]{Figures/ac_hsex.jpeg}
 \caption{Oscillations at $2\wP$ (HSEX, pump $6\cdot10^9$~kW/cm$^2$). Left: $\Delta$Im~$\varepsilon$ of the RT
-simulations of D.~Sangalli after the high-pass in the delay, Eq.~\eqref{eq:highpass}, and AC part of the response from
+simulations after the high-pass in the delay, Eq.~\eqref{eq:highpass}, and AC part of the response from
 the $\chi$ (accumulated envelope), same color scale. Right: amplitude $|a|$ and phase $\arg a$ of the component at
 $2\wP$, Eq.~\eqref{eq:fringes}, for the RT (black) and the $\chi$ (blue, dashed).}
 \label{fig:ac_hsex}
@@ -928,14 +925,14 @@ around and after the maximum is 0.91, 0.82 and 1.08 (median over the energies wh
 \centering
 \includegraphics[width=\textwidth]{Figures/ac_traces_hsex.jpeg}
 \caption{AC signal as a function of the delay at the two maxima of $|a|$ (HSEX, pump $6\cdot10^9$~kW/cm$^2$): RT
-simulations of D.~Sangalli after the high-pass (dots) and AC part of the response from the $\chi$ with the accumulated
+simulations after the high-pass (dots) and AC part of the response from the $\chi$ with the accumulated
 envelope (blue) and with the envelope at the probe time (red, dashed).}
 \label{fig:ac_traces_hsex}
 \end{figure}
 
 Two limits of this comparison: the RT simulations have the bands 3-12 and the $\chi$ the bands 3-6, so the agreement
 of the amplitudes is partly a compensation, while the phase is the clean test; and the comparison is not at the third
-order. Our RT simulations, with five delays 1.5~fs apart, cannot resolve the oscillations at $2\wP$: a comparison at
+order. The RT simulations with the bands 3-6, with five delays 1.5~fs apart, cannot resolve the oscillations at $2\wP$: a comparison at
 $6\cdot10^7$~kW/cm$^2$, with the even part, requires delays with a step of at most 0.3~fs around the pump maximum.
 
 % Notes for the following sections (their structure is to be defined with the user):

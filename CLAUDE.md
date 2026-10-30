@@ -166,7 +166,9 @@ done (theory, implementation, computations) and of the notation and conventions.
   implementation come in the later sections. Vectors in bold (`\bm`) with Cartesian indices until the fields are
   taken along x. Only a delta probe (no monochromatic probe). Display equations must fit the line (split with align,
   check the log for Overfull \hbox). Bibliography in `Notes/biblio.bib` (bibtex, unsrt); do NOT cite the
-  Attaccalite-Sangalli draft (these notes replace it). After each change Claude builds `Notes/main.pdf` in place
+  Attaccalite-Sangalli draft (these notes replace it). Do not attribute the RT simulations to D. Sangalli (he is a
+  co-author, user's request 2026-10-30): they are "RT simulations"; when two sets must be distinguished, use their
+  parameters (bands 3-6 / 3-12, number of delays, Sec. where they are described), not "ours"/"his". After each change Claude builds `Notes/main.pdf` in place
   with latexmk (user's request, 2026-10-19) and checks the log (errors, Overfull \hbox, undefined references); if the
   PDF is locked by the viewer (Acrobat: "I can't write on file main.pdf"), ask the user to close it. After a failed
   run latexmk does not recompile unchanged sources and reports the old errors (the log is not rewritten): use
