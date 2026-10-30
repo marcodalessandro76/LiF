@@ -230,7 +230,14 @@ done (theory, implementation, computations) and of the notation and conventions.
   sec:lif_hsex) from the HSEX handoff below: intro (kernel), 3.4.1 equilibrium spectrum and susceptibilities (Fig.
   eq_hsex, bands 3-6 vs 3-12, chi runs: 128 frequencies, damping 0.6 eV, Crank-Nicolson and why, energy map
   correction, checks), 3.4.2 comparison (Figs. dchi_rt_hsex and dchi_rt_hsex_6e9, numbers of the handoff, possible
-  reasons of the better agreement than IP). Nothing after Sec. 3 is defined:
+  reasons of the better agreement than IP). 2026-10-30: new Sec. 3.5 "Dependence on the delay and oscillations at
+  2wP (HSEX)" (label sec:lif_delay) from the handoff of 2026-10-29: intro (60 delays of D. Sangalli, bands 3-12, +x
+  only), 3.5.1 maps (Fig. maps_hsex), 3.5.2 oscillations at 2wP (DC/AC parts, interference picture and replica of the
+  exciton at E_x + 2wP, high-pass Eq. eq:highpass, fit Eq. eq:fringes with |a| and arg a, Fig. ac_hsex, phase and
+  amplitude results, other harmonics; Fig. ac_traces_hsex at 12.31 and 15.99 eV with the chi AC part for both envelope
+  models: the delay dependence of the fringes tests the accumulated W on the +-2wP terms, see the handoff below),
+  closing caveats. Figures from `make_figures.py` (`load_davide`, `highpass`, `hsex_ac_data`, `fig_maps_hsex`,
+  `fig_ac_hsex`, `fig_ac_traces_hsex`). Nothing after Sec. 3 is defined:
   do not refer to sections that do not exist. Figures: `Notes/make_figures.py` (registry FIGURES, run on ismhpc from
   ~/work/LiF/Notes with `--out ~/tmp_claude/notes_figures`, then scp the jpeg to Notes/Figures on the laptop and commit
   there; the cluster copy of the repo never commits). Our RT runs at 6e7: only 5 probe times (13-19 fs, tau -2.91 ...
@@ -414,6 +421,16 @@ part at 6e9 vs chi accumulated). `make_figures.py` has `rt_id(..., level='hsex')
   comparison with two RT smoothings (0.6 and 0.976 eV).
 
 ### Handoff (2026-10-29): RT vs chi maps and the oscillations at +-2wP, HSEX (for the laptop session)
+DONE (2026-10-30, laptop session): Sec. 3.5 of the notes; the three figures made by the laptop session on the cluster
+with `make_figures.py maps_hsex ac_hsex ac_traces_hsex` (numbers identical to the notebook; RT high-pass vs chi AC
+rel. rms 0.38 in 11-17 eV, 0.39 in the notebook on the whole output grid). New result (user's agreement, the traces
+figure was kept for it): the delay dependence of the fringes distinguishes the envelope models, unlike |a| and arg a at
+the pump maximum. Centroid in the delay of the AC power (11-17 eV) / rms width: RT high-pass -0.84 / 1.94 fs, chi AC
+accumulated -0.89 / 1.70 fs, probe time 0.00 / 1.62 fs; RT vs chi (same filter), rel. rms / ratio of the norms, tau <
+-1.5 fs: accumulated 0.40 / 0.98, probe time 0.66 / 1.38 (|tau| < 1.5: 0.38/0.92 vs 0.40/0.85; tau > 1.5: 0.49/1.17 vs
+0.47/0.77). So the RT supports the accumulated W on the +-2wP terms (the extension not derived in Sec. 1.5). For the
+cluster session: the "Envelope model" bullet of the outcome cell of `Dchi-neq_Analysis.ipynb` ("the two models differ
+little") holds only for |a| and arg a at the pump maximum; add these numbers there.
 User's decision: the content of the last two sections of `Dchi-neq_Analysis.ipynb` ("Maps vs the delay: RT of
 D. Sangalli vs the HSEX chi" and "Oscillations at +-2wP: RT vs the AC part of the chi (HSEX, pump 6e9 kW/cm^2)") goes
 at the END of the notes (after Sec. 3.4; structure and level of detail to be agreed with the user). Sources: the

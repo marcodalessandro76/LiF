@@ -807,6 +807,137 @@ $4\pi\dchi$ from the HSEX $\chi$ with the accumulated envelope (blue).}
 \label{fig:dchi_rt_hsex_6e9}
 \end{figure}
 
+\subsection{Dependence on the delay and oscillations at $2\wP$ (HSEX)}
+\label{sec:lif_delay}
+
+The comparisons above use five delays, 1.5~fs apart. The RT simulations of D.~Sangalli at the HSEX level give the
+transient response at 60 delays, from $-7.41$ to $+7.34$~fs with a step of 0.25~fs, which resolves its dependence on the
+delay, including the oscillations at $2\wP$ (period $\pi/\wP = 1.33$~fs, 5.3 delays per period). They have the same
+kernel and pump as our HSEX simulations ($6\cdot10^9$~kW/cm$^2$), but the bands 3-12 and the pump along $+x$ only: they
+give the total response, which contains the spurious odd part (4-9\% of the even one in our simulations at this
+intensity, Sec.~\ref{sec:lif_hsex_dchi}), and the reference is the earliest delay, $-10.66$~fs. We compare them with
+the transient response from the HSEX $\chi$ of Sec.~\ref{sec:lif_hsex_chi} (bands 3-6, accumulated envelope, the same
+pump, delays and reference), for $\Delta$Im~$\varepsilon$ in 11-17~eV. The RT simulations are beyond the third order at
+this intensity (Sec.~\ref{sec:lif_hsex_dchi}).
+
+\subsubsection{Maps vs the delay}
+\label{sec:lif_delay_maps}
+
+Fig.~\ref{fig:maps_hsex} shows $\Delta$Im~$\varepsilon$ as a function of the delay and of the probe energy. The map from
+the $\chi$ has the structures of the RT one: the bleach at 12.8~eV and the induced absorption at 13.4~eV, the negative
+band at $\sim$15~eV and the positive one at $\sim$16~eV, and the fringes at $2\wP$ with the same tilt. Near the pump
+maximum the two spectra have the same shape. The relative difference is 0.21 over all the delays (0.23 before the
+pump maximum, $\tau < -1.5$~fs, 0.18 around it, $|\tau| < 1.5$~fs, and 0.24 after it), and the ratio of the maxima
+RT/$\chi$ is 0.80, 0.85 and 1.12 in the same windows: the RT response is smaller than the third order one up to the
+pump maximum and slightly larger after it. The agreement is better than with our RT simulations with the bands 3-6,
+where the $\chi$ were larger by 26-58\% (Sec.~\ref{sec:lif_hsex_dchi}): at this intensity the RT response with the
+bands 3-12 is 20-30\% larger than the one with the bands 3-6, so the agreement is partly a compensation between the
+bands above 6 and the orders above the third.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/maps_hsex.jpeg}
+\caption{$\Delta$Im~$\varepsilon$ as a function of the delay and of the probe energy (HSEX, pump
+$6\cdot10^9$~kW/cm$^2$): RT simulations of D.~Sangalli (bands 3-12) and transient response from the $\chi$ (bands 3-6,
+accumulated envelope), same color scale. Right: the two spectra at $\tau = +0.09$~fs (dashed lines of the maps).}
+\label{fig:maps_hsex}
+\end{figure}
+
+\subsubsection{Oscillations at $2\wP$}
+\label{sec:lif_delay_2wp}
+
+In the third order response~\eqref{eq:dchi_mono} the term $\chiz$ (DC part) follows the pump envelope, while the
+terms $\chi^{(3)}_\pm$ (AC part) oscillate with the delay as $e^{\mp2i\wP\tau}$: they give the fringes of the maps.
+Their period is $\pi/\wP$, half of the pump period, because the third order is even in the pump field; they are seen
+only with a probe shorter than the pump cycle (the DC part is the average over the cycle). They come from the
+interference between the direct absorption of the probe at $\omega$ and the path in which a probe photon at
+$\omega\mp2\wP$ and two pump photons give the response at $\omega$; the tilt of the fringes comes from the dependence on
+the energy of the phase of $\chi^{(3)}_\pm$. The AC part is large near the exciton and around 16.0~eV, close to
+$E_x+2\hbar\wP = 16.04$~eV, where $\chip(\omega) = 3\chi^{(3)}(\omega;\omega-2\wP,\wP,\wP)$ is resonant at
+$\omega-2\wP = E_x$ (a replica of the exciton at $E_x = 12.9$~eV).
+
+The AC part of the $\chi$ is computed from Eq.~\eqref{eq:dchi_accumulated} without the term $\chiz$. In the RT response
+the two parts cannot be separated, and at each probe energy the part that follows the envelope is removed with a
+high-pass filter in the delay: the series $y(\tau_i) = \Delta\mathrm{Im}\,\varepsilon(\omega,\tau_i)$ minus its Gaussian
+smoothing,
+\begin{equation}
+y_{\mathrm{hp}}(\tau_i) = y(\tau_i) - \frac{\sum_jK_{ij}\,y(\tau_j)}{\sum_jK_{ij}} , \qquad
+K_{ij} = e^{-(\tau_i-\tau_j)^2/2s^2} , \qquad s = 0.55~\mathrm{fs} .
+\label{eq:highpass}
+\end{equation}
+The smoothing keeps $e^{-(2\wP s)^2/2} = 3\%$ of the oscillation at $2\wP$ and almost all of the part that follows the
+envelope, since $\fenv^2$ has the width $\sigma/\sqrt2 = 2.3$~fs. On the map from the $\chi$, where the AC part is known,
+the high-pass of the whole map differs from it by 9.6\% (rms for $|\tau| < 3$~fs; 3.9\% is the attenuation of the AC
+part itself).
+
+At each probe energy the AC signal $y(\tau)$, the RT after the high-pass or the AC part of the $\chi$, is an
+oscillation at $2\wP$ with an amplitude that follows the pump envelope, and it is described by one complex number
+$a(\omega)$:
+\begin{equation}
+y(\omega,\tau) \simeq \fenv^2(\tau)\,\mathrm{Re}\left[a(\omega)\,e^{2i\wP\tau}\right]
+= \fenv^2(\tau)\,|a(\omega)|\cos\big(2\wP\tau+\arg a(\omega)\big) .
+\label{eq:fringes}
+\end{equation}
+$a$ is the least squares fit of this form, with the frequency and the envelope fixed, i.e.\ the projection of $y$ on
+$e^{2i\wP\tau}$ with the weight $\fenv^2$, $a = 2\sum_iy(\tau_i)\fenv^2(\tau_i)e^{-2i\wP\tau_i}/\sum_i\fenv^4(\tau_i)$
+over the delays with $|\tau_i| < 6$~fs. The amplitude $|a|$ is the amplitude of the fringes at the pump maximum (a
+weighted average around it), and the phase fixes the delays of the crests, $\tau_k = (2\pi k-\arg a)/2\wP$: a difference
+of 0.1~rad moves them by 0.02~fs. The slope of the phase gives the tilt of the fringes,
+$d\tau_k/d\omega = -(d\arg a/d\omega)/2\wP$, and a jump of the phase by $\sim\pi$ where $|a|$ goes to zero means that the
+fringes above and below are in antiphase. The filter keeps 96\% of $|a|$ and does not change its phase
+($\le0.005$~rad).
+
+Fig.~\ref{fig:ac_hsex} shows the two AC maps and the amplitude and the phase of $a$. Where the component at $2\wP$ is
+large (12.0-13.7 and 15.0-16.3~eV) the phases of the RT and of the $\chi$ agree within 0.01-0.26~rad (0.44~rad at
+15.0~eV, near the minimum), i.e.\ the crests within 0.06~fs: the tilt of the fringes and its change of sign at
+14.6~eV, where the amplitude has its minimum, are those of the third order terms $\chi^{(3)}_\pm$. The amplitudes agree
+less well: relative difference 0.38 between the AC maps ($|\tau| < 3$~fs), ratio of the maxima 0.88; at the two maxima
+of $|a|$ the ratio RT/$\chi$ (with the same filter on both) is 0.82 at 12.3~eV and 1.01 at 16.0~eV, and the minimum of
+the RT is deeper and narrower (1.45 at 13.95~eV, 0.64 at 15.0~eV). The RT has also components at $\wP$, $3\wP$ and
+$4\wP$, with 13\%, 7\% and 5\% of the one at $2\wP$ (maximum over the energies): the first two are odd in the pump field
+(the spurious terms, not removed with the pump along $+x$ only), the last one is a fifth order term. At this
+intensity the orders above the third show up mostly as a reduced amplitude near the pump maximum, not as new
+harmonics.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/ac_hsex.jpeg}
+\caption{Oscillations at $2\wP$ (HSEX, pump $6\cdot10^9$~kW/cm$^2$). Left: $\Delta$Im~$\varepsilon$ of the RT
+simulations of D.~Sangalli after the high-pass in the delay, Eq.~\eqref{eq:highpass}, and AC part of the response from
+the $\chi$ (accumulated envelope), same color scale. Right: amplitude $|a|$ and phase $\arg a$ of the component at
+$2\wP$, Eq.~\eqref{eq:fringes}, for the RT (black) and the $\chi$ (blue, dashed).}
+\label{fig:ac_hsex}
+\end{figure}
+
+At the pump maximum the amplitude and the phase of the fringes hardly depend on the envelope model: with the
+envelope at the probe time $|a|$ changes by a factor 0.98-1.09 and the phase by at most 0.06~rad. Their dependence on
+the delay does, and Eq.~\eqref{eq:fringes}, with the symmetric envelope $\fenv^2(\tau)$, does not show it.
+Fig.~\ref{fig:ac_traces_hsex} shows the AC signals at the two maxima of $|a|$. With the envelope at the probe time the
+fringes of the $\chi$ have the envelope $\fenv^2(\tau)$, symmetric around the pump maximum; with the accumulated
+envelope they are shifted to negative delays, because the probe coherence feels the pump that comes after the probe.
+The RT fringes follow the accumulated envelope. Over 11-17~eV the centroid in the delay of the power of the AC signal is
+$-0.84$~fs for the RT, $-0.89$~fs for the $\chi$ with the accumulated envelope and 0.00~fs with the envelope at the
+probe time (rms widths 1.94, 1.70 and 1.62~fs), and before the pump maximum ($\tau < -1.5$~fs) the relative difference
+between the RT and the $\chi$ is 0.40 with the accumulated envelope (ratio of the norms 0.98), against 0.66 with the
+envelope at the probe time (ratio 1.38). This supports the use of the same weight $W$ for the terms at $\pm2\wP$ in
+Eq.~\eqref{eq:dchi_accumulated}, which is not derived in Sec.~\ref{sec:theory}. The RT fringes are wider because the
+orders above the third reduce them near the pump maximum: the ratio RT/$\chi$ of $|a|$ computed separately before,
+around and after the maximum is 0.91, 0.82 and 1.08 (median over the energies where the component is large).
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/ac_traces_hsex.jpeg}
+\caption{AC signal as a function of the delay at the two maxima of $|a|$ (HSEX, pump $6\cdot10^9$~kW/cm$^2$): RT
+simulations of D.~Sangalli after the high-pass (dots) and AC part of the response from the $\chi$ with the accumulated
+envelope (blue) and with the envelope at the probe time (red, dashed).}
+\label{fig:ac_traces_hsex}
+\end{figure}
+
+Two limits of this comparison: the RT simulations have the bands 3-12 and the $\chi$ the bands 3-6, so the agreement
+of the amplitudes is partly a compensation, while the phase is the clean test; and the comparison is not at the third
+order. Our RT simulations, with five delays 1.5~fs apart, cannot resolve the oscillations at $2\wP$: a comparison at
+$6\cdot10^7$~kW/cm$^2$, with the even part, requires delays with a step of at most 0.3~fs around the pump maximum.
+
 % Notes for the following sections (their structure is to be defined with the user):
 % - a posteriori broadening (for the details of the computation of the chi with MPPI): the terms linear in the probe can
 %   be further broadened by a Lorentzian convolution of width Delta on the grid of the probe frequencies, which gives

@@ -10,12 +10,15 @@ untracked files in the cluster copy of the repository, write them outside it (e.
 and copy them to Notes/Figures on the laptop, where they are committed.
 """
 import os
+import glob
 import argparse
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from matplotlib.colors import TwoSlopeNorm
 from scipy.optimize import minimize_scalar
+from scipy.interpolate import CubicSpline
 from mppi import Parsers as P
 from mppi import Optics as O
 from mppi.Optics.Utils import time_weighted
@@ -475,12 +478,220 @@ def fig_dchi_rt(out, pump_int=6e7, erange=(13.6, 21.3), name='dchi_rt', level='i
     plt.close(fig)
 
 
+DAVIDE_DIR = os.path.join(NL_CHI, 'Davide_data', '20250312_Report_simulations_data_kx16_ball')
+DAVIDE_FILE = 'o-abs_0-50eV_sm0.6eV.YPP-eps_along_E'
+
+
+def ypp_fields(fname):
+    # (initial time (fs), width (fs), frequency (eV), intensity (kW/cm^2)) of the fields (probe, pump) in the header of a
+    # ypp file
+    hdr = [l for l in open(fname) if l.startswith('#')]
+    get = lambda key: [float(l.split(':')[1].split()[0]) for l in hdr if '[FIELDs] ' + key in l]
+    return list(zip(get('Initial time'), get('Width'), get('Frequency range'), get('Intensity')))
+
+
+def load_davide(prefix='td-hsex-cv-ber'):
+    """
+    RT runs of D. Sangalli of the set prefix (ypp spectra, smoothing 0.6 eV), sorted by the delay tau = t_p - t_P:
+    energies (eV), eps along x (n_delays, n_energies) and delays (fs). The first one (-10.66 fs) is the reference.
+    """
+    folders = glob.glob(os.path.join(DAVIDE_DIR, prefix + '*delta*fs*'))
+    t_p = np.array([ypp_fields(os.path.join(f, DAVIDE_FILE))[0][0] for f in folders])
+    t_start, sigma, wP, _ = ypp_fields(os.path.join(folders[0], DAVIDE_FILE))[1]
+    t_P = t_start + np.pi * HB / wP * np.rint(wP / (np.pi * HB) * 5 * sigma)   # maximum of the QSFIELD 5SIGMA pump
+    # one file of the HSEX set starts with a stray 'ok' line
+    data = [np.loadtxt(os.path.join(folders[i], DAVIDE_FILE), comments=['#', 'ok']) for i in np.argsort(t_p)]
+    return data[0][:, 0], np.array([d[:, 4] + 1j * d[:, 1] for d in data]), np.sort(t_p) - t_P
+
+
+def highpass(y, t, s=0.55):
+    # y (delays, energies) minus its Gaussian smoothing in the delay t (width s, fs): removes the part that follows the
+    # pump envelope and keeps the oscillations at 2wP (the smoothing keeps exp(-(2 wP s)^2/2) = 3% of them)
+    K = np.exp(-(t[:, None] - t[None, :])**2 / (2 * s**2))
+    return y - (K @ y) / K.sum(1)[:, None]
+
+
+_hsex_ac = {}
+
+
+def hsex_ac_data():
+    """
+    Data of the figures maps_hsex, ac_hsex and ac_traces_hsex (HSEX, pump 6e9 kW/cm^2), computed once: Im Delta eps of
+    the RT runs of D. Sangalli (bands 3-12, pump along +x only) and of the HSEX chi (bands 3-6, accumulated envelope,
+    pump of the RT runs) at the same delays; AC part of the chi (chi_+- terms only) with the two envelope models; RT
+    after the high-pass in the delay; complex amplitude a(w) of the 2wP component, y = f^2(tau) Re[a e^{2i wP tau}].
+    """
+    if _hsex_ac:
+        return _hsex_ac
+    E, eps, taus_all = load_davide()
+    taus = taus_all[1:]
+    tr = chi_hsex()
+    w = tr.w
+    pump = load_nl(rt_id('3-6', 6e9, level='hsex'))                   # pump of the RT runs (our pump-only run)
+    E0P, sigma, wP = pump.Efield2[0]['amplitude'], pump_center(pump)[1], pump.Efield2[0]['freq_range'][0] * Const.HaToeV
+    tr_ac = O.Transient_Response(tr.freqs, tr.chi1, {(1, 0): tr.chi1, (1, 2): tr.keys[(1, 2)], (1, -2): tr.keys[(1, -2)]},
+                                 tr.E0P, tr.wP, verbose=False)        # chi_0 = 0: only the chi_+- terms
+
+    def im_deps(t, trr, model='accumulated'):
+        _, d = trr.dchi(t, E0P, pump=model, sigma=sigma, wP=wP)
+        return (4 * np.pi * cranknic_correction(w, d)).imag
+
+    # maps: change w.r.t. the reference delay, the chi on a 0.02 eV grid (cubic spline), 11-17 eV
+    Em = np.arange(w[0], w[-1] + 1e-9, 0.02)
+    Em = Em[(Em >= 11) & (Em <= 17)]
+    full = CubicSpline(w, im_deps(taus_all, tr), axis=1)(Em)
+    d = dict(Em=Em, taus=taus, w=w, sigma=sigma, wP=wP, dim_chi=full[1:] - full[0],
+             dim_rt=np.array([np.interp(Em, E, y - eps[0].imag) for y in eps[1:].imag]))
+    # oscillations at 2wP on the output grid w
+    d['hp_rt'] = highpass(np.array([np.interp(w, E, y - eps[0].imag) for y in eps[1:].imag]), taus)
+    d['ac'] = {m: im_deps(taus, tr_ac, m) for m in ['probe time', 'accumulated']}
+    d['taus_fine'] = np.arange(taus[0], taus[-1] + 1e-9, 0.02)
+    d['ac_fine'] = {m: im_deps(d['taus_fine'], tr_ac, m) for m in ['probe time', 'accumulated']}
+    W2 = 2 * wP / HB                                                    # 2 wP (rad/fs)
+
+    def demod(y, sel=None):
+        # complex amplitude a(w) of the 2wP component, fit of f^2 Re[a e^{2i wP tau}] on the delays sel (|tau| < 6 fs)
+        sel = np.abs(taus) < 6 if sel is None else sel
+        g = np.exp(-taus[sel]**2 / sigma**2)
+        return 2 * (y[sel] * (g * np.exp(-1j * W2 * taus[sel]))[:, None]).sum(0) / (g**2).sum()
+
+    ac, hp_ac = d['ac']['accumulated'], highpass(d['ac']['accumulated'], taus)
+    d['a_rt'], d['a_chi'] = demod(d['hp_rt']), demod(ac)
+    a_hp, a_full = demod(hp_ac), demod(highpass(im_deps(taus, tr), taus))
+    big = np.abs(d['a_chi']) > 0.5 * np.abs(d['a_chi']).max()
+
+    # printed numbers
+    s, m3 = (w >= 11) & (w <= 17), np.abs(taus) < 3
+    wins = {'all': np.ones(len(taus), bool), 'tau < -1.5': taus < -1.5, '|tau| < 1.5': np.abs(taus) < 1.5,
+            'tau > 1.5': taus > 1.5}
+    rel = lambda x, y, m: np.linalg.norm((x - y)[m][:, s]) / np.linalg.norm(y[m][:, s])
+    print('hsex_ac: %d delays %.2f..%.2f fs, E0P %.4e au, sigma %.3f fs, wP %.3f eV' % (len(taus), taus[0], taus[-1], E0P,
+                                                                                      sigma, wP))
+    print('maps, Delta Im eps in 11-17 eV, RT vs chi: rel. rms / ratio of the maxima RT/chi: ' + ' | '.join(
+          '%s %.2f / %.2f' % (k, np.linalg.norm(d['dim_rt'][m] - d['dim_chi'][m]) / np.linalg.norm(d['dim_chi'][m]),
+                              np.abs(d['dim_rt'][m]).max() / np.abs(d['dim_chi'][m]).max()) for k, m in wins.items()))
+    print('filter on the chi map (|tau| < 3 fs): rel. rms w.r.t. the AC part %.3f (high-pass of the AC part), %.3f '
+          '(high-pass of the full map); 2wP amplitude kept %.3f, phase changed by <= %.3f rad' % (
+          rel(hp_ac, ac, m3), rel(highpass(im_deps(taus, tr), taus), ac, m3), np.median(np.abs(a_full / d['a_chi'])[big]),
+          np.abs(np.angle(a_full / d['a_chi'])[big]).max()))
+    print('RT high-pass vs chi AC part (|tau| < 3 fs): rel. rms %.2f, ratio of the maxima %.2f' % (
+          rel(d['hp_rt'], ac, m3), np.abs(d['hp_rt'][m3][:, s]).max() / np.abs(ac[m3][:, s]).max()))
+    print('2wP component:  w (eV) | |a| RT | |a| chi | RT/chi (same filter) | arg a RT - chi (rad)')
+    for wi in [12.3, 12.9, 13.5, 13.95, 14.6, 15.0, 15.5, 16.0, 16.5]:
+        i = np.argmin(abs(w - wi))
+        print('                %6.2f | %.4f | %.4f | %.2f | %+.2f' % (w[i], abs(d['a_rt'][i]), abs(d['a_chi'][i]),
+              abs(d['a_rt'][i] / a_hp[i]), np.angle(d['a_rt'][i] / d['a_chi'][i])))
+    cent = lambda y: (taus[:, None] * y[:, s]**2).sum() / (y[:, s]**2).sum()
+    width = lambda y: np.sqrt((taus[:, None]**2 * y[:, s]**2).sum() / (y[:, s]**2).sum() - cent(y)**2)
+    print('envelope of the fringes vs the delay (11-17 eV): centroid / rms width of the AC power; RT high-pass %+.2f / '
+          '%.2f fs' % (cent(d['hp_rt']), width(d['hp_rt'])))
+    for m, y in d['ac'].items():
+        y = highpass(y, taus)
+        print('  chi %-11s %+.2f / %.2f fs | RT vs chi (same filter), rel. rms / ratio of the norms: ' % (m, cent(y),
+              width(y)) + ' | '.join('%s %.2f / %.2f' % (k, rel(d['hp_rt'], y, mm), np.linalg.norm(d['hp_rt'][mm][:, s])
+              / np.linalg.norm(y[mm][:, s])) for k, mm in wins.items() if k != 'all'))
+    _hsex_ac.update(d)
+    return _hsex_ac
+
+
+def fig_maps_hsex(out, tau_cut=0.):
+    """
+    Delta Im eps vs the delay and the probe energy (HSEX, pump 6e9 kW/cm^2): RT runs of D. Sangalli (bands 3-12) and the
+    chi (bands 3-6, accumulated envelope), same color scale, and the spectra at the delay nearest to tau_cut.
+    """
+    d = hsex_ac_data()
+    i = np.argmin(np.abs(d['taus'] - tau_cut))
+    v = max(np.abs(d['dim_rt']).max(), np.abs(d['dim_chi']).max())
+    fig = plt.figure(figsize=(7, 2.9))
+    gs = fig.add_gridspec(1, 5, width_ratios=[2, 2, 0.1, 0.45, 1.2], wspace=0.08)
+    axes = [fig.add_subplot(gs[0])]
+    axes += [fig.add_subplot(gs[k], sharey=axes[0]) for k in [1, 4]]
+    for ax, y, t in zip(axes[:2], [d['dim_rt'], d['dim_chi']], ['RT', r'from the $\chi$']):
+        pc = ax.pcolormesh(d['taus'], d['Em'], y.T, cmap='bwr', norm=TwoSlopeNorm(0, -v, v), shading='gouraud',
+                           rasterized=True)
+        ax.axvline(d['taus'][i], color='k', lw=0.8, ls='--')
+        ax.set_xlabel(r'delay $\tau$ (fs)')
+        ax.set_title(t, fontsize=9)
+    fig.colorbar(pc, cax=fig.add_subplot(gs[2])).ax.set_title(r'$\Delta$Im $\varepsilon$', fontsize=8)
+    axes[0].set_ylabel('probe energy (eV)')
+    axes[2].plot(d['dim_rt'][i], d['Em'], 'k', lw=1.2, label='RT')
+    axes[2].plot(d['dim_chi'][i], d['Em'], 'b--', lw=1, label=r'$\chi$')
+    axes[2].axvline(0, color='gray', lw=0.5)
+    axes[2].set_xlabel(r'$\Delta$Im $\varepsilon$, $\tau$ = %+.2f fs' % d['taus'][i])
+    axes[2].legend(frameon=False)
+    for ax in axes[1:]:
+        ax.tick_params(labelleft=False)
+    fig.savefig(os.path.join(out, 'maps_hsex.jpeg'))
+    plt.close(fig)
+
+
+def fig_ac_hsex(out):
+    """
+    Oscillations at 2wP (HSEX, pump 6e9 kW/cm^2): RT of D. Sangalli after the high-pass in the delay and AC part of the
+    chi (chi_+- terms, accumulated envelope), same color scale; amplitude |a| and phase arg a of the 2wP component.
+    """
+    d = hsex_ac_data()
+    w, ac = d['w'], d['ac']['accumulated']
+    v = np.abs(ac).max()
+    fig = plt.figure(figsize=(7, 3.0))
+    gs = fig.add_gridspec(1, 6, width_ratios=[1, 1, 0.07, 0.3, 0.8, 0.8], wspace=0.1)
+    axes = [fig.add_subplot(gs[0])]
+    axes += [fig.add_subplot(gs[k], sharey=axes[0]) for k in [1, 4, 5]]
+    for ax, y, t in zip(axes[:2], [d['hp_rt'], ac], ['RT, high-pass', r'$\chi$, AC part']):
+        pc = ax.pcolormesh(d['taus'], w, y.T, cmap='bwr', norm=TwoSlopeNorm(0, -v, v), shading='gouraud',
+                           rasterized=True)
+        ax.set_xlim(-6, 6)
+        ax.set_xlabel(r'delay $\tau$ (fs)')
+        ax.set_title(t, fontsize=9)
+    fig.colorbar(pc, cax=fig.add_subplot(gs[2])).ax.set_title(r'$\Delta$Im $\varepsilon$', fontsize=8)
+    axes[0].set_ylabel('probe energy (eV)')
+    axes[0].set_ylim(w[0], w[-1])
+    axes[2].plot(np.abs(d['a_rt']), w, 'k', lw=1.2, label='RT')
+    axes[2].plot(np.abs(d['a_chi']), w, 'b--', lw=1, label=r'$\chi$')
+    axes[2].set_xlabel(r'amplitude $|a|$')
+    axes[2].legend(frameon=False)
+    axes[3].plot(np.unwrap(np.angle(d['a_rt'])), w, 'k', lw=1.2)
+    axes[3].plot(np.unwrap(np.angle(d['a_chi'])), w, 'b--', lw=1)
+    axes[3].set_xlabel(r'phase arg $a$ (rad)')
+    for ax in axes[1:]:
+        ax.tick_params(labelleft=False)
+    fig.savefig(os.path.join(out, 'ac_hsex.jpeg'))
+    plt.close(fig)
+
+
+def fig_ac_traces_hsex(out, energies=(12.3, 16.0)):
+    """
+    Oscillations at 2wP vs the delay at two probe energies (HSEX, pump 6e9 kW/cm^2): RT of D. Sangalli after the
+    high-pass and AC part of the chi with the accumulated envelope and with the envelope at the probe time.
+    """
+    d = hsex_ac_data()
+    fig, axes = plt.subplots(1, len(energies), figsize=(7, 2.5), sharey=False)
+    for ax, wi in zip(axes, energies):
+        i = np.argmin(np.abs(d['w'] - wi))
+        ax.plot(d['taus_fine'], d['ac_fine']['accumulated'][:, i], 'b', lw=1, label=r'$\chi$, accumulated envelope')
+        ax.plot(d['taus_fine'], d['ac_fine']['probe time'][:, i], 'r--', lw=0.8,
+                label=r'$\chi$, envelope at the probe time')
+        ax.plot(d['taus'], d['hp_rt'][:, i], 'ko', ms=2.5, label='RT, high-pass')
+        ax.axhline(0, color='gray', lw=0.5)
+        ax.axvline(0, color='gray', lw=0.5, ls=':')
+        ax.set_xlim(-7.5, 7.5)
+        ax.set_xlabel(r'delay $\tau$ (fs)')
+        ax.set_title('%.2f eV' % d['w'][i], fontsize=9)
+    axes[0].set_ylabel(r'$\Delta$Im $\varepsilon$, oscillating part')
+    fig.tight_layout()
+    fig.legend(*axes[0].get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=3,
+               frameon=False)
+    fig.savefig(os.path.join(out, 'ac_traces_hsex.jpeg'))
+    plt.close(fig)
+
+
 FIGURES = {'rt_setup': fig_rt_setup, 'rt_even_odd': fig_rt_even_odd, 'chi_kgrid': fig_chi_kgrid,
            'chi_pump': fig_chi_pump, 'dchi_rt': fig_dchi_rt,
            'dchi_rt_6e9': lambda out: fig_dchi_rt(out, pump_int=6e9, name='dchi_rt_6e9'), 'eq_hsex': fig_eq_hsex,
            'dchi_rt_hsex': lambda out: fig_dchi_rt(out, erange=(11, 17), name='dchi_rt_hsex', level='hsex'),
            'dchi_rt_hsex_6e9': lambda out: fig_dchi_rt(out, pump_int=6e9, erange=(11, 17), name='dchi_rt_hsex_6e9',
-                                                       level='hsex')}
+                                                       level='hsex'),
+           'maps_hsex': fig_maps_hsex, 'ac_hsex': fig_ac_hsex, 'ac_traces_hsex': fig_ac_traces_hsex}
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Figures of the technical notes on LiF')
