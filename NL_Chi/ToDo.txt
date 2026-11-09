@@ -1,0 +1,6 @@
+TO DO
+
+1) 2d plot RT vs chi a livello IP (usando i dati di Davide). Si vede la feature derivativa attorno a che energia ? 
+2) Visualizzare le chi3 per capire l'origine del segnale (both IP e HSEX).
+3) Contributo del termine E*d vs il termine dSigma 
+4) Chi con la sum over states? 
