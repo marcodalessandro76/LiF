@@ -607,6 +607,21 @@ with respect to those extracted at $10^6$~kW/cm$^2$ (amplitude $\EOP$), in perce
 \label{tab:chi_pump}
 \end{table}
 
+Fig.~\ref{fig:chi3_ip} shows the imaginary part of the three third order terms used in the comparison with the RT
+simulations (Sec.~\ref{sec:lif_dchi}): kx16 grid, $10^6$~kW/cm$^2$, total broadening 0.6~eV, in 13.1-21.8~eV, where
+they are all defined, and with the correction of the integrator described there. $\chiz$ is the largest term: Im~$\chiz$
+has a deep minimum at 16.9~eV ($-4.5\cdot10^2$~au), just below the first maximum of the absorption (17.5~eV), which
+gives the bleach of the transient spectra, and a positive peak at 15.8~eV. $\chip$ and $\chim$ are about four times
+smaller (extrema of $\sim\pm1\cdot10^2$~au).
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/chi3_ip.jpeg}
+\caption{Imaginary part of the third order terms $\chiz$, $\chip$ and $\chim$ (IP, kx16, pump $10^6$~kW/cm$^2$, total
+broadening 0.6~eV, correction of the integrator of Sec.~\ref{sec:lif_dchi}), in atomic units.}
+\label{fig:chi3_ip}
+\end{figure}
+
 \subsection{Transient absorption from the $\chi$ and comparison with the RT results: independent particles}
 \label{sec:lif_dchi}
 
@@ -707,6 +722,38 @@ black) and $4\pi\dchi$ from the $\chi$ with the accumulated envelope (blue).}
 \label{fig:dchi_rt_6e9}
 \end{figure}
 
+\subsubsection{Maps vs the delay}
+\label{sec:lif_dchi_maps}
+
+The comparisons above use five delays, 1.5~fs apart. A set of RT simulations with the bands 1-15 gives the transient
+response at 61 delays, from $-7.16$ to $+8.09$~fs with a step of 0.25~fs, which resolves its dependence on the delay,
+including the oscillations at $2\wP$ (period $\pi/\wP = 1.33$~fs). They have the pump of Sec.~\ref{sec:lif_dchi_high}
+($6\cdot10^9$~kW/cm$^2$), along $+x$ only: they give the total response, which contains the spurious odd part (6-13\%
+of the even one at this intensity), and the reference is the earliest delay, $-10.66$~fs. Fig.~\ref{fig:maps_ip}
+compares $\Delta$Im~$\varepsilon$ with the transient response from the $\chi$ (bands 3-6, total broadening 0.6~eV,
+accumulated envelope, the same pump, delays and reference) in their output range, 13.1-21.8~eV.
+
+Below 17.5~eV the two maps have the same structures: the bleach at 17~eV, the positive band at 14-16~eV and the
+fringes at $2\wP$. Above 18~eV they differ (relative difference 1.07 in the whole range), because there the transitions
+to the bands above 6, which are not in the $\chi$, contribute. In 13.6-17.5~eV the relative difference is 0.51 over
+all the delays (0.59 before the pump maximum, $\tau < -1.5$~fs, 0.49 around it, $|\tau| < 1.5$~fs, and 0.29 after
+it), the ratio of the maxima RT/$\chi$ is 0.72 (0.67, 0.72 and 0.87 in the same windows), and the spectra from the
+$\chi$ are lower in energy by 0.15-0.26~eV (best rigid shift at $\tau = -2.91$, $-1.41$, $+0.09$, $+1.59$ and
+$+3.09$~fs). These are the numbers found with the RT simulations with the bands 3-6 at the same intensity
+(Sec.~\ref{sec:lif_dchi_high}: $\chi$ larger by 12-42\% and lower by 0.12-0.16~eV): the RT response is beyond the
+third order, smaller and at higher energies up to the pump maximum, and close to the third order after it.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/maps_ip.jpeg}
+\caption{$\Delta$Im~$\varepsilon$ as a function of the delay and of the probe energy (IP, pump
+$6\cdot10^9$~kW/cm$^2$): RT simulations (bands 1-15) and transient response from the $\chi$ (bands 3-6, accumulated
+envelope), same color scale, in the output range of the $\chi$. Right: the two spectra at $\tau = +0.09$~fs (dashed
+lines of the maps).}
+\label{fig:maps_ip}
+\end{figure}
+
+\FloatBarrier
 \subsection{Transient absorption from the $\chi$ and comparison with the RT results: excitonic effects}
 \label{sec:lif_hsex}
 
@@ -759,6 +806,24 @@ energy map removed, red, dashed). The IP spectrum of the RT simulations is shown
 \label{fig:eq_hsex}
 \end{figure}
 
+Fig.~\ref{fig:chi3_hsex} shows the imaginary part of the three third order terms with HSEX, in 10.95-17.05~eV and with
+the energy map removed. Im~$\chiz$ has a minimum at the exciton, 12.8~eV ($-1.8\cdot10^3$~au), and a maximum just
+above it, at 13.4~eV ($1.3\cdot10^3$~au): they give the bleach and the induced absorption around the exciton in the
+transient spectra (Sec.~\ref{sec:lif_delay_maps}). Its extrema are four times larger than the IP ones
+(Fig.~\ref{fig:chi3_ip}), those of $\chi^{(3)}_\pm$ about twice ($\sim\pm2\cdot10^2$~au). Im~$\chim$ is largest around
+the exciton (12.3 and 13.2~eV), Im~$\chip$ in 15.4-16.3~eV, near the replica of the exciton at $E_x+2\hbar\wP$
+(Sec.~\ref{sec:lif_delay_2wp}).
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/chi3_hsex.jpeg}
+\caption{Imaginary part of the third order terms $\chiz$, $\chip$ and $\chim$ with HSEX (kx16, bands 3-6, pump
+$10^6$~kW/cm$^2$, damping 0.6~eV, energy map removed), in atomic units. Vertical lines: the exciton, $E_x = 12.89$~eV
+(dashed for $\chiz$, dotted for $\chi^{(3)}_\pm$), and $E_x+2\hbar\wP$ for $\chip$ (dashed); $E_x-2\hbar\wP$ is below the
+window.}
+\label{fig:chi3_hsex}
+\end{figure}
+
 \subsubsection{Comparison with the RT results}
 \label{sec:lif_hsex_dchi}
 
@@ -804,11 +869,12 @@ $4\pi\dchi$ from the HSEX $\chi$ with the accumulated envelope (blue).}
 \label{fig:dchi_rt_hsex_6e9}
 \end{figure}
 
+\FloatBarrier
 \subsection{Dependence on the delay and oscillations at $2\wP$ (HSEX)}
 \label{sec:lif_delay}
 
-The comparisons above use five delays, 1.5~fs apart. A second set of RT simulations at the HSEX level gives the
-transient response at 60 delays, from $-7.41$ to $+7.34$~fs with a step of 0.25~fs, which resolves its dependence on the
+As at the IP level (Sec.~\ref{sec:lif_dchi_maps}), a set of RT simulations at the HSEX level gives the transient
+response at 60 delays, from $-7.41$ to $+7.34$~fs with a step of 0.25~fs, which resolves its dependence on the
 delay, including the oscillations at $2\wP$ (period $\pi/\wP = 1.33$~fs, 5.3 delays per period). They have the same
 kernel and pump as the HSEX simulations of Sec.~\ref{sec:lif_hsex} ($6\cdot10^9$~kW/cm$^2$), but the bands 3-12 and the
 pump along $+x$ only: they give the total response, which contains the spurious odd part (4-9\% of the even one at this
@@ -829,7 +895,8 @@ RT/$\chi$ is 0.80, 0.85 and 1.12 in the same windows: the RT response is smaller
 pump maximum and slightly larger after it. The agreement is better than with the RT simulations with the bands 3-6 of
 Sec.~\ref{sec:lif_hsex}, where the $\chi$ were larger by 26-58\% (Sec.~\ref{sec:lif_hsex_dchi}): at this intensity the RT response with the
 bands 3-12 is 20-30\% larger than the one with the bands 3-6, so the agreement is partly a compensation between the
-bands above 6 and the orders above the third.
+bands above 6 and the orders above the third. It is also better than at the IP level (relative difference 0.51 in
+13.6-17.5~eV, Sec.~\ref{sec:lif_dchi_maps}), where the effect of the orders above the third is not compensated.
 
 \begin{figure}[h!]
 \centering
@@ -934,6 +1001,58 @@ Two limits of this comparison: the RT simulations have the bands 3-12 and the $\
 of the amplitudes is partly a compensation, while the phase is the clean test; and the comparison is not at the third
 order. The RT simulations with the bands 3-6, with five delays 1.5~fs apart, cannot resolve the oscillations at $2\wP$: a comparison at
 $6\cdot10^7$~kW/cm$^2$, with the even part, requires delays with a step of at most 0.3~fs around the pump maximum.
+
+\subsubsection{Origin of the horizontal bands}
+\label{sec:lif_delay_bands}
+
+The maps of Fig.~\ref{fig:maps_hsex} are made of horizontal bands, which follow the pump envelope, and of the fringes
+at $2\wP$. In the third order response~\eqref{eq:dchi_mono} the bands are the DC part, the term $\chiz$, and the
+fringes the AC part, the terms $\chi^{(3)}_\pm$, which oscillate as $e^{\mp2i\wP\tau}$ under an envelope that contains
+many periods and vanish on average over the delay. Fig.~\ref{fig:dc_hsex} shows the map from the $\chi$ with the term
+$\chiz$ only, and the spectra averaged over the 60 delays. The DC part contains 98\% of the norm of the map in 11-17~eV
+and the average of the AC part (Fig.~\ref{fig:ac_hsex}) is $6\cdot10^{-4}$ of the one of the DC part: the bands are
+given by $\chiz$ alone. The average of the RT map is reproduced by the DC part with a relative difference of 0.15
+(ratio of the maxima 0.90). The terms $\chi^{(3)}_\pm$ have their structures at the resonances of the probe photon
+(vertical lines in Fig.~\ref{fig:chi3_hsex}): $\chip$ at the exciton and at $E_x+2\hbar\wP$, where the photon at
+$\omega-2\wP$ is absorbed by the exciton, and $\chim$ at the exciton (its replica at $E_x-2\hbar\wP = 9.8$~eV is below
+the window).
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Figures/dc_hsex.jpeg}
+\caption{Origin of the horizontal bands (HSEX, pump $6\cdot10^9$~kW/cm$^2$). Left: $\Delta$Im~$\varepsilon$ from the
+$\chi$ with the term $\chiz$ only (accumulated envelope, same color scale as Fig.~\ref{fig:maps_hsex}). Right: spectra
+averaged over the delays, RT simulations and response from the $\chi$ (all the terms, $\chiz$ only and
+$\chi^{(3)}_\pm$ only).}
+\label{fig:dc_hsex}
+\end{figure}
+
+The shape of the bands is that of Im~$\chiz$ (Fig.~\ref{fig:chi3_hsex}). Going up in energy, Im~$\chiz$ is positive
+below the exciton (12.2~eV), negative on the exciton line (minimum at 12.8~eV, while the maximum of
+Im~$\chi^{(1)}$ is at $E_x = 12.89$~eV) and positive above it (13.4~eV, with a larger value than at 12.2~eV); it
+changes sign at 12.45 and 13.08~eV, on the two sides of the line. A change of a resonance
+$\chi^{(1)}\propto1/(E_x-\omega-i\Gamma)$ gives $-\delta E\,d\chi^{(1)}/d\omega$ for a shift $\delta E$ of its energy and
+$i\,\delta\Gamma\,d\chi^{(1)}/d\omega$ for a change $\delta\Gamma$ of its width ($\partial\chi^{(1)}/\partial\Gamma =
+i\,\partial\chi^{(1)}/\partial\omega$): a shift to higher energies removes absorption below the line and adds it above,
+a broadening removes it at the center and adds it on both sides. The bands contain both. The least squares fit
+\begin{equation}
+|\EP(\wP)|^2\,\chiz(\omega) \simeq a\,\chi^{(1)}(\omega) + \left(-\delta E + i\,\delta\Gamma\right)
+\frac{d\chi^{(1)}}{d\omega}
+\label{eq:line_shape}
+\end{equation}
+in 12.4-13.5~eV, with $a$, $\delta E$ and $\delta\Gamma$ proportional to the pump intensity (third order), reproduces
+$\chiz$ within 19\% (89\% with the shift only, 86\% with the change of the amplitude $a$ only), with $\delta E = 1.2$~meV
+and $\delta\Gamma = 2.2$~meV at $6\cdot10^7$~kW/cm$^2$, about 0.12 and 0.22~eV extrapolated to $6\cdot10^9$~kW/cm$^2$
+(where the response is already beyond the third order). A single line that shifts and broadens rigidly is only a first
+approximation (relative residual 0.40 in 11.5-14~eV): each transition has its own shift, as in the model of the
+accumulated envelope of Sec.~\ref{sec:theory_pulse}.
+
+The pump, at 1.55~eV, is far below the exciton: it does not create excitations, but it dresses the states for the
+duration of the pulse. The shift to higher energies is the optical (AC) Stark effect of a pump below the resonance: the
+coupling with the pump repels the levels and opens the transition. The broadening and the change of the amplitude come
+from the mixing, by the pump field, of the exciton with the other excitonic states and with the continuum, up to the
+field induced dissociation of the exciton, which moves spectral weight from the line to its sides. Both effects are
+proportional to the pump intensity and follow its envelope, so they give bands that do not oscillate with the delay.
 
 % Notes for the following sections (their structure is to be defined with the user):
 % - a posteriori broadening (for the details of the computation of the chi with MPPI): the terms linear in the probe can

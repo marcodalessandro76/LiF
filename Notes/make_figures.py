@@ -360,6 +360,49 @@ def fig_eq_hsex(out, erange=(8, 20)):
     plt.close(fig)
 
 
+def fig_chi3(out, level='ip'):
+    """
+    The three third order terms chi_0, chi_+, chi_- on the output grid of the transient response, as they enter the
+    comparison with the RT results: IP (kx16, pump 1e6 kW/cm^2, total broadening 0.6 eV, INVINT correction) or HSEX
+    (level='hsex': kx16, damping 0.6 eV, CRANKNIC correction). Imaginary parts, atomic units.
+    """
+    if level == 'hsex':
+        tr, correction, name = chi_hsex(), cranknic_correction, 'chi3_hsex'
+    else:
+        r = chi_kgrids(out)
+        tr = O.Transient_Response(r['freqs'], r['kx16_chi1'], {key: r['kx16_%d_%d' % key] for key in MIX_KEYS},
+                                  r['kx16_EP'], WP_NL, centrosymmetric=True, verbose=False)
+        correction, name = invint_correction, 'chi3_ip'
+    w, comp = tr.w, tr.components()
+    labels = {'chi_0': r'$\chi^{(3)}_0$', 'chi_+': r'$\chi^{(3)}_+$', 'chi_-': r'$\chi^{(3)}_-$'}
+    print('%s: output grid %.2f-%.2f eV (%d points)' % (name, w[0], w[-1], len(w)))
+    lines = {}
+    if level == 'hsex':
+        # exciton: maximum of Im chi1 (corrected) on the output grid; dashed lines at the resonances of each term (E_x for
+        # chi_0, E_x + 2wP for chi_+; E_x - 2wP is below the window), dotted at E_x for chi_+-
+        chi1 = correction(w, np.interp(w, tr.freqs, tr.chi1.real) + 1j * np.interp(w, tr.freqs, tr.chi1.imag))
+        Ex = w[np.argmax(chi1.imag)]
+        lines = {'chi_0': [(Ex, '--')], 'chi_+': [(Ex, ':'), (Ex + 2 * tr.wP, '--')], 'chi_-': [(Ex, ':')]}
+        print('  exciton (maximum of Im chi1) %.2f eV, E_x + 2wP %.2f eV, E_x - 2wP %.2f eV' % (Ex, Ex + 2 * tr.wP,
+                                                                                               Ex - 2 * tr.wP))
+    fig, axes = plt.subplots(1, 3, figsize=(7, 2.4), sharex=True)
+    for ax, key in zip(axes, labels):
+        for x, ls in lines.get(key, []):
+            ax.axvline(x, color='k', lw=0.7, ls=ls)
+        y = correction(w, comp[key]).imag
+        i, j = np.argmax(y), np.argmin(y)
+        print('  %-5s Im: max %+.3e au at %.2f eV, min %+.3e au at %.2f eV' % (key, y[i], w[i], y[j], w[j]))
+        ax.plot(w, y / 1e2, 'r', lw=1)
+        ax.axhline(0, color='gray', lw=0.5)
+        ax.set_title(labels[key], fontsize=10)
+        ax.set_xlabel('energy (eV)')
+        ax.set_xlim(w[0], w[-1])
+    axes[0].set_ylabel(r'Im $\chi$ ($10^2$ au)')
+    fig.tight_layout()
+    fig.savefig(os.path.join(out, name + '.jpeg'))
+    plt.close(fig)
+
+
 def dchi_local(tr, taus, E0P, sigma, wP):
     """
     As tr.dchi(taus, E0P, pump='accumulated', sigma=sigma, wP=wP) of the MPPI Transient_Response tr, with the local weight
@@ -594,12 +637,51 @@ def hsex_ac_data():
     return _hsex_ac
 
 
-def fig_maps_hsex(out, tau_cut=0.):
+_ip_maps = {}
+
+
+def ip_maps_data(out):
     """
-    Delta Im eps vs the delay and the probe energy (HSEX, pump 6e9 kW/cm^2): RT runs of D. Sangalli (bands 3-12) and the
-    chi (bands 3-6, accumulated envelope), same color scale, and the spectra at the delay nearest to tau_cut.
+    Data of the figure maps_ip (IP, pump 6e9 kW/cm^2), counterpart of maps_hsex: Im Delta eps of the IP RT runs of
+    D. Sangalli (bands 1-15, pump along +x only) and of the IP chi of the kx16 grid (bands 3-6, total broadening 0.6 eV,
+    cubic terms only, accumulated envelope, pump of the RT runs, INVINT correction) at the same delays, w.r.t. the
+    earliest delay (-10.66 fs), on a 0.02 eV grid in the output range of the chi (13.1-21.8 eV).
     """
-    d = hsex_ac_data()
+    if _ip_maps:
+        return _ip_maps
+    E, eps, taus_all = load_davide('td-ip-ber')
+    r = chi_kgrids(out)
+    tr = O.Transient_Response(r['freqs'], r['kx16_chi1'], {key: r['kx16_%d_%d' % key] for key in MIX_KEYS},
+                              r['kx16_EP'], WP_NL, centrosymmetric=True, verbose=False)
+    pump = load_nl(rt_id('3-6', 6e9))                                   # pump of the RT runs (our pump-only run)
+    E0P, sigma, wP = pump.Efield2[0]['amplitude'], pump_center(pump)[1], pump.Efield2[0]['freq_range'][0] * Const.HaToeV
+    w, dchi = tr.dchi(taus_all, E0P, pump='accumulated', sigma=sigma, wP=wP)
+    Em = np.arange(w[0], w[-1] + 1e-9, 0.02)
+    full = CubicSpline(w, (4 * np.pi * invint_correction(w, dchi)).imag, axis=1)(Em)
+    d = dict(Em=Em, taus=taus_all[1:], dim_chi=full[1:] - full[0],
+             dim_rt=np.array([np.interp(Em, E, y - eps[0].imag) for y in eps[1:].imag]))
+    taus = d['taus']
+    print('maps_ip: %d delays %.2f..%.2f fs (reference %.2f fs), E0P %.4e au, sigma %.3f fs, wP %.3f eV' % (
+          len(taus), taus[0], taus[-1], taus_all[0], E0P, sigma, wP))
+    wins = {'all': np.ones(len(taus), bool), 'tau < -1.5': taus < -1.5, '|tau| < 1.5': np.abs(taus) < 1.5,
+            'tau > 1.5': taus > 1.5}
+    for lo, hi in [(Em[0], Em[-1]), (13.6, 17.5)]:
+        s = (Em >= lo - 1e-9) & (Em <= hi + 1e-9)
+        rt, chi = d['dim_rt'][:, s], d['dim_chi'][:, s]
+        print('maps_ip, Delta Im eps in %.1f-%.1f eV, RT vs chi: rel. rms / ratio of the maxima RT/chi: ' % (lo, hi) +
+              ' | '.join('%s %.2f / %.2f' % (k, np.linalg.norm(rt[m] - chi[m]) / np.linalg.norm(chi[m]),
+                                            np.abs(rt[m]).max() / np.abs(chi[m]).max()) for k, m in wins.items()))
+    print('maps_ip: best rigid shift of the chi spectrum w.r.t. the RT one in 13.6-17.5 eV (eV): ' + ', '.join(
+          '%+.2f fs %+.2f' % (taus[i], compare(Em, d['dim_chi'][i].astype(complex), d['dim_rt'][i].astype(complex),
+                                              (13.6, 17.5))[2]) for i in [np.argmin(np.abs(taus - t)) for t in
+                                                                           (-2.9, -1.4, 0.1, 1.6, 3.1)]))
+    _ip_maps.update(d)
+    return _ip_maps
+
+
+def plot_maps(out, d, name, tau_cut=0.):
+    # maps of Delta Im eps vs the delay and the probe energy, RT (d['dim_rt']) and chi (d['dim_chi']) with the same color
+    # scale, and the spectra at the delay nearest to tau_cut (figures maps_hsex and maps_ip)
     i = np.argmin(np.abs(d['taus'] - tau_cut))
     v = max(np.abs(d['dim_rt']).max(), np.abs(d['dim_chi']).max())
     fig = plt.figure(figsize=(7, 2.9))
@@ -621,7 +703,106 @@ def fig_maps_hsex(out, tau_cut=0.):
     axes[2].legend(frameon=False)
     for ax in axes[1:]:
         ax.tick_params(labelleft=False)
-    fig.savefig(os.path.join(out, 'maps_hsex.jpeg'))
+    fig.savefig(os.path.join(out, name + '.jpeg'))
+    plt.close(fig)
+
+
+def fig_maps_hsex(out, tau_cut=0.):
+    """
+    Delta Im eps vs the delay and the probe energy (HSEX, pump 6e9 kW/cm^2): RT runs of D. Sangalli (bands 3-12) and the
+    chi (bands 3-6, accumulated envelope), same color scale, and the spectra at the delay nearest to tau_cut.
+    """
+    plot_maps(out, hsex_ac_data(), 'maps_hsex', tau_cut)
+
+
+def fig_maps_ip(out, tau_cut=0.):
+    """
+    Counterpart of maps_hsex at the IP level (pump 6e9 kW/cm^2): RT runs of D. Sangalli (bands 1-15) and the IP chi
+    (kx16, bands 3-6, cubic terms, accumulated envelope, INVINT correction) in 13.1-21.8 eV.
+    """
+    plot_maps(out, ip_maps_data(out), 'maps_ip', tau_cut)
+
+
+def fig_dc_hsex(out):
+    """
+    Origin of the horizontal bands of the maps (HSEX, pump 6e9 kW/cm^2): map of the DC part of the chi (chi_0 term only,
+    accumulated envelope), same color scale as maps_hsex, and the spectra averaged over the delays: RT of D. Sangalli,
+    full chi, DC part (chi_0) and AC part (chi_+- terms). Prints the numbers of the decomposition of chi_0 on the line
+    shape of chi1: chi_0 ~ A chi1 + B dchi1/dw, B = -dE + i dGamma (shift and broadening per E0P^2/4).
+    """
+    d = hsex_ac_data()
+    tr = chi_hsex()
+    w, taus = d['w'], d['taus']
+    pump = load_nl(rt_id('3-6', 6e9, level='hsex'))
+    E0P = pump.Efield2[0]['amplitude']
+    zero = np.zeros_like(tr.chi1)
+    tr_dc = O.Transient_Response(tr.freqs, tr.chi1, {(1, 0): tr.keys[(1, 0)], (1, 2): zero, (1, -2): zero}, tr.E0P, tr.wP,
+                                 verbose=False)
+    E, eps, taus_all = load_davide()
+
+    def im_map(t):
+        _, dd = t.dchi(taus_all, E0P, pump='accumulated', sigma=d['sigma'], wP=d['wP'])
+        y = (4 * np.pi * cranknic_correction(w, dd)).imag
+        return y[1:] - y[0]
+    full, dc = im_map(tr), im_map(tr_dc)
+    ac = full - dc
+    rt = np.array([np.interp(w, E, y - eps[0].imag) for y in eps[1:].imag])
+    s = (w >= 11) & (w <= 17)
+    avg = {k: v.mean(0) for k, v in [('rt', rt), ('full', full), ('dc', dc), ('ac', ac)]}
+    print('dc_hsex: norm of the maps (11-17 eV) DC/full %.2f, AC/full %.2f; average over the %d delays: max |<AC>| / '
+          'max |<DC>| %.1e; RT average vs DC average: rel. rms %.2f, ratio of the maxima %.2f' % (
+          np.linalg.norm(dc[:, s]) / np.linalg.norm(full[:, s]), np.linalg.norm(ac[:, s]) / np.linalg.norm(full[:, s]),
+          len(taus), np.abs(avg['ac'][s]).max() / np.abs(avg['dc'][s]).max(),
+          np.linalg.norm((avg['rt'] - avg['dc'])[s]) / np.linalg.norm(avg['dc'][s]),
+          np.abs(avg['rt'][s]).max() / np.abs(avg['dc'][s]).max()))
+    # line shape of chi_0 around the exciton
+    chi1 = cranknic_correction(w, np.interp(w, tr.freqs, tr.chi1.real) + 1j * np.interp(w, tr.freqs, tr.chi1.imag))
+    chi0 = cranknic_correction(w, tr.components()['chi_0'])
+    d1 = np.gradient(chi1, w)
+    y0 = chi0.imag
+    k = np.where((np.sign(y0[:-1]) != np.sign(y0[1:])) & (w[:-1] > 12) & (w[:-1] < 14))[0]
+    print('dc_hsex: exciton %.2f eV; Im chi_0 changes sign at %s eV' % (w[np.argmax(chi1.imag)], ', '.join(
+          '%.2f' % (w[j] - y0[j] * (w[j + 1] - w[j]) / (y0[j + 1] - y0[j])) for j in k)))
+    for e in [12.2, 12.8, 13.4]:
+        i = np.argmin(abs(w - e))
+        print('  %.2f eV: Im chi_0 %+.3e au, <Delta Im eps>: DC %+.4f, RT %+.4f' % (w[i], y0[i], avg['dc'][i], avg['rt'][i]))
+    m = (w >= 12.4) & (w <= 13.5)
+    rel = lambda f: np.linalg.norm((chi0 - f)[m]) / np.linalg.norm(chi0[m])
+    (A, B), *_ = np.linalg.lstsq(np.array([chi1[m], d1[m]]).T, chi0[m], rcond=None)
+    b = np.vdot(d1[m], chi0[m]) / np.vdot(d1[m], d1[m])
+    v = np.r_[d1[m].real, d1[m].imag]
+    br = np.dot(v, np.r_[chi0[m].real, chi0[m].imag]) / np.dot(v, v)
+    a = np.vdot(chi1[m], chi0[m]) / np.vdot(chi1[m], chi1[m])
+    print('dc_hsex: chi_0 in 12.4-13.5 eV, rel. residual of the fit: A chi1 + B dchi1/dw %.2f, B dchi1/dw %.2f, real B '
+          '(shift only) %.2f, A chi1 (strength only) %.2f' % (rel(A * chi1 + B * d1), rel(b * d1), rel(br * d1), rel(a * chi1)))
+    for I in [6e7, 6e9]:
+        e2 = (tr.E0P**2 / 4) * I / 1e6
+        print('  pump %.0e kW/cm^2: shift dE = -Re B E0P^2/4 = %+.4f eV, broadening dGamma = Im B E0P^2/4 = %+.4f eV, '
+              'A E0P^2/4 = %+.4f %+.4fi' % (I, -B.real * e2, B.imag * e2, (A * e2).real, (A * e2).imag))
+
+    Em = d['Em']
+    dcm = CubicSpline(w, dc, axis=1)(Em)
+    vmax = max(np.abs(d['dim_rt']).max(), np.abs(d['dim_chi']).max())
+    fig = plt.figure(figsize=(7, 2.9))
+    gs = fig.add_gridspec(1, 4, width_ratios=[2, 0.1, 0.45, 1.6], wspace=0.08)
+    ax = fig.add_subplot(gs[0])
+    pc = ax.pcolormesh(taus, Em, dcm.T, cmap='bwr', norm=TwoSlopeNorm(0, -vmax, vmax), shading='gouraud',
+                       rasterized=True)
+    ax.set_xlabel(r'delay $\tau$ (fs)')
+    ax.set_ylabel('probe energy (eV)')
+    ax.set_title(r'from the $\chi$, $\chi^{(3)}_0$ term only', fontsize=9)
+    fig.colorbar(pc, cax=fig.add_subplot(gs[1])).ax.set_title(r'$\Delta$Im $\varepsilon$', fontsize=8)
+    ax2 = fig.add_subplot(gs[3], sharey=ax)
+    ax2.plot(avg['rt'], w, 'k', lw=1.2, label='RT')
+    ax2.plot(avg['full'], w, 'b--', lw=1, label=r'$\chi$')
+    ax2.plot(avg['dc'], w, 'c:', lw=1.4, label=r'$\chi$, $\chi^{(3)}_0$ only')
+    ax2.plot(avg['ac'], w, 'm-', lw=0.8, label=r'$\chi$, $\chi^{(3)}_\pm$ only')
+    ax2.axvline(0, color='gray', lw=0.5)
+    ax2.set_xlabel(r'$\Delta$Im $\varepsilon$, average over $\tau$')
+    ax2.tick_params(labelleft=False)
+    ax2.set_ylim(Em[0], Em[-1])
+    ax2.legend(frameon=False, fontsize=7, loc='center right', bbox_to_anchor=(1.03, 0.62), handlelength=1.2)
+    fig.savefig(os.path.join(out, 'dc_hsex.jpeg'))
     plt.close(fig)
 
 
@@ -691,7 +872,9 @@ FIGURES = {'rt_setup': fig_rt_setup, 'rt_even_odd': fig_rt_even_odd, 'chi_kgrid'
            'dchi_rt_hsex': lambda out: fig_dchi_rt(out, erange=(11, 17), name='dchi_rt_hsex', level='hsex'),
            'dchi_rt_hsex_6e9': lambda out: fig_dchi_rt(out, pump_int=6e9, erange=(11, 17), name='dchi_rt_hsex_6e9',
                                                        level='hsex'),
-           'maps_hsex': fig_maps_hsex, 'ac_hsex': fig_ac_hsex, 'ac_traces_hsex': fig_ac_traces_hsex}
+           'maps_hsex': fig_maps_hsex, 'ac_hsex': fig_ac_hsex, 'ac_traces_hsex': fig_ac_traces_hsex,
+           'maps_ip': fig_maps_ip, 'chi3_ip': fig_chi3, 'chi3_hsex': lambda out: fig_chi3(out, level='hsex'),
+           'dc_hsex': fig_dc_hsex}
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Figures of the technical notes on LiF')

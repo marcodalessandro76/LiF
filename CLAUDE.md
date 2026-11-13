@@ -239,7 +239,28 @@ done (theory, implementation, computations) and of the notation and conventions.
   amplitude results, other harmonics; Fig. ac_traces_hsex at 12.31 and 15.99 eV with the chi AC part for both envelope
   models: the delay dependence of the fringes tests the accumulated W on the +-2wP terms, see the handoff below),
   closing caveats. Figures from `make_figures.py` (`load_davide`, `highpass`, `hsex_ac_data`, `fig_maps_hsex`,
-  `fig_ac_hsex`, `fig_ac_traces_hsex`). Nothing after Sec. 3 is defined:
+  `fig_ac_hsex`, `fig_ac_traces_hsex`). 2026-11-13 (laptop session): Fig. maps_ip, the IP counterpart of maps_hsex,
+  in the new Sec. 3.3.3 "Maps vs the delay" (label sec:lif_dchi_maps; user's request: all the IP material before the
+  HSEX one, `\FloatBarrier` of the package placeins before Secs. 3.4 and 3.5) (`make_figures.py maps_ip`: `ip_maps_data`, plotting shared with maps_hsex in `plot_maps`,
+  maps_hsex unchanged pixel by pixel): RT IP set of D. Sangalli (bands 1-15, 61 delays -7.16..+8.09 fs) vs IP chi kx16
+  (cubic terms, accumulated envelope, INVINT correction), 13.1-21.8 eV; in 13.6-17.5 eV rel. rms 0.51 (0.59/0.49/0.29
+  before/around/after the maximum), RT/chi maxima 0.72 (0.67/0.72/0.87), chi lower by 0.15-0.26 eV; above 18 eV the
+  bands above 6 dominate (rel. rms 1.07 in the whole range). Same analysis in `Dchi-neq_Analysis.ipynb`, section
+  "Maps vs the delay at the IP level" (after the HSEX maps). Also new figures `chi3_ip` (end of Sec. 3.2.2) and
+  `chi3_hsex` (end of Sec. 3.4.1), `fig_chi3` of `make_figures.py`: Im chi_0, chi_+, chi_- as they enter the comparisons
+  (IP kx16 0.6 eV with the INVINT correction, 13.1-21.8 eV; HSEX with the energy map removed, 10.95-17.05 eV), plotted
+  vs the frequency w of the spectrum (chi_+-(w) = chi_(1,+-2)(w -+ 2wP)). Numbering now: chi3_ip Fig. 5, maps_ip
+  Fig. 8, chi3_hsex Fig. 10, maps_hsex Fig. 13. New Sec. 3.5.3 "Origin of the horizontal bands" (label
+  sec:lif_delay_bands, figure `dc_hsex` = Fig. 16, `fig_dc_hsex`; vertical lines at E_x = 12.89 eV and E_x + 2wP in
+  chi3_hsex): the bands are the DC part chi_0 (98% of the norm of the map, average over the delays of the AC part
+  6e-4 of the DC one; RT average vs DC average rel. rms 0.15, maxima 0.90); shape of Im chi_0 (+ at 12.2, - at 12.8,
+  + at 13.4 eV, zeros 12.45/13.08) = blue shift + broadening of the exciton line: fit Eq. line_shape
+  |E_P|^2 chi_0 ~ a chi1 + (-dE + i dGamma) dchi1/dw in 12.4-13.5 eV, residual 19% (shift only 89%, amplitude only
+  86%), dE 1.2 meV and dGamma 2.2 meV at 6e7 (0.12/0.22 eV extrapolated to 6e9); interpretation: optical (AC) Stark
+  shift of a pump below resonance + mixing with the other excitonic states/continuum (dissociation). Not written (user):
+  the IP analog (edge: shift 0.15, broadening 0.13 eV at 6e9, residual 57%) and the dynamical Franz-Keldysh / ponderomotive
+  energy (U_p ~ 0.18 eV at 6e9). The resonances of chi_+-: chi_+ at E_x + 2wP ~ 16.0 eV in HSEX (~20.6 eV in IP);
+  chi_- at E - 2wP, 14.4 eV in IP, 9.8 eV in HSEX outside the window. Nothing after Sec. 3 is defined:
   do not refer to sections that do not exist. Figures: `Notes/make_figures.py` (registry FIGURES, run on ismhpc from
   ~/work/LiF/Notes with `--out ~/tmp_claude/notes_figures`, then scp the jpeg to Notes/Figures on the laptop and commit
   there; the cluster copy of the repo never commits). Our RT runs at 6e7: only 5 probe times (13-19 fs, tau -2.91 ...
