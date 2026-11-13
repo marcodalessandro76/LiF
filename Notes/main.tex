@@ -1028,24 +1028,37 @@ $\chi^{(3)}_\pm$ only).}
 \end{figure}
 
 The shape of the bands is that of Im~$\chiz$ (Fig.~\ref{fig:chi3_hsex}). Going up in energy, Im~$\chiz$ is positive
-below the exciton (12.2~eV), negative on the exciton line (minimum at 12.8~eV, while the maximum of
-Im~$\chi^{(1)}$ is at $E_x = 12.89$~eV) and positive above it (13.4~eV, with a larger value than at 12.2~eV); it
-changes sign at 12.45 and 13.08~eV, on the two sides of the line. A change of a resonance
-$\chi^{(1)}\propto1/(E_x-\omega-i\Gamma)$ gives $-\delta E\,d\chi^{(1)}/d\omega$ for a shift $\delta E$ of its energy and
-$i\,\delta\Gamma\,d\chi^{(1)}/d\omega$ for a change $\delta\Gamma$ of its width ($\partial\chi^{(1)}/\partial\Gamma =
-i\,\partial\chi^{(1)}/\partial\omega$): a shift to higher energies removes absorption below the line and adds it above,
-a broadening removes it at the center and adds it on both sides. The bands contain both. The least squares fit
+below the exciton, negative on the exciton line (minimum at 12.8~eV, slightly below the maximum of Im~$\chi^{(1)}$,
+$E_x = 12.89$~eV) and positive above it, with a larger value than below.
+
+This is the shape of a change of the exciton line. For a monochromatic pump the DC part of the transient
+response~\eqref{eq:dchi_mono} is
 \begin{equation}
-|\EP(\wP)|^2\,\chiz(\omega) \simeq a\,\chi^{(1)}(\omega) + \left(-\delta E + i\,\delta\Gamma\right)
-\frac{d\chi^{(1)}}{d\omega}
+\langle\dchi(\omega)\rangle = |\EP(\wP)|^2\,\chiz(\omega) = \chin{1}{0}(\omega)-\chi^{(1)}(\omega) ,
+\end{equation}
+the change of the linear response produced by the pump, averaged over its cycle. Consider a line
+$\chi^{(1)}(\omega) = S/(E_x-i\Gamma-\omega)$: its energy and width enter only through the complex position of the pole,
+$E_x-i\Gamma$. If the pump moves the energy to $E_x+\delta E$, the width to $\Gamma+\delta\Gamma$ and the strength to
+$S(1+a)$, the new line is the old one read at the complex frequency $\omega-\delta E+i\,\delta\Gamma$, and for small
+changes
+\begin{equation}
+\langle\dchi(\omega)\rangle = (1+a)\,\chi^{(1)}(\omega-\delta E+i\,\delta\Gamma)-\chi^{(1)}(\omega) \simeq
+a\,\chi^{(1)}(\omega)+\left(-\delta E+i\,\delta\Gamma\right)\frac{d\chi^{(1)}}{d\omega} .
 \label{eq:line_shape}
 \end{equation}
-in 12.4-13.5~eV, with $a$, $\delta E$ and $\delta\Gamma$ proportional to the pump intensity (third order), reproduces
-$\chiz$ within 19\% (89\% with the shift only, 86\% with the change of the amplitude $a$ only), with $\delta E = 1.2$~meV
-and $\delta\Gamma = 2.2$~meV at $6\cdot10^7$~kW/cm$^2$, about 0.12 and 0.22~eV extrapolated to $6\cdot10^9$~kW/cm$^2$
-(where the response is already beyond the third order). A single line that shifts and broadens rigidly is only a first
-approximation (relative residual 0.40 in 11.5-14~eV): each transition has its own shift, as in the model of the
-accumulated envelope of Sec.~\ref{sec:theory_pulse}.
+With $x = \omega-E_x$, the imaginary parts of the shift and broadening terms are
+\begin{equation}
+\mathrm{Im}\left[-\delta E\,\frac{d\chi^{(1)}}{d\omega}\right] = \delta E\,\frac{2S\Gamma x}{(x^2+\Gamma^2)^2} , \qquad
+\mathrm{Im}\left[i\,\delta\Gamma\,\frac{d\chi^{(1)}}{d\omega}\right] = \delta\Gamma\,\frac{S(x^2-\Gamma^2)}{(x^2+\Gamma^2)^2} .
+\end{equation}
+The first one, for a shift to higher energies ($\delta E > 0$), is antisymmetric around the line: negative below it,
+positive above it, zero at $E_x$. The second one, for a broadening ($\delta\Gamma > 0$), is symmetric: negative at the
+center ($|x| < \Gamma$) and positive on both sides, since absorption is moved from the peak to its wings. Im~$\chiz$
+contains both: the broadening gives the negative minimum on the line and the positive values on both sides, and the
+blue shift moves the minimum below $E_x$ and makes the positive band above the line larger than the one below. A fit of
+Eq.~\eqref{eq:line_shape} around the exciton, with the $\chi^{(1)}$ of our simulations, confirms this picture: $\delta E$
+and $\delta\Gamma$ are both positive, about 1 and 2~meV at $6\cdot10^7$~kW/cm$^2$, and they grow with the pump
+intensity.
 
 The pump, at 1.55~eV, is far below the exciton: it does not create excitations, but it dresses the states for the
 duration of the pulse. The shift to higher energies is the optical (AC) Stark effect of a pump below the resonance: the
