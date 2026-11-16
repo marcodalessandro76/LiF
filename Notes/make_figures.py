@@ -806,6 +806,69 @@ def fig_dc_hsex(out):
     plt.close(fig)
 
 
+def fig_line_fit_hsex(out, win_eq=(12.0, 13.8), win_neq=(12.2, 13.8), pump_int=6e9, erange=(11.5, 14.5)):
+    """
+    Line shape of the exciton (HSEX). Left: Im eps = 4 pi Im chi1 (CRANKNIC correction) and the fit of a line
+    S/(E_x - i Gamma - w) plus a linear complex background in win_eq. Right: the DC part of the transient response for a
+    monochromatic pump of intensity pump_int, Delta Im eps = 4 pi Im (|E_P|^2 chi_0), and its fit with Eq. line_shape on
+    the fitted line, (dS/S) chi1 + (-dE + i dGamma) dchi1/dw (three real parameters).
+    """
+    from scipy.optimize import least_squares
+    tr = chi_hsex()
+    w = tr.w
+    chi1 = cranknic_correction(w, np.interp(w, tr.freqs, tr.chi1.real) + 1j * np.interp(w, tr.freqs, tr.chi1.imag))
+    EP2 = (tr.E0P**2 / 4) * pump_int / 1e6                      # |E_P|^2 at pump_int (E0P of the chi runs at 1e6)
+    dchi = EP2 * cranknic_correction(w, tr.components()['chi_0'])
+
+    line = lambda p, x: p[0] / (p[1] - 1j * p[2] - x)
+    s = (w >= win_eq[0]) & (w <= win_eq[1])
+
+    def res(p):
+        r = line(p, w[s]) + (p[3] + 1j * p[4]) + (p[5] + 1j * p[6]) * (w[s] - 13)
+        return np.r_[(r - chi1[s]).real, (r - chi1[s]).imag]
+    i0 = np.argmax(chi1.imag)
+    p = least_squares(res, [chi1.imag[i0] * 0.4, w[i0], 0.4, 0, 0, 0, 0]).x
+    S, Ex, G = p[:3]
+    model = line(p, w)
+    fit_eq = model + (p[3] + 1j * p[4]) + (p[5] + 1j * p[6]) * (w - 13)
+    print('line_fit_hsex: equilibrium fit in %.1f-%.1f eV: S %.4f eV, E_x %.3f eV, Gamma %.3f eV (FWHM %.3f eV), '
+          'background %+.3f%+.3fi + (%+.3f%+.3fi)(w-13); rel. residual %.3f' % (win_eq + (S, Ex, G, 2 * G) + tuple(p[3:])
+          + (np.linalg.norm((fit_eq - chi1)[s]) / np.linalg.norm(chi1[s]),)))
+    d1 = S / (Ex - 1j * G - w)**2                               # d(line)/dw
+    terms = {'strength': model, 'shift': -d1, 'broadening': 1j * d1}
+    m = (w >= win_neq[0]) & (w <= win_neq[1])
+    M = np.array([np.r_[t[m].real, t[m].imag] for t in terms.values()]).T
+    c = np.linalg.lstsq(M, np.r_[dchi[m].real, dchi[m].imag], rcond=None)[0]
+    fit = sum(ci * t for ci, t in zip(c, terms.values()))
+    print('line_fit_hsex: DC change at %.0e kW/cm^2 in %.1f-%.1f eV: dS/S %+.4f, dE %+.4f eV, dGamma %+.4f eV; rel. '
+          'residual %.2f (at 6e7 kW/cm^2: dS/S %+.5f, dE %+.4f eV, dGamma %+.4f eV)' % ((pump_int,) + win_neq + tuple(c) + (
+          np.linalg.norm((fit - dchi)[m]) / np.linalg.norm(dchi[m]),) + tuple(c * 6e7 / pump_int)))
+
+    e = (w >= erange[0]) & (w <= erange[1])
+    fig, axes = plt.subplots(1, 2, figsize=(7, 2.8))
+    ax = axes[0]
+    ax.plot(w[e], 4 * np.pi * chi1.imag[e], 'k', lw=1.2, label=r'$\chi$ runs')
+    ax.plot(w[e], 4 * np.pi * fit_eq.imag[e], 'r--', lw=1, label='fit, line + background')
+    ax.axvline(Ex, color='gray', lw=0.6, ls='--')
+    ax.set_ylabel(r'Im $\varepsilon$')
+    ax.set_title('equilibrium', fontsize=9)
+    ax.legend(frameon=False, fontsize=7)
+    ax = axes[1]
+    ax.plot(w[e], 4 * np.pi * dchi.imag[e], 'k', lw=1.2, label=r'$4\pi|E_\mathrm{P}|^2\chi^{(3)}_0$')
+    ax.plot(w[e], 4 * np.pi * fit.imag[e], 'r--', lw=1, label='fit')
+    ax.axhline(0, color='gray', lw=0.5)
+    ax.axvline(Ex, color='gray', lw=0.6, ls='--')
+    ax.set_ylabel(r'$\Delta$Im $\varepsilon$')
+    ax.set_title(r'change by the pump (DC part, $6\cdot10^9$ kW/cm$^2$)', fontsize=9)
+    ax.legend(frameon=False, fontsize=7)
+    for ax in axes:
+        ax.set_xlabel('energy (eV)')
+        ax.set_xlim(*erange)
+    fig.tight_layout()
+    fig.savefig(os.path.join(out, 'line_fit_hsex.jpeg'))
+    plt.close(fig)
+
+
 def fig_ac_hsex(out):
     """
     Oscillations at 2wP (HSEX, pump 6e9 kW/cm^2): RT of D. Sangalli after the high-pass in the delay and AC part of the
@@ -874,7 +937,7 @@ FIGURES = {'rt_setup': fig_rt_setup, 'rt_even_odd': fig_rt_even_odd, 'chi_kgrid'
                                                        level='hsex'),
            'maps_hsex': fig_maps_hsex, 'ac_hsex': fig_ac_hsex, 'ac_traces_hsex': fig_ac_traces_hsex,
            'maps_ip': fig_maps_ip, 'chi3_ip': fig_chi3, 'chi3_hsex': lambda out: fig_chi3(out, level='hsex'),
-           'dc_hsex': fig_dc_hsex}
+           'dc_hsex': fig_dc_hsex, 'line_fit_hsex': fig_line_fit_hsex}
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Figures of the technical notes on LiF')

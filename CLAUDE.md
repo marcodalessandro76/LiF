@@ -254,10 +254,17 @@ done (theory, implementation, computations) and of the notation and conventions.
   sec:lif_delay_bands, figure `dc_hsex` = Fig. 16, `fig_dc_hsex`; vertical lines at E_x = 12.89 eV and E_x + 2wP in
   chi3_hsex): the bands are the DC part chi_0 (98% of the norm of the map, average over the delays of the AC part
   6e-4 of the DC one; RT average vs DC average rel. rms 0.15, maxima 0.90); shape of Im chi_0 (+ at 12.2, - at 12.8,
-  + at 13.4 eV, zeros 12.45/13.08) = blue shift + broadening of the exciton line: fit Eq. line_shape
-  |E_P|^2 chi_0 ~ a chi1 + (-dE + i dGamma) dchi1/dw in 12.4-13.5 eV, residual 19% (shift only 89%, amplitude only
-  86%), dE 1.2 meV and dGamma 2.2 meV at 6e7 (0.12/0.22 eV extrapolated to 6e9); interpretation: optical (AC) Stark
-  shift of a pump below resonance + mixing with the other excitonic states/continuum (dissociation). Not written (user):
+  + at 13.4 eV, zeros 12.45/13.08) = blue shift + broadening of the exciton line. Text (simple, user's request
+  2026-11-16): line chi1(w;S,E_x,Gamma) = S/(E_x - i Gamma - w) (Eq. line_shape_eq), its change by the pump
+  (Eq. line_shape) <dchi> = (dS/S) chi1 + (-dE + i dGamma) dchi1/dw = |E_P|^2 chi_0, imaginary parts of the shift
+  (antisymmetric) and broadening (symmetric) terms; figure `line_fit_hsex` (Fig. 17, `fig_line_fit_hsex`): left Im eps
+  and the fit line + linear background in 12.0-13.8 eV (E_x 12.86 eV, Gamma 0.57 eV, residual 0.6%), right
+  4 pi |E_P|^2 Im chi_0 at 6e9 and the fit with three real parameters on that line (12.2-13.8 eV, residual 30%):
+  dE 0.6 meV, dGamma 2.3 meV, dS/S 0.2% at 6e7 (0.06 eV, 0.23 eV, 22% at 6e9); dS and dGamma partly correlated.
+  Meaning: dE = optical (AC) Stark shift of a pump far below resonance (small, dE/E_x ~ 5e-5 at 6e7); dGamma, four
+  times larger, dominant: mixing with the other excitonic states and the continuum (field induced dissociation);
+  the negative band is a broadening, not a population bleaching (the pump creates no excitations). (An earlier fit
+  with the numerical chi1 and a complex amplitude gave dE 1.2 and dGamma 2.2 meV at 6e7, residual 19%.) Not written (user):
   the IP analog (edge: shift 0.15, broadening 0.13 eV at 6e9, residual 57%) and the dynamical Franz-Keldysh / ponderomotive
   energy (U_p ~ 0.18 eV at 6e9). The resonances of chi_+-: chi_+ at E_x + 2wP ~ 16.0 eV in HSEX (~20.6 eV in IP);
   chi_- at E - 2wP, 14.4 eV in IP, 9.8 eV in HSEX outside the window. Nothing after Sec. 3 is defined:
