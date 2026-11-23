@@ -20,4 +20,14 @@ Notes/*.blg
 Notes/*.fls
 Notes/*.fdb_latexmk
 Notes/*.synctex.gz
+# LaTeX auxiliary files of the article (the PDF is compiled locally; revtex writes <jobname>Notes.bib)
+PumpProbe-NL-Chi/*.aux
+PumpProbe-NL-Chi/*.log
+PumpProbe-NL-Chi/*.out
+PumpProbe-NL-Chi/*.bbl
+PumpProbe-NL-Chi/*.blg
+PumpProbe-NL-Chi/*.fls
+PumpProbe-NL-Chi/*.fdb_latexmk
+PumpProbe-NL-Chi/*.synctex.gz
+PumpProbe-NL-Chi/*Notes.bib
 __pycache__/

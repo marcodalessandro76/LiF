@@ -44,8 +44,8 @@ chi_(1,0) - chi1 already contains |E_P|^2 (chi1 from a probe-only run). To be ch
 ## Repository and data
 - Laptop: `D:\RICERCA\DFT AND MANY BODY\SIMULATIONS\LiF` (path with spaces: quote it). Cluster: `~/work/LiF` on ismhpc.
   Same git repo (GitHub `marcodalessandro76/LiF`, branch `main`), synced only through git (commit/push on one
-  machine, pull on the other). In git there are only README, this file, `Attivita nuova.txt`, the notebooks, `References/` and the
-  technical notes `Notes/` (LaTeX sources and figures):
+  machine, pull on the other). In git there are only README, this file, `Attivita nuova.txt`, the notebooks, `References/`, the
+  technical notes `Notes/` (LaTeX sources and figures) and the article `PumpProbe-NL-Chi/` (same, see "Article" below):
   the data (~11 GB on the cluster) are NOT in git and live only on the cluster (the yambo runs) or on the laptop
   (Davide's reports and tarballs in `NL_Chi/Davide_Google_drive`, ~320 MB).
   Never `git add` data folders, `.ipynb_checkpoints` or tarballs (see `.gitignore`).
@@ -275,7 +275,7 @@ done (theory, implementation, computations) and of the notation and conventions.
   end of main.tex keeps notes for later (comparison of the envelope weights; relation between the keys chi_(1,m) and
   the chi of Sec. 1, shifted grids, chi0 from the difference of two runs).
 
-### Reminder for the article (2026-10-20, NOT for the technical notes)
+### Reminder for the article (2026-10-20, NOT for the technical notes; since 2026-11-23 see `PumpProbe-NL-Chi/Outline.md`)
 The technical notes are for the discussion with the colleagues; the user does not want these elements there. To be
 included in the document that prepares the article:
 1. Introduction (goal, the two approaches, LiF, IR pump and XUV probe).
@@ -547,6 +547,80 @@ relative; chi_+ and chi_- median relative): 4e6 0.05/0.19%, 0.25%, 0.55%; 1.6e7 
 3.5-3.8 (~ I_P: fifth order projected on the chi); the change is concentrated in 17-21 eV (peak ~18.5 eV, 14% of the
 max at 2.56e8); chi_- changes about twice as much as chi_0 and chi_+. The linear scale of the right panel is still
 readable (the 4e6 curve is flat at zero).
+
+## Article (`PumpProbe-NL-Chi/`, started 2026-11-23)
+Provisional title: "Understanding pump and probe signal from excitonic non linear response functions". Target Phys.
+Rev. B (revtex4-2 reprint, can be changed later). The plan (structure, figures, decisions, open points) is in
+`PumpProbe-NL-Chi/Outline.md`, which also keeps the original draft of the user verbatim: read it before working on the
+article and update it when a decision is taken.
+- Files: `main.tex` (revtex4-2; `\input{macros.tex}` and `sections/*.tex`: introduction, theory, lif, analysis,
+  conclusions, appendix_envelope, appendix_extraction), `macros.tex` (the notation macros of `Notes/header.tex`: keep
+  the two in sync), `biblio.bib` (started as a copy of `Notes/biblio.bib`; apsrev4-2, revtex writes `mainNotes.bib`,
+  ignored), `Figures/` (jpeg), `make_figures.py`, `Outline.md`.
+- Relation with the notes: text and figures may be copied from `Notes/` (duplication accepted), but the text of the
+  article is independent (selected and rewritten). Unlike the notes, the article names the codes and gives the
+  computational details ("Reminder for the article" above). D. Sangalli is a co-author and writes the introduction.
+- Figures: `PumpProbe-NL-Chi/make_figures.py` loads `Notes/make_figures.py` as the module `notes` (with importlib: the
+  two files have the same name) and only redoes the plotting in the style of the article (column 3.375 in, page 7.0
+  in). New calculations go in `Notes/make_figures.py` as data functions, so that the two documents show the same
+  numbers. Run on ismhpc from `~/work/LiF/PumpProbe-NL-Chi` with `LIF_NL_CHI=$HOME/work/LiF/NL_Chi` and
+  `--out ~/tmp_claude/paper_figures`, then scp to `PumpProbe-NL-Chi/Figures` on the laptop and commit there.
+- Workflow as for the notes: written on the laptop, compiled in place with `latexmk -pdf main.tex` (check the log; PDF
+  and auxiliary files not tracked); data, notebooks and figures on the cluster.
+- Agreed with the user (2026-11-23): Sec. 2 general (no LiF, no codes), everything specific in Sec. 3; Sec. 1.4 of the
+  notes merged into the pulsed pump (Eq. 17 and the definitions of chi_0, chi_+- stay in the text, as the limit of the
+  envelope at the probe time); envelope at the probe time short in the text, the derivations of both envelope models in
+  an appendix; HSEX level only (IP at most one sentence or the Supplemental Material); reference figure of Sec. 3 = map
+  RT vs chi with the same approximations in both (bands 3-6, HSEX, pump 6e7, even part of the RT): new runs, handoff
+  below. Pending (user's decision): convergence in k and bands at the HSEX level (all the tests are at the IP level).
+
+### Handoff (2026-11-23): HSEX RT runs on a dense delay grid (for the CLI session on the cluster)
+Prepared by the laptop session; the user launches it from the cluster session of this project, which manages the runs.
+Goal: the reference figure of Sec. 3 of the article, the analog of Fig. 13 of the notes (`maps_hsex`: RT of D. Sangalli,
+bands 3-12, 6e9 along +x only, vs the chi) with the same approximations in the RT and in the chi: bands 3-6, HSEX, kx16,
+the same collisions, pump 6e7 kW/cm^2 (third order regime), even part of the RT (pump along +x and -x) vs the HSEX
+CRANKNIC chi. It also gives the third order comparison of the oscillations at 2wP, which the 5 delays of our runs (1.5 fs
+apart) cannot resolve (caveat of Sec. 3.5.2 of the notes).
+1. Runs. `NL_Chi/YamboNL_Analysis.ipynb`, new section at the end, "RT pump-probe runs with HARTREE+SEX on a dense delay
+   grid (bands 3-6, pump 6e7)": dataset `study_rt_hsex_delays` (`num_tasks=3`, `run_dir=rt_dir`, postprocessing
+   `PP.yambo_parse_data`) with `append_rt_hsex(study, 6.e7, t_p, pump_sign=s)` (section "RT pump-probe runs with
+   HARTREE+SEX") for s = +1, -1 and the 41 probe times `t_p = np.round(np.arange(11.0, 21.0 + 1e-6, 0.25), 2)` fs:
+   tau = t_p - 15.909 = -4.91..+5.09 fs, on the same 0.25 fs grid as the RT runs of D. Sangalli (t_p = 8.50 + 0.25 k).
+   82 ids (e.g. `rt-hsex-bands_3-6-EP_6e7-neg-tp_11.25-Pp`); the 10 at the old probe times (13.00, 14.50, 16.00, 17.50,
+   19.00) exist and are skipped by `skip=True`: 72 new runs. The pump-only (`rt-hsex-bands_3-6-EP_6e7[-neg]-P`) and
+   probe-only (`rt-hsex-bands_3-6-tp_10.00-p`) references exist. Same input as the existing HSEX RT runs
+   (`build_rt_input([3,6], 6e7, t_p, pump_sign, corr='SEX')`, collisions `coll_hsex` as second `-J`, `code_rt` = 1
+   node), Lumen `bug-fixes` build.
+2. Before launching (report to the user): wall time of the existing `rt-hsex-*` runs (sacct or the job outputs; the IP
+   RT runs took ~50 min) and size of one run folder (`du -sh`) times 72 vs the home quota (19.5 GB); dry run
+   `~/tmp_claude/launch_dataset.py study_rt_hsex_delays --dry` (check that the launcher executes the cells that define
+   `fmt_int`, `yambo_nl_code`, `rt_dir`, `build_rt_input`, `rt_id`, `code_rt`, `coll_hsex`, `append_rt_hsex` without
+   running the old datasets; adapt it if needed). At most 3 nodes in use at the same time, counting the other jobs
+   (~72 node-hours if ~1 h per run: about one day). Launch with the user's go, with `nohup` as for the other datasets.
+3. Checks: every run complete (40 fs of polarization); even and odd parts at the 5 old probe times unchanged (same
+   runs); Delta eps smooth vs tau for each pump sign (no isolated anomalies); odd/even ratio at 6e7 as before (0.44-1.29
+   in 11-17 eV). Anything wrong: tell the user (and, if it looks like a yambo_nl problem, write the note for the
+   sysadmin session as for the corrupted frequencies).
+4. Analysis. `NL_Chi/Dchi-neq_Analysis.ipynb`, new section after "Maps vs the delay at the IP level": "Maps vs the delay:
+   RT third order (even part, bands 3-6, pump 6e7) vs the HSEX chi", with the tools of the HSEX sections (`hsex_id`,
+   `nl_eps`, `nl_delay`, `on_wh`, `pump_h[6e7]`, `tr_h`, `cranknic_correction`, `chi_runs_hsex`, `highpass`, `demod`):
+   - RT: Delta eps = eps[P_Pp - P_P] - eps_eq (smoothing 0.6 eV, reference the probe-only run) for both pump signs at
+     the 41 delays (tau from `nl_delay`); even and odd parts; maps of Delta Im eps (and Delta Re eps) in 11-17 eV.
+   - chi: 4 pi dchi at the same delays with the pump of the RT runs at 6e7, accumulated envelope and envelope at the
+     probe time, `cranknic_correction`.
+   - Numbers: rel. rms / ratio of the maxima RT even / chi (and best rigid shift) in the delay windows all, tau < -1.5,
+     |tau| < 1.5, tau > 1.5 fs, for both envelope models; max|odd|/max|even| vs tau.
+   - DC/AC: high-pass in the delay (s = 0.55 fs) and the 2wP fit (`demod`; the window |tau| < 6 fs of the 6e9 analysis
+     limited to the available delays) on the RT even part vs the AC part of the chi (both envelope models): |a|, arg a,
+     their ratio and difference where the component is large, centroid and width in the delay of the AC power, as in
+     the section "Oscillations at +-2wP". Check that the even part has no components at wP and 3wP in tau and that the
+     odd part has them (spurious second order: carrier phase at wP). Delay average of the RT even part vs the DC (chi_0)
+     term, as in `fig_dc_hsex` of `Notes/make_figures.py`.
+   - Markdown "Outcome" cell with the numbers; report them to the user (who brings them to the laptop session).
+5. Figure: NOT now. Once the numbers are agreed, the laptop session asks for it in `PumpProbe-NL-Chi/make_figures.py`
+   (style of the article), with its data function in `Notes/make_figures.py`.
+6. Commit and push the two notebooks from the cluster only with the user's go; in the meantime the laptop session does
+   not edit them (it works on `PumpProbe-NL-Chi/` and `Notes/`).
 
 ## Cluster ismhpc
 - Reached from the laptop with `ssh -o BatchMode=yes -o ClearAllForwardings=yes ismhpc '...'` (host in
