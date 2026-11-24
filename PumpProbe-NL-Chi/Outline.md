@@ -34,8 +34,16 @@ Sec. 2 holds the theoretical frame of the article only (the motivation is in the
     inversion symmetry dchi^(2) = 0 and the response is even in E_P (needed in Sec. 3, even part of the RT); (b) if
     chi3 depends only on w, the convolution theorem gives dchi^(3) = 3 chi3(w) E_P(t_p)^2, the response to the pump
     field at the probe time (possible link to the envelope at the probe time in 2.3).
-  - 2.3 Pulsed pump, envelope at the probe time (to do).
-  - 2.4 Accumulated envelope (to do).
+  - 2.3 Pulsed pump (DRAFTED 2026-11-24, restructured on the user's request): general formulas for the Gaussian pump,
+    no approximation on the envelope and no mention of the envelope at the probe time; no comment on inversion
+    symmetry. Pump and its +- frequency terms (time and spectrum); second order (exact, sum over E^+-); third order
+    (four products, chi3 at w1 = +-wP, S_0, S_+-2); susceptibilities at the centers = those of a monochromatic pump
+    (chi2_+-, chi_0, chi_+-).
+  - 2.4 Envelope at the probe time (DRAFTED 2026-11-24): the simple case, which connects to expressions already in
+    the literature (to be cited: TODO). Second and third order results by the convolution theorem, monochromatic
+    limit, validity (eta >> 1/sigma; in time 1/eta << sigma; under/overestimate before/after the maximum).
+  - 2.5 Accumulated envelope (to do): the relevant case; salient points and result in the text, detailed derivation
+    in Appendix A.
 - Reduced version of Secs. 1.1-1.3 of the notes: conventions, delta probe, chi^neq and its expansion in the
   susceptibilities (Eqs. 1-11).
 - Sec. 1.4 of the notes (monochromatic pump) is not a separate part: from the general third order expression (Eq. 9,

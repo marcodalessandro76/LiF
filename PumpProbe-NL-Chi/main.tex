@@ -72,23 +72,17 @@ We consider an impulsive probe at the time $\tp$,
 \Ep(\omega) = \frac{E_{0\mathrm{p}}}{2\pi}\,e^{i\omega\tp} ,
 \label{eq:delta_probe}
 \end{equation}
-which models a probe pulse much shorter than the period of the pump and than the time scale of the response. All the
-probe frequencies have the same amplitude and a phase fixed by $\tp$.
-
-With this probe the transient response depends on the probe time, i.e.\ on the delay between probe and pump. Its
-change induced by the pump,
+which models a probe pulse much shorter than both the period of the pump and the time scale of the response.
+The time dependence of the probe field implies that the transient response depends on the probe time as well,
+and we define the pump-induced change of the response according to
 \begin{equation}
-\dchi(\omega,\tp) = \chineq(\omega,\tp)-\chi^{(1)}(\omega) ,
-\label{eq:dchi}
+\chineq(\omega,\tp) = \chi^{(1)}(\omega) + \dchi(\omega,\tp) ,
+\label{eq:chineq_split}
 \end{equation}
-where $\chi^{(1)}$ is the linear susceptibility at equilibrium, is the quantity that we express in terms of the
-equilibrium susceptibilities in the following. It gives the change of the dielectric function with respect to the
-equilibrium one, $1+4\pi\chi^{(1)}(\omega)$,
-\begin{equation}
-\deps(\omega,\tp) = 4\pi\,\dchi(\omega,\tp) ,
-\label{eq:deps}
-\end{equation}
-whose imaginary part is the change of the absorption.
+where $\chi^{(1)}(\omega)$ is the equilibrium linear susceptibility. Correspondingly, the dielectric function changes
+from its equilibrium value $\varepsilon(\omega) = 1+4\pi\chi^{(1)}(\omega)$ by
+$\deps(\omega,\tp) = 4\pi\,\dchi(\omega,\tp)$, whose imaginary part describes the pump-induced change of the
+absorption.
 
 \subsection{Expansion in the equilibrium susceptibilities}
 \label{sec:theory_expansion}
@@ -100,7 +94,7 @@ complex exponentials~\cite{Boyd},
 \bm{P}(t) = \int d\omega\,\bm{P}(\omega)\,e^{-i\omega t} ,
 \end{equation*}
 so that $\bm{E}(\omega) = (2\pi)^{-1}\int dt\,\bm{E}(t)\,e^{i\omega t}$ and $\bm{E}(-\omega) = \bm{E}(\omega)^*$ for a
-real field (atomic units are used throughout). The polarization is expanded in powers of the field,
+real field. The polarization is expanded in powers of the field,
 $\bm{P} = \bm{P}^{(1)}+\bm{P}^{(2)}+\bm{P}^{(3)}+\dots$, and the susceptibility of order $n$ is defined by
 \begin{align}
 P^{(n)}_i(\omega) &= \int d\omega_1\dots d\omega_n\,\delta\Big(\omega-\sum_{k=1}^n\omega_k\Big) \nonumber\\
@@ -118,7 +112,7 @@ $\PPo$, which cancels in Eq.~\eqref{eq:chineq}, and we keep the terms linear in 
 can take any of the $n$ input places, which give the same contribution by permutation symmetry. We call $\Omega$ the
 total frequency given by the pump, so that the probe enters at $\omega-\Omega$; for the probe of
 Eq.~\eqref{eq:delta_probe}, $\Ep(\omega-\Omega) = \Ep(\omega)\,e^{-i\Omega\tp}$. The term of first order gives
-$\chi^{(1)}$, and the pump induced change of Eq.~\eqref{eq:dchi} is $\dchi = \dchi^{(2)}+\dchi^{(3)}+\dots$, with
+$\chi^{(1)}$, and the pump-induced change of Eq.~\eqref{eq:chineq_split} is $\dchi = \dchi^{(2)}+\dchi^{(3)}+\dots$, with
 \begin{align}
 \dchi^{(2)}(\omega,\tp) &= 2\int d\Omega\,e^{-i\Omega\tp}\,\chi^{(2)}(\omega;\omega-\Omega,\Omega)\,\EP(\Omega) ,
 \label{eq:dchi2}\\
@@ -129,8 +123,105 @@ $\chi^{(1)}$, and the pump induced change of Eq.~\eqref{eq:dchi} is $\dchi = \dc
 \end{align}
 and in general $\dchi^{(n+1)}$ contains $(n+1)\,\chi^{(n+1)}$ and $n$ pump fields. The term $\dchi^{(n+1)}$ describes a
 probe photon at $\omega-\Omega$ that leaves the system at $\omega$ after the exchange of $n$ pump photons of total
-frequency $\Omega$. No assumption is made on the pump. The frequency $\Omega$ enters only through the phase
-$e^{-i\Omega\tp}$, which sets the dependence of $\dchi$ on the probe time.
+frequency $\Omega$. 
+
+\subsection{Pulsed pump}
+\label{sec:theory_pulse}
+
+We consider a pump pulse with a Gaussian envelope and maximum at $\tP$,
+\begin{equation}
+\EP(t) = \EOP\,\fenv(t-\tP)\sin[\wP(t-\tP)] ,
+\label{eq:pump_pulse}
+\end{equation}
+with $\fenv(t) = e^{-t^2/2\sigma^2}$, and measure the probe time from the pump maximum with the delay
+$\tau = \tp-\tP$. The pump is the sum of a positive and a negative frequency term, $\EP = E^++E^-$, with
+\begin{align}
+E^\pm(t) &= \pm\frac{i\EOP}{2}\,\fenv(t-\tP)\,e^{\mp i\wP(t-\tP)} , \nonumber\\
+E^\pm(\omega) &= \pm\frac{i\EOP}{2}\,\frac{\sigma}{\sqrt{2\pi}}\,e^{i\omega\tP}\,e^{-(\omega\mp\wP)^2\sigma^2/2} :
+\label{eq:pump_terms}
+\end{align}
+the spectrum of the pulse has two Gaussian peaks of width $1/\sigma$ centered at $\pm\wP$.
+
+\paragraph{Second order.} With $\EP = E^++E^-$, Eq.~\eqref{eq:dchi2} is the sum of two terms,
+\begin{equation}
+\dchi^{(2)}(\omega,\tp) = 2\sum_\pm\int d\Omega\,e^{-i\Omega\tp}\,\chi^{(2)}(\omega;\omega-\Omega,\Omega)\,
+E^\pm(\Omega) ,
+\label{eq:dchi2_pulse}
+\end{equation}
+in which $E^\pm$ restrict the pump frequency $\Omega$ to a range of width $1/\sigma$ around $\pm\wP$. No approximation
+is made.
+
+\paragraph{Third order.} The two pump fields in Eq.~\eqref{eq:dchi3} give four products
+$E^a(\omega_1)E^b(\Omega-\omega_1)$, $a,b = \pm$, different from zero for $\omega_1$ close to $a\wP$ and $\Omega$ close
+to $(a+b)\wP$: $E^+E^-$ and $E^-E^+$ with $\Omega\simeq0$, $E^+E^+$ with $\Omega\simeq2\wP$ and $E^-E^-$ with
+$\Omega\simeq-2\wP$. At fixed $\Omega$ a change of $\omega_1$ changes only the two pump arguments of $\chi^{(3)}$,
+which stay within $1/\sigma$ of $\pm\wP$. For a pump far from the resonances of the system $\chi^{(3)}$ changes with
+them on a scale much larger than $1/\sigma$, and it can be evaluated at $\omega_1 = \pm\wP$. The probe argument
+$\omega-\Omega$ is instead resonant, and the dependence on $\Omega$ is kept. The two cross terms give the same
+contribution, and
+\begin{align}
+&\dchi^{(3)}(\omega,\tp) = \int d\Omega\,e^{-i\Omega\tp}\,\Big[ \nonumber\\
+&\qquad 6\,\chi^{(3)}(\omega;\omega-\Omega,\wP,\Omega-\wP)\,S_0(\Omega) \nonumber\\
+&\quad + 3\,\chi^{(3)}(\omega;\omega-\Omega,\wP,\Omega-\wP)\,S_{+2}(\Omega) \nonumber\\
+&\quad + 3\,\chi^{(3)}(\omega;\omega-\Omega,-\wP,\Omega+\wP)\,S_{-2}(\Omega)\Big] ,
+\label{eq:dchi3_pulse}
+\end{align}
+where
+\begin{align}
+S_0(\Omega) &= \int d\omega_1\,E^+(\omega_1)\,E^-(\Omega-\omega_1) , \nonumber\\
+S_{\pm2}(\Omega) &= \int d\omega_1\,E^\pm(\omega_1)\,E^\pm(\Omega-\omega_1)
+\label{eq:S}
+\end{align}
+are the spectra of the products $E^+(t)E^-(t)$ and $E^\pm(t)^2$, peaked within $\sqrt{2}/\sigma$ of $\Omega = 0$ and
+$\pm2\wP$.
+
+At the centers of the ranges of $\Omega$ selected by the pump, $\Omega = \pm\wP$ at second order and
+$\Omega = 0,\pm2\wP$ at third order, the susceptibilities in Eqs.~\eqref{eq:dchi2_pulse}-\eqref{eq:dchi3_pulse} are
+those of a monochromatic pump of frequency $\wP$,
+\begin{align}
+\chi^{(2)}_\pm(\omega) &= 2\,\chi^{(2)}(\omega;\omega\mp\wP,\pm\wP) , \nonumber\\
+\chiz(\omega) &= 6\,\chi^{(3)}(\omega;\omega,\wP,-\wP) , \nonumber\\
+\chi^{(3)}_\pm(\omega) &= 3\,\chi^{(3)}(\omega;\omega\mp2\wP,\pm\wP,\pm\wP) .
+\label{eq:chi_mono}
+\end{align}
+For a pulse they enter also away from the centers, through their dependence on $\Omega$ within the ranges. The
+following two subsections treat this dependence in two different ways.
+
+\subsection{Envelope at the probe time}
+\label{sec:theory_probetime}
+
+If the susceptibilities do not change over the ranges of $\Omega$ selected by the pump, they can be taken out of the
+integrals of Eqs.~\eqref{eq:dchi2_pulse}-\eqref{eq:dchi3_pulse} at the centers, Eq.~\eqref{eq:chi_mono}. The
+integrals left give the pump terms~\eqref{eq:pump_terms} at the probe time: $E^\pm(\tp) = \pm(i\EOP/2)\,\fenv(\tau)\,
+e^{\mp i\wP\tau}$ at second order and, by the convolution theorem, $E^+(\tp)E^-(\tp) = (\EOP^2/4)\,\fenv^2(\tau)$ and
+$E^\pm(\tp)^2 = -(\EOP^2/4)\,\fenv^2(\tau)\,e^{\mp2i\wP\tau}$ at third order. Hence
+\begin{align}
+\dchi^{(2)}(\omega,\tau) &= \frac{i\EOP}{2}\,\fenv(\tau)\Big[\chi^{(2)}_+(\omega)\,e^{-i\wP\tau}
+- \chi^{(2)}_-(\omega)\,e^{i\wP\tau}\Big] , \nonumber\\
+\dchi^{(3)}(\omega,\tau) &= \frac{\EOP^2}{4}\,\fenv^2(\tau)\Big[\chiz(\omega) - \chip(\omega)\,e^{-2i\wP\tau}
+\nonumber\\
+&\qquad - \chim(\omega)\,e^{2i\wP\tau}\Big] .
+\label{eq:dchi_probetime}
+\end{align}
+For $\sigma\to\infty$ ($\fenv = 1$) Eqs.~\eqref{eq:dchi_probetime} are exact and give the response to a monochromatic
+pump, in which the delay enters only through the phase of the pump at the probe time. For a pulse the pump acts
+through its field envelope $\fenv(\tau)$ and its intensity envelope $\fenv^2(\tau)$ at the probe time.
+% TODO: cite the literature where these expressions appear
+
+The approximation requires that the susceptibilities do not change over a range of $\Omega$ of width $\sim1/\sigma$.
+Their probe argument $\omega-\Omega$ is resonant: near a transition of width $\eta$ they change with $\Omega$ on the
+scale $\eta$, and the condition is $\eta\gg1/\sigma$. In time, the delta probe creates a polarization that oscillates
+at the transition energies and lasts a time $1/\eta$, and the pump changes the response as long as this polarization
+lives. Eqs.~\eqref{eq:dchi_probetime} replace the pump field during this time with its value at $\tp$, which
+requires $1/\eta\ll\sigma$. The approximation is best at the pump maximum, where the envelope is flat. Before the
+maximum the intensity grows during the life of the polarization and Eqs.~\eqref{eq:dchi_probetime} underestimate the
+effect of the pump; after the maximum they overestimate it.
+
+\subsection{Accumulated envelope}
+\label{sec:theory_accumulated}
+
+% To be written: model of the accumulated envelope (Sec. 1.5 of the notes) for the third order term, salient points
+% and the result (Eq. dchi_accumulated of the notes); the detailed derivation in Appendix A.
 
 % ====================================================================================================
 \section{Pump and probe signal at the exciton peak of LiF}
