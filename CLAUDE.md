@@ -623,6 +623,17 @@ apart) cannot resolve (caveat of Sec. 3.5.2 of the notes).
 6. Commit and push the two notebooks from the cluster only with the user's go; in the meantime the laptop session does
    not edit them (it works on `PumpProbe-NL-Chi/` and `Notes/`).
 
+Outcome (2026-11-24, CLI session on the cluster): 72 runs done (jobs 62383-62472, 48-66 min each, all complete, no
+anomaly vs the delay; the launcher's final `PP.yambo_parse_data` raised a harmless `TypeError`). Section added at the
+END of `Dchi-neq_Analysis.ipynb` (it uses `highpass`, `demod`, `tr_h_ac` of the section "Oscillations at +-2wP"), with
+an "Outcome" cell. Numbers (11-17 eV, RT even vs chi): maps, accumulated envelope, rel. rms / ratio of the maxima all
+0.04/1.00 (shift +0.003 eV), tau < -1.5 0.04/1.00, |tau| < 1.5 0.03/1.00, tau > 1.5 0.09/0.91 (per delay 0.02-0.06
+up to tau = 1.3 fs, up to 0.20 in the tail); probe time 0.40/0.88 (0.61/1.15 before, 0.54/0.45 after). max|odd|/max|even| 0.39-1.30
+(1.1-2.1 at the last 4 delays). 2wP at the third order: phase RT = chi_+- within 0.08 rad and |a| ratio 0.92-1.05
+(median 0.97) in 12.0-16.3 eV; AC map rel. rms 0.19 (accumulated) vs 0.33 (probe time); AC power centroid / width RT
+-0.89/1.73 fs, chi accumulated -0.84/1.64, probe time 0.00/1.60 fs. Even part only 2wP, odd part only wP (<= 1% other
+harmonics). Delay average of the RT even part = chi_0 (DC) term within 3%. Figure for the article: not yet (step 5).
+
 ## Cluster ismhpc
 - Reached from the laptop with `ssh -o BatchMode=yes -o ClearAllForwardings=yes ismhpc '...'` (host in
   `~/.ssh/config`, jump through `narro`; ClearAllForwardings avoids the LocalForward 4444 clash). CentOS 7 /
