@@ -553,13 +553,14 @@ Provisional title: "Understanding pump and probe signal from excitonic non linea
 Rev. B (revtex4-2 reprint, can be changed later). The plan (structure, figures, decisions, open points) is in
 `PumpProbe-NL-Chi/Outline.md`, which also keeps the original draft of the user verbatim: read it before working on the
 article and update it when a decision is taken.
-- Files: `main.tex` (revtex4-2; `\input{macros.tex}` and `sections/*.tex`: introduction, theory, lif, analysis,
-  conclusions, appendix_envelope, appendix_extraction), `macros.tex` (the notation macros of `Notes/header.tex`: keep
-  the two in sync), `biblio.bib` (started as a copy of `Notes/biblio.bib`; apsrev4-2, revtex writes `mainNotes.bib`,
+- Files: `main.tex` (revtex4-2, `\input{macros.tex}`; ALL the text of the article is in `main.tex`, no separate files
+  for the sections: user's request, 2026-11-24), `macros.tex` (the notation macros of `Notes/header.tex`: keep the two
+  in sync), `biblio.bib` (started as a copy of `Notes/biblio.bib`; apsrev4-2, revtex writes `mainNotes.bib`,
   ignored), `Figures/` (jpeg), `make_figures.py`, `Outline.md`.
 - Relation with the notes: text and figures may be copied from `Notes/` (duplication accepted), but the text of the
   article is independent (selected and rewritten). Unlike the notes, the article names the codes and gives the
-  computational details ("Reminder for the article" above). D. Sangalli is a co-author and writes the introduction.
+  computational details ("Reminder for the article" above). Authors: M. D'Alessandro, C. Attaccalite, D. Sangalli;
+  D. Sangalli writes the introduction.
 - Figures: `PumpProbe-NL-Chi/make_figures.py` loads `Notes/make_figures.py` as the module `notes` (with importlib: the
   two files have the same name) and only redoes the plotting in the style of the article (column 3.375 in, page 7.0
   in). New calculations go in `Notes/make_figures.py` as data functions, so that the two documents show the same

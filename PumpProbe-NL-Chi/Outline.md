@@ -17,14 +17,25 @@ probe.
 ## Structure
 
 ### 1. Introduction
-Written by D. Sangalli.
+Written by D. Sangalli. It contains the motivation of the approach (decided 2026-11-24; a short placeholder in
+`main.tex`): the established approach is the RT simulation with explicit pump and probe, exact but
+with no direct physical interpretation; the chi are properties of the system and the field enters in a way fixed by
+the formalism, so building the same response from the chi explains the origin of its features.
 
 ### 2. Theory: RT vs chi approach to dchi^neq (provisional title)
-- Motivation. The established approach is the RT simulation with explicit pump and probe:
-  chi^neq = (P_Pp - P_P)/E_p (Eq. 7 of the notes, `eq:chineq`), with P(w) the Fourier transforms of the computed
-  polarizations. Exact, but with no direct physical interpretation. The chi are properties of the system and the field
-  enters in a way fixed by the formalism: building the same response from the chi explains the origin of its features.
+Sec. 2 holds the theoretical frame of the article only (the motivation is in the Introduction).
 - Rule (agreed): Sec. 2 is general (no LiF, no codes); everything specific to LiF and to the computations goes in Sec. 3.
+- Subsections:
+  - 2.1 Pump-probe response (DRAFTED 2026-11-24): conventions, chi^neq = (P_Pp - P_P)/E_p (Eq. 7 of the notes,
+    `eq:chineq`) and how the RT computes it, delta probe, Delta eps.
+  - 2.2 Expansion in the equilibrium susceptibilities (DRAFTED 2026-11-24): P^(n), dchi^(2), dchi^(3).
+    Removed from 2.2 (user, 2026-11-24), to be introduced where they are needed: (a) the term with n pump fields is
+    multiplied by (-1)^n when E_P -> -E_P, so the odd and even terms are separated with the two signs of the pump; with
+    inversion symmetry dchi^(2) = 0 and the response is even in E_P (needed in Sec. 3, even part of the RT); (b) if
+    chi3 depends only on w, the convolution theorem gives dchi^(3) = 3 chi3(w) E_P(t_p)^2, the response to the pump
+    field at the probe time (possible link to the envelope at the probe time in 2.3).
+  - 2.3 Pulsed pump, envelope at the probe time (to do).
+  - 2.4 Accumulated envelope (to do).
 - Reduced version of Secs. 1.1-1.3 of the notes: conventions, delta probe, chi^neq and its expansion in the
   susceptibilities (Eqs. 1-11).
 - Sec. 1.4 of the notes (monochromatic pump) is not a separate part: from the general third order expression (Eq. 9,
@@ -32,7 +43,8 @@ Written by D. Sangalli.
   |E_P|^2 [chi_0 - chi_+ e^{-2i wP tau} - chi_- e^{2i wP tau}] and the definitions of chi_0, chi_+- (Eqs. 16-17,
   `eq:chi3_mono`, `eq:dchi_mono`) appear as the limit of the envelope at the probe time (Eq. 26, `eq:dchi_probetime`).
   They are the basis of the DC/AC analysis of Sec. 4. Second order terms: one sentence (zero in a centrosymmetric
-  system).
+  system). The meaning of the DC (chi_0) and AC (chi_+-) parts is NOT discussed here but in Sec. 3, with the results for
+  LiF (user, 2026-11-24).
 - Envelope at the probe time: short, in the text (standard approximation; its failure is the reason for the accumulated
   envelope). Derivation in Appendix A. To be revisited while writing.
 - Accumulated envelope (Sec. 1.5 of the notes, up to Eq. 32, `eq:dchi_accumulated`): probably the main theoretical
@@ -41,6 +53,8 @@ Written by D. Sangalli.
 ### 3. Pump and probe signal at the exciton peak in LiF
 HSEX level only (the IP level is excluded: at most one sentence or the Supplemental Material).
 - Equilibrium: the exciton, 1 + 4 pi chi1 vs the RT probe-only run (as Fig. 9 of the notes, `fig:eq_hsex`).
+- Meaning of the DC part (chi_0: follows the envelope, cycle average) and of the AC part (chi_+-: oscillations at 2wP,
+  seen only with a probe shorter than the pump cycle), with the results for LiF (moved here from Sec. 2).
 - Computational details of the two approaches, without heavy details: DFT (functional, lattice, 100 bands, scissor
   6.0 eV + stretch 0.05), kx16 (the 8 symmetries without inversion/time reversal), bands 3-6, HSEX kernel (collisions),
   codes and versions (named here, unlike the notes); RT: CRANKNIC 3 as, 40 fs, delta probe, QSFIELD pump; chi: sine
@@ -105,7 +119,8 @@ Figures 4-6 will be redone on the new runs where possible (pump 6e7, even part, 
 - k (and bands) convergence at the HSEX level: pending (user).
 - "literature: model + delta pump" in Sec. 4: to be clarified.
 - Envelope at the probe time: in the text for now, to be revisited while writing.
-- Authors and affiliations (placeholders in `main.tex`).
+- Authors: M. D'Alessandro, C. Attaccalite, D. Sangalli (order of 2026-11-24); affiliations still placeholders in
+  `main.tex`.
 - Material listed in the "Reminder for the article" of `CLAUDE.md` (computational details, codes and versions, relation
   with the simulations of D. Sangalli, validation of the extraction, a posteriori broadening, corrupted frequencies of
   yambo_nl, outlook): to be placed.

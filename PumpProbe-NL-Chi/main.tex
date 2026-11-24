@@ -1,4 +1,5 @@
-% Article on the transient absorption of LiF from the non-linear susceptibilities (plan: Outline.md)
+% Article on the transient absorption of LiF from the non-linear susceptibilities (plan: Outline.md).
+% All the text is in this file (no separate files for the sections).
 \documentclass[aps,prb,reprint,superscriptaddress,amsmath,amssymb]{revtex4-2}
 
 \usepackage[utf8]{inputenc}
@@ -17,6 +18,8 @@
 % Authors and affiliations: placeholders, to be completed
 \author{Marco D'Alessandro}
 \affiliation{[affiliation]}
+\author{Claudio Attaccalite}
+\affiliation{[affiliation]}
 \author{Davide Sangalli}
 \affiliation{[affiliation]}
 
@@ -28,15 +31,139 @@
 
 \maketitle
 
-\input{sections/introduction}
-\input{sections/theory}
-\input{sections/lif}
-\input{sections/analysis}
-\input{sections/conclusions}
+% ====================================================================================================
+\section{Introduction}
+\label{sec:intro}
+
+% To be written by Davide (Outline.md, Sec. 1).
+\textit{[Among the points: motivation of the approach. RT simulations with explicit pump
+and probe fields give the transient response, but they do not explain the origin of its features; the
+non-linear susceptibilities are properties of the system and the pump enters the response in a way fixed by the
+formalism (Sec.~\ref{sec:theory}), so that the features of the signal can be traced back to them.]}
+
+% ====================================================================================================
+% Provisional title
+\section{Transient response: real-time simulations and non-linear susceptibilities}
+\label{sec:theory}
+
+% Plan: Outline.md, Sec. 2 (general: no LiF, no codes). The motivation of the approach is in the Introduction.
+
+\subsection{Pump-probe response}
+\label{sec:theory_neq}
+
+In a pump-probe setup the system is driven by a pump field $\bm{E}_{\mathrm{P}}$ and by a weak probe field
+$\bm{E}_{\mathrm{p}}$, delayed with respect to the pump. We take the two fields along the same direction, and denote by
+$\EP$, $\Ep$ and $P$ the components of the fields and of the polarization along it. The transient response is the
+polarization induced by the probe in the presence of the pump, divided by the probe field,
+\begin{equation}
+\chineq[\EP](\omega) = \frac{\PPp(\omega)-\PPo(\omega)}{\Ep(\omega)} ,
+\label{eq:chineq}
+\end{equation}
+where $\PPp$ is the polarization with both the fields and $\PPo$ the one with the pump only. In a real-time (RT)
+simulation $\PPp(t)$ and $\PPo(t)$ are obtained from the time evolution of the system in the fields, and
+$\chineq$ from their Fourier transforms; the pump-only simulation does not depend on the probe and is the same for
+all the delays. Eq.~\eqref{eq:chineq} contains the response to all orders in the pump field, and it is linear in the
+probe field as long as the probe is weak.
+% TODO: references for the RT pump-probe simulations
+
+We consider an impulsive probe at the time $\tp$,
+\begin{equation}
+\Ep(t) = E_{0\mathrm{p}}\,\delta(t-\tp) , \qquad
+\Ep(\omega) = \frac{E_{0\mathrm{p}}}{2\pi}\,e^{i\omega\tp} ,
+\label{eq:delta_probe}
+\end{equation}
+which models a probe pulse much shorter than the period of the pump and than the time scale of the response. All the
+probe frequencies have the same amplitude and a phase fixed by $\tp$.
+
+With this probe the transient response depends on the probe time, i.e.\ on the delay between probe and pump. Its
+change induced by the pump,
+\begin{equation}
+\dchi(\omega,\tp) = \chineq(\omega,\tp)-\chi^{(1)}(\omega) ,
+\label{eq:dchi}
+\end{equation}
+where $\chi^{(1)}$ is the linear susceptibility at equilibrium, is the quantity that we express in terms of the
+equilibrium susceptibilities in the following. It gives the change of the dielectric function with respect to the
+equilibrium one, $1+4\pi\chi^{(1)}(\omega)$,
+\begin{equation}
+\deps(\omega,\tp) = 4\pi\,\dchi(\omega,\tp) ,
+\label{eq:deps}
+\end{equation}
+whose imaginary part is the change of the absorption.
+
+\subsection{Expansion in the equilibrium susceptibilities}
+\label{sec:theory_expansion}
+
+To express $\dchi$ in terms of the equilibrium susceptibilities we write fields and polarization as superpositions of
+complex exponentials~\cite{Boyd},
+\begin{equation*}
+\bm{E}(t) = \int d\omega\,\bm{E}(\omega)\,e^{-i\omega t} , \qquad
+\bm{P}(t) = \int d\omega\,\bm{P}(\omega)\,e^{-i\omega t} ,
+\end{equation*}
+so that $\bm{E}(\omega) = (2\pi)^{-1}\int dt\,\bm{E}(t)\,e^{i\omega t}$ and $\bm{E}(-\omega) = \bm{E}(\omega)^*$ for a
+real field (atomic units are used throughout). The polarization is expanded in powers of the field,
+$\bm{P} = \bm{P}^{(1)}+\bm{P}^{(2)}+\bm{P}^{(3)}+\dots$, and the susceptibility of order $n$ is defined by
+\begin{align}
+P^{(n)}_i(\omega) &= \int d\omega_1\dots d\omega_n\,\delta\Big(\omega-\sum_{k=1}^n\omega_k\Big) \nonumber\\
+&\quad\times\chi^{(n)}_{ij_1\dots j_n}(\omega;\omega_1,\dots,\omega_n)\prod_{k=1}^n E_{j_k}(\omega_k) ,
+\label{eq:Pn}
+\end{align}
+where the repeated Cartesian indices are summed over. The susceptibilities $\chi^{(n)}$ are properties of the system
+at equilibrium. Their first frequency argument is the output frequency, equal to the sum of the input ones, and they
+can be taken symmetric under the simultaneous permutation of the input frequencies and of the corresponding Cartesian
+indices (intrinsic permutation symmetry)~\cite{Boyd}. With the fields along the same direction only the diagonal
+component along it enters, which we denote by $\chi^{(n)}$.
+
+We insert the sum of the two fields, $E = \Ep+\EP$, in Eq.~\eqref{eq:Pn}. The terms with the pump only give
+$\PPo$, which cancels in Eq.~\eqref{eq:chineq}, and we keep the terms linear in the probe. In $\chi^{(n)}$ the probe
+can take any of the $n$ input places, which give the same contribution by permutation symmetry. We call $\Omega$ the
+total frequency given by the pump, so that the probe enters at $\omega-\Omega$; for the probe of
+Eq.~\eqref{eq:delta_probe}, $\Ep(\omega-\Omega) = \Ep(\omega)\,e^{-i\Omega\tp}$. The term of first order gives
+$\chi^{(1)}$, and the pump induced change of Eq.~\eqref{eq:dchi} is $\dchi = \dchi^{(2)}+\dchi^{(3)}+\dots$, with
+\begin{align}
+\dchi^{(2)}(\omega,\tp) &= 2\int d\Omega\,e^{-i\Omega\tp}\,\chi^{(2)}(\omega;\omega-\Omega,\Omega)\,\EP(\Omega) ,
+\label{eq:dchi2}\\
+\dchi^{(3)}(\omega,\tp) &= 3\int d\Omega\,e^{-i\Omega\tp}\int d\omega_1\,\EP(\omega_1)\,\EP(\Omega-\omega_1)
+\nonumber\\
+&\quad\times\chi^{(3)}(\omega;\omega-\Omega,\omega_1,\Omega-\omega_1) ,
+\label{eq:dchi3}
+\end{align}
+and in general $\dchi^{(n+1)}$ contains $(n+1)\,\chi^{(n+1)}$ and $n$ pump fields. The term $\dchi^{(n+1)}$ describes a
+probe photon at $\omega-\Omega$ that leaves the system at $\omega$ after the exchange of $n$ pump photons of total
+frequency $\Omega$. No assumption is made on the pump. The frequency $\Omega$ enters only through the phase
+$e^{-i\Omega\tp}$, which sets the dependence of $\dchi$ on the probe time.
+
+% ====================================================================================================
+\section{Pump and probe signal at the exciton peak of LiF}
+\label{sec:lif}
+
+% Plan: Outline.md, Sec. 3 (HSEX level only; computational details of the two approaches).
+
+% ====================================================================================================
+\section{Analysis and discussion of the non-equilibrium signal}
+\label{sec:analysis}
+
+% Plan: Outline.md, Sec. 4 (DC and AC parts, poles of chi3).
+
+% ====================================================================================================
+\section{Conclusions}
+\label{sec:conclusions}
+
+% Plan: Outline.md, Sec. 5.
+
 
 \appendix
-\input{sections/appendix_envelope}
-\input{sections/appendix_extraction}
+% ====================================================================================================
+\section{Envelope of the pump}
+\label{app:envelope}
+
+% Derivation of the envelope at the probe time and of the accumulated envelope (Outline.md, Appendix A).
+
+% ====================================================================================================
+\section{Non-linear susceptibilities from the real-time polarization}
+\label{app:extraction}
+
+% Sec. 2 of the technical notes, shortened (Outline.md, Appendix B).
+
 
 \bibliography{biblio}
 
