@@ -20,6 +20,8 @@
 \affiliation{[affiliation]}
 \author{Claudio Attaccalite}
 \affiliation{[affiliation]}
+\author{Myrta Gr\"uning}
+\affiliation{[affiliation]}
 \author{Davide Sangalli}
 \affiliation{[affiliation]}
 
@@ -128,6 +130,9 @@ frequency $\Omega$.
 \subsection{Pulsed pump}
 \label{sec:theory_pulse}
 
+In this subsection we specialize Eqs.~\eqref{eq:dchi2} and~\eqref{eq:dchi3} to a pulsed pump and identify the ranges
+of the pump frequency $\Omega$ that contribute to them; the resulting expressions are evaluated in
+Sec.~\ref{sec:theory_envelope}.
 We consider a pump pulse with a Gaussian envelope and maximum at $\tP$,
 \begin{equation}
 \EP(t) = \EOP\,\fenv(t-\tP)\sin[\wP(t-\tP)] ,
@@ -137,10 +142,10 @@ with $\fenv(t) = e^{-t^2/2\sigma^2}$, and measure the probe time from the pump m
 $\tau = \tp-\tP$. The pump is the sum of a positive and a negative frequency term, $\EP = E^++E^-$, with
 \begin{align}
 E^\pm(t) &= \pm\frac{i\EOP}{2}\,\fenv(t-\tP)\,e^{\mp i\wP(t-\tP)} , \nonumber\\
-E^\pm(\omega) &= \pm\frac{i\EOP}{2}\,\frac{\sigma}{\sqrt{2\pi}}\,e^{i\omega\tP}\,e^{-(\omega\mp\wP)^2\sigma^2/2} :
+E^\pm(\omega) &= \pm\frac{i\EOP}{2}\,\frac{\sigma}{\sqrt{2\pi}}\,e^{i\omega\tP}\,e^{-(\omega\mp\wP)^2\sigma^2/2} \, ,
 \label{eq:pump_terms}
 \end{align}
-the spectrum of the pulse has two Gaussian peaks of width $1/\sigma$ centered at $\pm\wP$.
+so the spectrum of the pulse has two Gaussian peaks of width $1/\sigma$ centered at $\pm\wP$.
 
 \paragraph{Second order.} With $\EP = E^++E^-$, Eq.~\eqref{eq:dchi2} is the sum of two terms,
 \begin{equation}
@@ -151,14 +156,18 @@ E^\pm(\Omega) ,
 in which $E^\pm$ restrict the pump frequency $\Omega$ to a range of width $1/\sigma$ around $\pm\wP$. No approximation
 is made.
 
-\paragraph{Third order.} The two pump fields in Eq.~\eqref{eq:dchi3} give four products
-$E^a(\omega_1)E^b(\Omega-\omega_1)$, $a,b = \pm$, different from zero for $\omega_1$ close to $a\wP$ and $\Omega$ close
-to $(a+b)\wP$: $E^+E^-$ and $E^-E^+$ with $\Omega\simeq0$, $E^+E^+$ with $\Omega\simeq2\wP$ and $E^-E^-$ with
-$\Omega\simeq-2\wP$. At fixed $\Omega$ a change of $\omega_1$ changes only the two pump arguments of $\chi^{(3)}$,
-which stay within $1/\sigma$ of $\pm\wP$. For a pump far from the resonances of the system $\chi^{(3)}$ changes with
-them on a scale much larger than $1/\sigma$, and it can be evaluated at $\omega_1 = \pm\wP$. The probe argument
-$\omega-\Omega$ is instead resonant, and the dependence on $\Omega$ is kept. The two cross terms give the same
-contribution, and
+\paragraph{Third order.} The product of the two pump fields in Eq.~\eqref{eq:dchi3} gives four terms, different
+from zero for $\Omega$ close to the values in parentheses:
+\begin{align*}
+&E^+(\omega_1)\,E^-(\Omega-\omega_1) &&(\Omega\simeq0) , \\
+&E^-(\omega_1)\,E^+(\Omega-\omega_1) &&(\Omega\simeq0) , \\
+&E^+(\omega_1)\,E^+(\Omega-\omega_1) &&(\Omega\simeq2\wP) , \\
+&E^-(\omega_1)\,E^-(\Omega-\omega_1) &&(\Omega\simeq-2\wP) .
+\end{align*}
+In each term the pump arguments of $\chi^{(3)}$, $\omega_1$ and $\Omega-\omega_1$, stay within $1/\sigma$ of $\pm\wP$. For a pump far from the resonances of the system $\chi^{(3)}$
+changes with them on a scale much larger than $1/\sigma$, and $\omega_1$ can be fixed at the center of its range,
+$\omega_1 = \pm\wP$ for $E^\pm(\omega_1)$. The probe argument $\omega-\Omega$ is instead resonant, and the dependence
+on $\Omega$ is kept. Hence
 \begin{align}
 &\dchi^{(3)}(\omega,\tp) = \int d\Omega\,e^{-i\Omega\tp}\,\Big[ \nonumber\\
 &\qquad 6\,\chi^{(3)}(\omega;\omega-\Omega,\wP,\Omega-\wP)\,S_0(\Omega) \nonumber\\
@@ -173,26 +182,31 @@ S_{\pm2}(\Omega) &= \int d\omega_1\,E^\pm(\omega_1)\,E^\pm(\Omega-\omega_1)
 \label{eq:S}
 \end{align}
 are the spectra of the products $E^+(t)E^-(t)$ and $E^\pm(t)^2$, peaked within $\sqrt{2}/\sigma$ of $\Omega = 0$ and
-$\pm2\wP$.
+$\pm2\wP$. Only three terms appear in Eq.~\eqref{eq:dchi3_pulse} because the two cross
+terms $E^{\pm}E^{\mp}$ give the same contribution, as follows from the change of variable $\omega_1\to\Omega-\omega_1$ in one of them
+and the permutation symmetry of $\chi^{(3)}$.
 
-At the centers of the ranges of $\Omega$ selected by the pump, $\Omega = \pm\wP$ at second order and
-$\Omega = 0,\pm2\wP$ at third order, the susceptibilities in Eqs.~\eqref{eq:dchi2_pulse}-\eqref{eq:dchi3_pulse} are
-those of a monochromatic pump of frequency $\wP$,
+\subsection{Approximations for the pump envelope}
+\label{sec:theory_envelope}
+
+For a pulse the susceptibilities in Eqs.~\eqref{eq:dchi2_pulse} and~\eqref{eq:dchi3_pulse} enter also away from the
+centers of the ranges of $\Omega$ selected by the pump, and their dependence on $\Omega$ has to be treated in some
+way. In the following we analyze two distinct approximations.
+
+\subsubsection{Envelope at the probe time}
+\label{sec:theory_probetime}
+
+If the susceptibilities do not change over the ranges of $\Omega$ selected by the pump, they can be taken out of the
+integrals of Eqs.~\eqref{eq:dchi2_pulse} and~\eqref{eq:dchi3_pulse} at the centers, $\Omega = \pm\wP$ at second order
+and $\Omega = 0,\pm2\wP$ at third order. There, with their factors, they are the susceptibilities of a monochromatic
+pump of frequency $\wP$,
 \begin{align}
 \chi^{(2)}_\pm(\omega) &= 2\,\chi^{(2)}(\omega;\omega\mp\wP,\pm\wP) , \nonumber\\
 \chiz(\omega) &= 6\,\chi^{(3)}(\omega;\omega,\wP,-\wP) , \nonumber\\
 \chi^{(3)}_\pm(\omega) &= 3\,\chi^{(3)}(\omega;\omega\mp2\wP,\pm\wP,\pm\wP) .
 \label{eq:chi_mono}
 \end{align}
-For a pulse they enter also away from the centers, through their dependence on $\Omega$ within the ranges. The
-following two subsections treat this dependence in two different ways.
-
-\subsection{Envelope at the probe time}
-\label{sec:theory_probetime}
-
-If the susceptibilities do not change over the ranges of $\Omega$ selected by the pump, they can be taken out of the
-integrals of Eqs.~\eqref{eq:dchi2_pulse}-\eqref{eq:dchi3_pulse} at the centers, Eq.~\eqref{eq:chi_mono}. The
-integrals left give the pump terms~\eqref{eq:pump_terms} at the probe time: $E^\pm(\tp) = \pm(i\EOP/2)\,\fenv(\tau)\,
+The integrals left give the pump terms~\eqref{eq:pump_terms} at the probe time: $E^\pm(\tp) = \pm(i\EOP/2)\,\fenv(\tau)\,
 e^{\mp i\wP\tau}$ at second order and, by the convolution theorem, $E^+(\tp)E^-(\tp) = (\EOP^2/4)\,\fenv^2(\tau)$ and
 $E^\pm(\tp)^2 = -(\EOP^2/4)\,\fenv^2(\tau)\,e^{\mp2i\wP\tau}$ at third order. Hence
 \begin{align}
@@ -217,7 +231,7 @@ requires $1/\eta\ll\sigma$. The approximation is best at the pump maximum, where
 maximum the intensity grows during the life of the polarization and Eqs.~\eqref{eq:dchi_probetime} underestimate the
 effect of the pump; after the maximum they overestimate it.
 
-\subsection{Accumulated envelope}
+\subsubsection{Accumulated envelope}
 \label{sec:theory_accumulated}
 
 % To be written: model of the accumulated envelope (Sec. 1.5 of the notes) for the third order term, salient points

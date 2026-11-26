@@ -36,13 +36,22 @@ Sec. 2 holds the theoretical frame of the article only (the motivation is in the
     field at the probe time (possible link to the envelope at the probe time in 2.3).
   - 2.3 Pulsed pump (DRAFTED 2026-11-24, restructured on the user's request): general formulas for the Gaussian pump,
     no approximation on the envelope and no mention of the envelope at the probe time; no comment on inversion
-    symmetry. Pump and its +- frequency terms (time and spectrum); second order (exact, sum over E^+-); third order
-    (four products, chi3 at w1 = +-wP, S_0, S_+-2); susceptibilities at the centers = those of a monochromatic pump
-    (chi2_+-, chi_0, chi_+-).
-  - 2.4 Envelope at the probe time (DRAFTED 2026-11-24): the simple case, which connects to expressions already in
-    the literature (to be cited: TODO). Second and third order results by the convolution theorem, monochromatic
-    limit, validity (eta >> 1/sigma; in time 1/eta << sigma; under/overestimate before/after the maximum).
-  - 2.5 Accumulated envelope (to do): the relevant case; salient points and result in the text, detailed derivation
+    symmetry. Revised 2026-11-26: opening sentence (Eqs. 5-6 specialized to a pulsed pump, ranges of Omega that
+    contribute, evaluated in II D); pump and its +-
+    frequency terms (time and spectrum); second order (exact, sum over E^+-); third order (the four products E^+E^-,
+    E^-E^+ around Omega = 0, E^+E^+ around 2wP, E^-E^- around -2wP, no a,b indices; cross terms equal by
+    w1 -> Omega - w1 and permutation symmetry; chi3 at w1 = +-wP; S_0, S_+-2). Second order exact; third order with the only approximation of a pump far from resonance
+    (pump arguments of chi3 fixed at +-wP). The
+    monochromatic chi2_+-, chi_0, chi_+- are NOT defined here (user, 2026-11-26: useless at this level).
+  - 2.4 Approximations for the pump envelope (structure of 2026-11-26, user's choice: the two approximations are
+    subsubsections of one subsection, II D 1 and II D 2). Short opening: for a pulse the chi enter also away from the
+    centers, the Omega dependence must be treated, two distinct approximations follow.
+  - 2.4.1 Envelope at the probe time (DRAFTED 2026-11-24): the simple case, which connects to expressions already in
+    the literature (to be cited: TODO). Opens with the chi taken out at the centers, where they are those of a
+    monochromatic pump: definitions of chi2_+-, chi_0, chi_+- (`eq:chi_mono`, moved here 2026-11-26; reused in 2.4.2).
+    Second and third order results by the convolution theorem, monochromatic limit, validity (eta >> 1/sigma; in time
+    1/eta << sigma; under/overestimate before/after the maximum).
+  - 2.4.2 Accumulated envelope (to do): the relevant case; salient points and result in the text, detailed derivation
     in Appendix A.
 - Reduced version of Secs. 1.1-1.3 of the notes: conventions, delta probe, chi^neq and its expansion in the
   susceptibilities (Eqs. 1-11).
@@ -127,7 +136,7 @@ Figures 4-6 will be redone on the new runs where possible (pump 6e7, even part, 
 - k (and bands) convergence at the HSEX level: pending (user).
 - "literature: model + delta pump" in Sec. 4: to be clarified.
 - Envelope at the probe time: in the text for now, to be revisited while writing.
-- Authors: M. D'Alessandro, C. Attaccalite, D. Sangalli (order of 2026-11-24); affiliations still placeholders in
+- Authors: M. D'Alessandro, C. Attaccalite, M. Grüning, D. Sangalli (order of 2026-11-26); affiliations still placeholders in
   `main.tex`.
 - Material listed in the "Reminder for the article" of `CLAUDE.md` (computational details, codes and versions, relation
   with the simulations of D. Sangalli, validation of the extraction, a posteriori broadening, corrupted frequencies of
