@@ -51,8 +51,22 @@ Sec. 2 holds the theoretical frame of the article only (the motivation is in the
     monochromatic pump: definitions of chi2_+-, chi_0, chi_+- (`eq:chi_mono`, moved here 2026-11-26; reused in 2.4.2).
     Second and third order results by the convolution theorem, monochromatic limit, validity (eta >> 1/sigma; in time
     1/eta << sigma; under/overestimate before/after the maximum).
-  - 2.4.2 Accumulated envelope (to do): the relevant case; salient points and result in the text, detailed derivation
-    in Appendix A.
+  - 2.4.2 Accumulated envelope (DRAFTED 2026-11-26): the relevant case; in the text only the idea (probe coherences,
+    pump shift of the transition energies ~ f^2, accumulated phase, same weight for all the times between t_p and
+    t_p + t), W(tau,t) (`eq:W`), R_0 of chi_0 (`eq:R0`), the +-2wP extension (not derived) and the final formula
+    (`eq:dchi_accumulated`, Eq. 32 of the notes), limits sigma -> inf and 1/eta << sigma, correction of the
+    under/overestimate of 2.4.1. Shift called "dynamical Stark shift" only (Franz-Keldysh not named: the relation with
+    the dynamical Franz-Keldysh effect was put aside by the user). Derivation (two-level transitions, calibration on
+    chi_0) in Appendix A: DRAFTED 2026-11-26 (Appendix A retitled "Accumulated envelope"): two-level R_eps, shift
+    delta eps = c_eps (E0P^2/4) f^2 (c_eps may be complex: change of the width, same result), accumulated phase,
+    delta R_eps = -i c_eps (E0P^2/4) t W R_eps, sum over transitions, calibration on chi_0 (f = 1) ->
+    delta R = (E0P^2/4) W R_0; +-2wP terms by the extension of 2.4.2; second order paragraph at the end.
+    Opening (user, 2026-11-26): the model is derived for chi_0 (slow change of the transition energies by the pump
+    intensity); the terms oscillating with the carrier (+-2wP third order, +-wP second order) do not strictly produce
+    such a change but their monochromatic chi already contain the carrier, only the envelope changes: included by
+    extending the chi_0 result, tested against the RT in Sec. 3; third order only because it is the leading one in
+    a centrosymmetric system (Sec. 3). Second order extension (W_1 = mean of f, `eq:W1`, `eq:dchi2_accumulated`)
+    written at the end of Appendix A, marked as not tested.
 - Reduced version of Secs. 1.1-1.3 of the notes: conventions, delta probe, chi^neq and its expansion in the
   susceptibilities (Eqs. 1-11).
 - Sec. 1.4 of the notes (monochromatic pump) is not a separate part: from the general third order expression (Eq. 9,
