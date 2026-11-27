@@ -61,12 +61,14 @@ Sec. 2 holds the theoretical frame of the article only (the motivation is in the
     delta eps = c_eps (E0P^2/4) f^2 (c_eps may be complex: change of the width, same result), accumulated phase,
     delta R_eps = -i c_eps (E0P^2/4) t W R_eps, sum over transitions, calibration on chi_0 (f = 1) ->
     delta R = (E0P^2/4) W R_0; +-2wP terms by the extension of 2.4.2; second order paragraph at the end.
-    Opening (user, 2026-11-26): the model is derived for chi_0 (slow change of the transition energies by the pump
-    intensity); the terms oscillating with the carrier (+-2wP third order, +-wP second order) do not strictly produce
-    such a change but their monochromatic chi already contain the carrier, only the envelope changes: included by
-    extending the chi_0 result, tested against the RT in Sec. 3; third order only because it is the leading one in
-    a centrosymmetric system (Sec. 3). Second order extension (W_1 = mean of f, `eq:W1`, `eq:dchi2_accumulated`)
-    written at the end of Appendix A, marked as not tested.
+    Opening: the model is derived for chi_0 (slow change of the transition energies by the pump intensity); third
+    order only because it is the leading one in a centrosymmetric system (Sec. 3); second order in Appendix A.
+    Justification of the extension (user, 2026-11-27: NOT in the opening, where the model is explained, but after
+    Eq. 15, to justify Eq. 16): the +-2wP terms oscillate with the carrier and do not strictly produce such a slow
+    change, but chi_+- already contain the carrier and with a pulse only the envelope (the same f^2) changes:
+    included by extending the chi_0 result, tested against the RT in Sec. 3. Same motivation for the second order
+    terms (+-wP, field envelope f) at the start of their paragraph at the end of Appendix A (W_1 = mean of f,
+    `eq:W1`, `eq:dchi2_accumulated`, marked as not tested).
 - Reduced version of Secs. 1.1-1.3 of the notes: conventions, delta probe, chi^neq and its expansion in the
   susceptibilities (Eqs. 1-11).
 - Sec. 1.4 of the notes (monochromatic pump) is not a separate part: from the general third order expression (Eq. 9,
@@ -83,6 +85,19 @@ Sec. 2 holds the theoretical frame of the article only (the motivation is in the
 
 ### 3. Pump and probe signal at the exciton peak in LiF
 HSEX level only (the IP level is excluded: at most one sentence or the Supplemental Material).
+DRAFTED 2026-11-27 (user's indications): III A model and computational details (DFT: QE 7.0, PBE, 80 Ry,
+a = 7.70 bohr, from the xml of the SAVE of D. Sangalli; scissor 6.0 eV + stretching 1.05; Gamma-centered 16^3, 648
+IBZ points; bands 3-6; HSEX kernel; Lumen 2.1.0 with the Berry phase coupling; RT parameters; chi runs with the
+CRANKNIC energy map; pump intensity in the third order regime from RT 6e9 vs 6e7 x 100), III B spurious second order
+terms (no computational results, user's choice; possibly in an appendix later), III C equilibrium and chi3 (Figs.
+eq_hsex and chi3_hsex of the notes, provisional; IP only as the dotted line of eq_hsex), III D transient response
+(line cuts at tau = -2.91, +0.09, +3.09 fs, envelope at the probe time vs accumulated, numbers of the 5-delay
+analysis; map 6e7 even part vs chi accumulated with the numbers of the dense-delay outcome, AC part and centroid).
+Figures made 2026-11-27 on ismhpc (scripts copied to ~/tmp_claude/paper_work, output ~/tmp_claude/paper_figures):
+`eq_hsex` (Im eps only, column), `chi3_hsex` (page), `dchi_cuts` (Im Delta eps only at tau = -2.91, +0.09, +3.09 fs,
+column), `maps` (page, RT even vs chi accumulated + cut at +0.09 fs); data of the map from `hsex_dense_data` of
+`Notes/make_figures.py` (numbers identical to the notebook; printed in the article convention).
+Ratios of the maxima in the article: chi/RT everywhere (the map numbers of CLAUDE.md are RT/chi: converted).
 - Equilibrium: the exciton, 1 + 4 pi chi1 vs the RT probe-only run (as Fig. 9 of the notes, `fig:eq_hsex`).
 - Meaning of the DC part (chi_0: follows the envelope, cycle average) and of the AC part (chi_+-: oscillations at 2wP,
   seen only with a probe shorter than the pump cycle), with the results for LiF (moved here from Sec. 2).

@@ -429,9 +429,9 @@ def compare(w, y, ref, erange):
     return (np.linalg.norm(y[s] - ref[s]) / np.linalg.norm(ref[s]), np.abs(y[s]).max() / np.abs(ref[s]).max(), shift)
 
 
-def rt_even(pump_int, level='ip'):
+def rt_even(pump_int, level='ip', t_probes=T_PROBES):
     """
-    Even part in the pump field of the RT Delta eps (bands 3-6) at the probe times T_PROBES, from the runs with the pump
+    Even part in the pump field of the RT Delta eps (bands 3-6) at the probe times t_probes, from the runs with the pump
     along +x and -x. Returns the energies (eV), eps_eq of the probe-only run, the list of the even parts, the delays
     (fs), t_P and sigma (fs), E0P (au) and the pump frequency (eV).
     """
@@ -440,7 +440,7 @@ def rt_even(pump_int, level='ip'):
     t_P, sigma = pump_center(ref_p)
     pump = ref_p.Efield2[0]
     even, taus = [], []
-    for tp in T_PROBES:
+    for tp in t_probes:
         run_p, run_m = load_nl(rt_id('3-6', pump_int, tp, level=level)), load_nl(rt_id('3-6', pump_int, tp, True, level))
         even.append((rt_eps(run_p, ref_p)[1] + rt_eps(run_m, ref_m)[1]) / 2 - eps_eq)
         taus.append(run_p.Efield[0]['initial_time'] / Const.FsToAu - t_P)
@@ -677,6 +677,84 @@ def ip_maps_data(out):
                                                                            (-2.9, -1.4, 0.1, 1.6, 3.1)]))
     _ip_maps.update(d)
     return _ip_maps
+
+
+T_PROBES_DENSE = np.round(np.arange(11.0, 21.0 + 1e-6, 0.25), 2)    # probe times of the dense delay grid (fs)
+_hsex_dense = {}
+
+
+def demod_2wp(y, taus, sigma, wP):
+    # complex amplitude a(w) of the 2wP component of y (delays, energies): least squares fit of f^2 Re[a e^{2i wP tau}],
+    # f^2 = exp(-tau^2/sigma^2), on all the delays (as `demod` of hsex_ac_data and of Dchi-neq_Analysis.ipynb)
+    g = np.exp(-taus**2 / sigma**2)
+    return 2 * (y * (g * np.exp(-2j * wP / HB * taus))[:, None]).sum(0) / (g**2).sum()
+
+
+def hsex_dense_data():
+    """
+    Data of the figures of the article on the dense delay grid (HSEX, kx16, bands 3-6, pump 6e7 kW/cm^2 along +x and -x,
+    41 probe times 11-21 fs, tau = -4.91..+5.09 fs; section "Maps vs the delay: RT third order ..." of
+    Dchi-neq_Analysis.ipynb): even part of the RT Delta eps and 4 pi dchi from the HSEX chi (CRANKNIC correction, pump of
+    the RT runs) with the two envelope models, on the output grid w of the chi; Im Delta eps on a 0.02 eV grid in
+    11-17 eV for the maps (chi by cubic spline). Computed once. The printed measures are those of the article: relative
+    difference ||chi - RT|| / ||RT|| and ratio of the maxima chi/RT in 11-17 eV (the notebook divides by the chi and
+    gives RT/chi).
+    """
+    if _hsex_dense:
+        return _hsex_dense
+    E, eps_eq, even, taus, t_P, sigma, E0P, wP = rt_even(6e7, 'hsex', T_PROBES_DENSE)
+    taus = np.array(taus)
+    tr = chi_hsex()
+    w = tr.w
+    models = ['accumulated', 'probe time']
+    rt = np.array([np.interp(w, E, y.real) + 1j * np.interp(w, E, y.imag) for y in even])
+    chi = {m: 4 * np.pi * cranknic_correction(w, tr.dchi(taus, E0P, pump=m, sigma=sigma, wP=wP)[1]) for m in models}
+    tr_ac = O.Transient_Response(tr.freqs, tr.chi1, {(1, 0): tr.chi1, (1, 2): tr.keys[(1, 2)], (1, -2): tr.keys[(1, -2)]},
+                                 tr.E0P, tr.wP, verbose=False)        # chi_0 = 0: only the chi_+- terms (AC part)
+    ac = {m: (4 * np.pi * cranknic_correction(w, tr_ac.dchi(taus, E0P, pump=m, sigma=sigma, wP=wP)[1])).imag
+          for m in models}
+    Em = np.arange(11, 17 + 1e-9, 0.02)
+    d = dict(taus=taus, w=w, rt=rt, chi=chi, ac=ac, Em=Em, E=E, even=even, t_P=t_P, sigma=sigma, wP=wP, E0P=E0P,
+             dim_rt=np.array([np.interp(Em, E, y.imag) for y in even]),
+             dim_chi={m: CubicSpline(w, chi[m].imag, axis=1)(Em) for m in models})
+
+    # printed numbers (11-17 eV on the output grid w)
+    s = (w >= 11) & (w <= 17)
+    wins = {'all': np.ones(len(taus), bool), 'tau < -1.5': taus < -1.5, '|tau| < 1.5': np.abs(taus) < 1.5,
+            'tau > 1.5': taus > 1.5}
+    rel = lambda y, ref, m: np.linalg.norm((y - ref)[m][:, s]) / np.linalg.norm(ref[m][:, s])
+    rmax = lambda y, ref, m: np.abs(y[m][:, s]).max() / np.abs(ref[m][:, s]).max()
+    print('hsex_dense: %d delays %.2f..%.2f fs, E0P %.4e au, sigma %.3f fs, wP %.3f eV, output grid %.2f-%.2f eV'
+          % (len(taus), taus[0], taus[-1], E0P, sigma, wP, w[0], w[-1]))
+    for lab, part in [('Delta eps (complex)', lambda x: x), ('Delta Im eps', np.imag)]:
+        print('maps, %s, chi vs RT even part: rel. difference (/RT) / ratio of the maxima chi/RT' % lab)
+        for m in models:
+            print('  %-11s ' % m + ' | '.join('%s %.2f / %.2f' % (k, rel(part(chi[m]), part(rt), mm),
+                                                                rmax(part(chi[m]), part(rt), mm)) for k, mm in wins.items()))
+    for m in models:
+        per = [(rel(chi[m], rt, np.arange(len(taus)) == i), rmax(chi[m], rt, np.arange(len(taus)) == i))
+               for i in range(len(taus))]
+        print('per delay (%s), rel. difference / ratio of the maxima: ' % m + ', '.join(
+              '%+.2f %.2f/%.2f' % (t, a, b) for t, (a, b) in zip(taus, per)))
+    # oscillating (AC) part: high-pass in the delay of the RT even part vs the same filter on the chi AC part
+    hp_rt = highpass(rt.imag, taus)
+    hp_ac = {m: highpass(ac[m], taus) for m in models}
+    a_rt, a_hp = demod_2wp(hp_rt, taus, sigma, wP), {m: demod_2wp(hp_ac[m], taus, sigma, wP) for m in models}
+    a_ac = demod_2wp(ac['accumulated'], taus, sigma, wP)
+    big = np.abs(a_ac) > 0.5 * np.abs(a_ac).max()
+    cent = lambda y: (taus[:, None] * y[:, s]**2).sum() / (y[:, s]**2).sum()
+    for m in models:
+        print('AC part (%s): RT high-pass vs chi AC high-pass, rel. difference (/RT) / ratio of the norms chi/RT: '
+              % m + ' | '.join('%s %.2f / %.2f' % (k, rel(hp_ac[m], hp_rt, mm), np.linalg.norm(hp_ac[m][mm][:, s])
+                                                  / np.linalg.norm(hp_rt[mm][:, s])) for k, mm in wins.items()))
+    print('AC power vs the delay, centroid: RT %+.2f fs, ' % cent(hp_rt) + ', '.join('chi %s %+.2f fs' % (m, cent(hp_ac[m]))
+                                                                              for m in models))
+    print('2wP component where |a_chi| > max/2 (%.2f-%.2f eV): |a| chi/RT (same filter) %.2f-%.2f (median %.2f), '
+          'max |arg a RT - arg a chi| %.3f rad' % (w[big].min(), w[big].max(), np.abs(a_hp['accumulated'] / a_rt)[big].min(),
+          np.abs(a_hp['accumulated'] / a_rt)[big].max(), np.median(np.abs(a_hp['accumulated'] / a_rt)[big]),
+          np.abs(np.angle(a_rt / a_ac))[big].max()))
+    _hsex_dense.update(d)
+    return _hsex_dense
 
 
 def plot_maps(out, d, name, tau_cut=0.):
